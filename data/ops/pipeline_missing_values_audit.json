@@ -1,0 +1,314 @@
+{
+  "ts": "2026-07-29T16:57:53.586487+00:00",
+  "n_checks": 49,
+  "n_ok": 48,
+  "n_fail": 1,
+  "n_crit_fail": 0,
+  "n_warn_fail": 1,
+  "green": true,
+  "crit_failures": [],
+  "warn_failures": [
+    {
+      "name": "yahoo.SPY_close_nan",
+      "ok": false,
+      "detail": "rows=40 nan_close=1",
+      "severity": "warn"
+    }
+  ],
+  "checks": [
+    {
+      "name": "env.ALPACA_API_KEY",
+      "ok": true,
+      "detail": "value='***REDACTED***'",
+      "severity": "info"
+    },
+    {
+      "name": "env.ALPACA_SECRET_KEY",
+      "ok": true,
+      "detail": "value='***REDACTED***'",
+      "severity": "info"
+    },
+    {
+      "name": "env.FINNHUB_API_KEY",
+      "ok": true,
+      "detail": "value='***REDACTED***'",
+      "severity": "info"
+    },
+    {
+      "name": "env.MATH_P_UP_FLOOR",
+      "ok": true,
+      "detail": "value='0.55'",
+      "severity": "info"
+    },
+    {
+      "name": "env.USE_DOWNWARD_PRESSURE_GATE",
+      "ok": true,
+      "detail": "value='true'",
+      "severity": "info"
+    },
+    {
+      "name": "env.FORTRESS_ALLOW_OVERNIGHT",
+      "ok": true,
+      "detail": "value='true'",
+      "severity": "info"
+    },
+    {
+      "name": "env.USE_MONTHLY_DRAWDOWN_HALT",
+      "ok": true,
+      "detail": "value='true'",
+      "severity": "info"
+    },
+    {
+      "name": "env.MICRO_SCALP_ENABLED",
+      "ok": true,
+      "detail": "value='false'",
+      "severity": "info"
+    },
+    {
+      "name": "env.TALK_ALLOW_EDITS",
+      "ok": true,
+      "detail": "value='false'",
+      "severity": "info"
+    },
+    {
+      "name": "env.NETWORK_FIRST",
+      "ok": true,
+      "detail": "value='true'",
+      "severity": "info"
+    },
+    {
+      "name": "env.DAY_TRADE_MODE",
+      "ok": true,
+      "detail": "value='true'",
+      "severity": "info"
+    },
+    {
+      "name": "env.FORTRESS_STOP_LOSS_PCT",
+      "ok": true,
+      "detail": "value='0.010'",
+      "severity": "info"
+    },
+    {
+      "name": "env.BUY_THRESHOLD",
+      "ok": true,
+      "detail": "value='0.58'",
+      "severity": "info"
+    },
+    {
+      "name": "talk.edits_locked",
+      "ok": true,
+      "detail": "TALK_ALLOW_EDITS=false",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/risk/monthly_equity.json",
+      "ok": true,
+      "detail": "exists=True size=135",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/deploy_scale.env",
+      "ok": true,
+      "detail": "exists=True size=5095",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/policy/runtime_policy_overrides.json",
+      "ok": true,
+      "detail": "exists=True size=365",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/intel/earnings_radar.json",
+      "ok": true,
+      "detail": "exists=True size=8545",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/intel/earnings_time_overrides.json",
+      "ok": true,
+      "detail": "exists=True size=973",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/intel/unique_playbook.json",
+      "ok": true,
+      "detail": "exists=True size=4164",
+      "severity": "info"
+    },
+    {
+      "name": "file.data/algo_risk_config.json",
+      "ok": true,
+      "detail": "exists=True size=986",
+      "severity": "info"
+    },
+    {
+      "name": "risk.peak_equity",
+      "ok": true,
+      "detail": "peak=100000.0 start=78140.0",
+      "severity": "info"
+    },
+    {
+      "name": "risk.month_key",
+      "ok": true,
+      "detail": "month_key=2026-07",
+      "severity": "info"
+    },
+    {
+      "name": "earnings.calendar_exists",
+      "ok": true,
+      "detail": "with_date=5679 with_hour=743",
+      "severity": "info"
+    },
+    {
+      "name": "earnings.sbux_date",
+      "ok": true,
+      "detail": "date=2026-07-29",
+      "severity": "info"
+    },
+    {
+      "name": "earnings.sbux_call_1315_pt",
+      "ok": true,
+      "detail": "call_pt=13:15 hour=amc et=16:15",
+      "severity": "info"
+    },
+    {
+      "name": "earnings.sample_dates",
+      "ok": true,
+      "detail": "ok=5 issues=['AAPL', 'AMZN', 'NVDA']",
+      "severity": "info"
+    },
+    {
+      "name": "models.daily_pkl",
+      "ok": true,
+      "detail": "n_daily=331",
+      "severity": "info"
+    },
+    {
+      "name": "models.dir",
+      "ok": true,
+      "detail": "du_hint=331 pkl",
+      "severity": "info"
+    },
+    {
+      "name": "train.data/train_checkpoint.json",
+      "ok": true,
+      "detail": "keys=['done', 'failed']",
+      "severity": "info"
+    },
+    {
+      "name": "train.data/intraday_train_checkpoint.json",
+      "ok": true,
+      "detail": "keys=['done', 'failed']",
+      "severity": "info"
+    },
+    {
+      "name": "train.data/lstm_train_checkpoint.json",
+      "ok": true,
+      "detail": "keys=['done', 'failed']",
+      "severity": "info"
+    },
+    {
+      "name": "train.data/enhancement_queue_state.json",
+      "ok": true,
+      "detail": "keys=['phase', 'started_at', 'notes', 'finished_at']",
+      "severity": "info"
+    },
+    {
+      "name": "talk.problems_done",
+      "ok": true,
+      "detail": "done=25350000 pct=2.535",
+      "severity": "info"
+    },
+    {
+      "name": "talk.edits_still_locked",
+      "ok": true,
+      "detail": "edits_allowed=False",
+      "severity": "info"
+    },
+    {
+      "name": "alpaca.equity",
+      "ok": true,
+      "detail": "equity=77384.36",
+      "severity": "info"
+    },
+    {
+      "name": "alpaca.status",
+      "ok": true,
+      "detail": "status=ACTIVE",
+      "severity": "info"
+    },
+    {
+      "name": "proc.fortress/intraday",
+      "ok": true,
+      "detail": "pgrep=['15550']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.hft_obi",
+      "ok": true,
+      "detail": "pgrep=['15573']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.day_trade",
+      "ok": true,
+      "detail": "pgrep=['15660']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.weekly",
+      "ok": true,
+      "detail": "pgrep=['15621']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.stack_watchdog",
+      "ok": true,
+      "detail": "pgrep=['15408']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.paper_awake",
+      "ok": true,
+      "detail": "pgrep=['14960']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.talk_overnight",
+      "ok": true,
+      "detail": "pgrep=['60007']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.pattern",
+      "ok": true,
+      "detail": "pgrep=['23742']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.universe_lifecycle",
+      "ok": true,
+      "detail": "pgrep=['15759']",
+      "severity": "info"
+    },
+    {
+      "name": "proc.cramer",
+      "ok": true,
+      "detail": "pgrep=['15837']",
+      "severity": "info"
+    },
+    {
+      "name": "micro_scalp.paused_intentionally",
+      "ok": true,
+      "detail": "MICRO_SCALP_ENABLED=false (paused during bleed)",
+      "severity": "info"
+    },
+    {
+      "name": "yahoo.SPY_close_nan",
+      "ok": false,
+      "detail": "rows=40 nan_close=1",
+      "severity": "warn"
+    }
+  ]
+}

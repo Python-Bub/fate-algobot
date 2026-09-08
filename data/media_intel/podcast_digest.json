@@ -1,0 +1,62 @@
+{
+  "ts": 1788841510.32624,
+  "n": 8,
+  "items": [
+    {
+      "title": "Chancellor calls for 'confidence about Britain' despite 'historic high' borrowing costs",
+      "link": "https://www.bbc.co.uk/news/articles/cgjqg450w28o?at_medium=RSS&at_campaign=rss",
+      "summary": "John Healey detailed plans to spread growth more widely across the UK, ahead of his first Budget.",
+      "sentiment": 0.3333333333333333,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "'I performed on stage to get my first job' - the firms turning recruitment into competitions",
+      "link": "https://www.bbc.co.uk/news/articles/cgk43mn42g7o?at_medium=RSS&at_campaign=rss",
+      "summary": "Applicants have to pitch their ideas on stage in front of a panel of judges and an audience. But is this exciting or unfair?",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "AI cancer cures slowed by chip shortage, says UK's biggest tech boss",
+      "link": "https://www.bbc.co.uk/news/articles/c0m39g7xzevo?at_medium=RSS&at_campaign=rss",
+      "summary": "The head of chip designer Arm says modelling how a DNA marker is impacted by cancer cannot be done now, but computers are \"going to solve it\".",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "Trump threatens to stop sale of Canadian Bombardier jets in US",
+      "link": "https://www.bbc.co.uk/news/articles/c4gj8xx5010o?at_medium=RSS&at_campaign=rss",
+      "summary": "The threat against one of Canada's largest companies comes amid an escalating trade war between the two neighbours.",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "Next wins key appeal to overturn \u00a330m equal pay ruling",
+      "link": "https://www.bbc.co.uk/news/articles/c05r61rqe4yo?at_medium=RSS&at_campaign=rss",
+      "summary": "A judge ruled Next can pay warehouse workers more because it is harder to recruit and retain them.",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "Faisal Islam: Chancellor's attempts to boost vibes may limit tax rises",
+      "link": "https://www.bbc.co.uk/news/articles/c39mz7xlvjzo?at_medium=RSS&at_campaign=rss",
+      "summary": "The new leadership is trying to maintain both confidence and the promotion of economic animal spirits.",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "Why the 'Temu Range Rover' is such a threat to Jaguar Land Rover",
+      "link": "https://www.bbc.co.uk/news/articles/c5y4l22p262o?at_medium=RSS&at_campaign=rss",
+      "summary": "Job cuts come as JLR faces falling sales and intense Chinese competition while trying to switch to electric vehicles.",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    },
+    {
+      "title": "Why are European countries moving their gold out of North America?",
+      "link": "https://www.bbc.co.uk/news/articles/cvgyn8q8gqxo?at_medium=RSS&at_campaign=rss",
+      "summary": "The Netherlands has relocated 86 tonnes of the shiny stuff - what's going on?",
+      "sentiment": 0.0,
+      "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+    }
+  ]
+}

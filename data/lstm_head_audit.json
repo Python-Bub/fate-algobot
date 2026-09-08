@@ -1,0 +1,2502 @@
+{
+  "n_heads": 4376,
+  "n_ok": 4127,
+  "n_weak": 249,
+  "min_acc": 0.45,
+  "by_reason": {
+    "ok": 4127,
+    "weak_test_acc": 249
+  },
+  "weak": [
+    {
+      "ticker": "AAUM",
+      "path": "models/lstm/AAUM_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4000000059604645,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ABT",
+      "path": "models/lstm/ABT_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.38749998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ACOG",
+      "path": "models/lstm/ACOG_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.42424243688583374,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ACRV",
+      "path": "models/lstm/ACRV_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4124999940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ACTU",
+      "path": "models/lstm/ACTU_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3037974536418915,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AFGB",
+      "path": "models/lstm/AFGB_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4171779155731201,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AFGD",
+      "path": "models/lstm/AFGD_lstm.pt",
+      "ok": false,
+      "bytes": 267107,
+      "test_acc": 0.3827160596847534,
+      "feat_cols": 50,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AFJK",
+      "path": "models/lstm/AFJK_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.36936935782432556,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AGIQ",
+      "path": "models/lstm/AGIQ_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.06666667014360428,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AGRZ",
+      "path": "models/lstm/AGRZ_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.1818181872367859,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AINT",
+      "path": "models/lstm/AINT_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.1111111119389534,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AIP",
+      "path": "models/lstm/AIP_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.42500001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AKBA",
+      "path": "models/lstm/AKBA_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.40625,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ALPS",
+      "path": "models/lstm/ALPS_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ALUB",
+      "path": "models/lstm/ALUB_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AMAT",
+      "path": "models/lstm/AMAT_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.25,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AMCI",
+      "path": "models/lstm/AMCI_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3885350227355957,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AMPG",
+      "path": "models/lstm/AMPG_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.35624998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "APP",
+      "path": "models/lstm/APP_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.44999998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "APWC",
+      "path": "models/lstm/APWC_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.44785276055336,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ARAY",
+      "path": "models/lstm/ARAY_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.21250000596046448,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ARKD",
+      "path": "models/lstm/ARKD_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.38461539149284363,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ARKT",
+      "path": "models/lstm/ARKT_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.42307692766189575,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ASRV",
+      "path": "models/lstm/ASRV_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.29447853565216064,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AVNS",
+      "path": "models/lstm/AVNS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.41874998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "AWX",
+      "path": "models/lstm/AWX_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.42331287264823914,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BAMB",
+      "path": "models/lstm/BAMB_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3650793731212616,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BB",
+      "path": "models/lstm/BB_lstm.pt",
+      "ok": false,
+      "bytes": 268607,
+      "test_acc": 0.3913043439388275,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BCG",
+      "path": "models/lstm/BCG_lstm.pt",
+      "ok": false,
+      "bytes": 266065,
+      "test_acc": 0.3163265287876129,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BDL",
+      "path": "models/lstm/BDL_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.4382716119289398,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BGIN",
+      "path": "models/lstm/BGIN_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3913043439388275,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BHP",
+      "path": "models/lstm/BHP_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.23529411852359772,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BLIV",
+      "path": "models/lstm/BLIV_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.23999999463558197,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BLZR",
+      "path": "models/lstm/BLZR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.190476194024086,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BNGE",
+      "path": "models/lstm/BNGE_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.22839505970478058,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BOXA",
+      "path": "models/lstm/BOXA_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.29230770468711853,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BOXL",
+      "path": "models/lstm/BOXL_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.35403725504875183,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BPI",
+      "path": "models/lstm/BPI_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.3529411852359772,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BREE",
+      "path": "models/lstm/BREE_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4444444477558136,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BRFH",
+      "path": "models/lstm/BRFH_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.43558281660079956,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BRK-B",
+      "path": "models/lstm/BRK-B_lstm.pt",
+      "ok": false,
+      "bytes": 269237,
+      "test_acc": 0.3726707994937897,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BVFL",
+      "path": "models/lstm/BVFL_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4285714328289032,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "BWOW",
+      "path": "models/lstm/BWOW_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3888888955116272,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CABR",
+      "path": "models/lstm/CABR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3684210479259491,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CANG",
+      "path": "models/lstm/CANG_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3375000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CBOJ",
+      "path": "models/lstm/CBOJ_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.44999998807907104,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CBOY",
+      "path": "models/lstm/CBOY_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3947368562221527,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CBTL",
+      "path": "models/lstm/CBTL_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.375,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CBXL",
+      "path": "models/lstm/CBXL_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.2916666567325592,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CCO",
+      "path": "models/lstm/CCO_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.4312500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CCXI",
+      "path": "models/lstm/CCXI_lstm.pt",
+      "ok": false,
+      "bytes": 277795,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 60,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CGEN",
+      "path": "models/lstm/CGEN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4000000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CGRO",
+      "path": "models/lstm/CGRO_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.39516130089759827,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CHOW",
+      "path": "models/lstm/CHOW_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CJMB",
+      "path": "models/lstm/CJMB_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.25,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CMCM",
+      "path": "models/lstm/CMCM_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.34355828166007996,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "COIO",
+      "path": "models/lstm/COIO_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.375,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CPSP",
+      "path": "models/lstm/CPSP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.1568627506494522,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CRSH",
+      "path": "models/lstm/CRSH_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.2688172161579132,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "CTWO",
+      "path": "models/lstm/CTWO_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.375,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DDS",
+      "path": "models/lstm/DDS_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.44999998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DIT",
+      "path": "models/lstm/DIT_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.44785276055336,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DLFE",
+      "path": "models/lstm/DLFE_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DOCN",
+      "path": "models/lstm/DOCN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.34375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DSMC",
+      "path": "models/lstm/DSMC_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4049079716205597,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DUNK",
+      "path": "models/lstm/DUNK_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.1785714328289032,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DVDN",
+      "path": "models/lstm/DVDN_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.42975205183029175,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "DXR",
+      "path": "models/lstm/DXR_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.3680981695652008,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EBON",
+      "path": "models/lstm/EBON_lstm.pt",
+      "ok": false,
+      "bytes": 279907,
+      "test_acc": 0.23312883079051971,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ED",
+      "path": "models/lstm/ED_lstm.pt",
+      "ok": false,
+      "bytes": 278207,
+      "test_acc": 0.386904776096344,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EHTH",
+      "path": "models/lstm/EHTH_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.42500001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EMIS",
+      "path": "models/lstm/EMIS_lstm.pt",
+      "ok": false,
+      "bytes": 277795,
+      "test_acc": 0.260869562625885,
+      "feat_cols": 60,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ENSC",
+      "path": "models/lstm/ENSC_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.36250001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EPIN",
+      "path": "models/lstm/EPIN_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4047619104385376,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EQS",
+      "path": "models/lstm/EQS_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.4049079716205597,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ESLG",
+      "path": "models/lstm/ESLG_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.23999999463558197,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ETTY",
+      "path": "models/lstm/ETTY_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4399999976158142,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EVGO",
+      "path": "models/lstm/EVGO_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3187499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "EXTR",
+      "path": "models/lstm/EXTR_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.33125001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FATE",
+      "path": "models/lstm/FATE_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.38749998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FATN",
+      "path": "models/lstm/FATN_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.08510638028383255,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FDBC",
+      "path": "models/lstm/FDBC_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.38036808371543884,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FITBO",
+      "path": "models/lstm/FITBO_lstm.pt",
+      "ok": false,
+      "bytes": 279925,
+      "test_acc": 0.4171779155731201,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FMFC",
+      "path": "models/lstm/FMFC_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.2777777910232544,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FMQQ",
+      "path": "models/lstm/FMQQ_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.23170731961727142,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FMY",
+      "path": "models/lstm/FMY_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.4110429584980011,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FNWB",
+      "path": "models/lstm/FNWB_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FRMM",
+      "path": "models/lstm/FRMM_lstm.pt",
+      "ok": false,
+      "bytes": 279907,
+      "test_acc": 0.1463414579629898,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FTHM",
+      "path": "models/lstm/FTHM_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3812499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "FTLF",
+      "path": "models/lstm/FTLF_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.19631901383399963,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GAIA",
+      "path": "models/lstm/GAIA_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.19254659116268158,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GAING",
+      "path": "models/lstm/GAING_lstm.pt",
+      "ok": false,
+      "bytes": 276725,
+      "test_acc": 0.1111111119389534,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GALT",
+      "path": "models/lstm/GALT_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3913043439388275,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GAMR",
+      "path": "models/lstm/GAMR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.35975611209869385,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GDRX",
+      "path": "models/lstm/GDRX_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3499999940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GFS",
+      "path": "models/lstm/GFS_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.3187499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GGME",
+      "path": "models/lstm/GGME_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.37195122241973877,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GIGM",
+      "path": "models/lstm/GIGM_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.4049079716205597,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GLBS",
+      "path": "models/lstm/GLBS_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.3987730145454407,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GNSS",
+      "path": "models/lstm/GNSS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.41874998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GOSS",
+      "path": "models/lstm/GOSS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.29192546010017395,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GROW",
+      "path": "models/lstm/GROW_lstm.pt",
+      "ok": false,
+      "bytes": 279907,
+      "test_acc": 0.4146341383457184,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GRX",
+      "path": "models/lstm/GRX_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.44785276055336,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "GXPE",
+      "path": "models/lstm/GXPE_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4444444477558136,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "HERE",
+      "path": "models/lstm/HERE_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.18471337854862213,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "HFMF",
+      "path": "models/lstm/HFMF_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.2702702581882477,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "HOII",
+      "path": "models/lstm/HOII_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4285714328289032,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "HSPT",
+      "path": "models/lstm/HSPT_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.43103447556495667,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "HYFM",
+      "path": "models/lstm/HYFM_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.4049079716205597,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ICCC",
+      "path": "models/lstm/ICCC_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.4171779155731201,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ICCM",
+      "path": "models/lstm/ICCM_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.26249998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "IGCB",
+      "path": "models/lstm/IGCB_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4202898442745209,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "IPSC",
+      "path": "models/lstm/IPSC_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.32499998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "IQ",
+      "path": "models/lstm/IQ_lstm.pt",
+      "ok": false,
+      "bytes": 268607,
+      "test_acc": 0.4000000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ISSB",
+      "path": "models/lstm/ISSB_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.0,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ITOL",
+      "path": "models/lstm/ITOL_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.11999999731779099,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "IWFL",
+      "path": "models/lstm/IWFL_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.43292683362960815,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "JENA",
+      "path": "models/lstm/JENA_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "JFIN",
+      "path": "models/lstm/JFIN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.44720497727394104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "JHS",
+      "path": "models/lstm/JHS_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.44171780347824097,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "JPO",
+      "path": "models/lstm/JPO_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.44186046719551086,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "JRE",
+      "path": "models/lstm/JRE_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.39024388790130615,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "KFRC",
+      "path": "models/lstm/KFRC_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3812499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "KORE",
+      "path": "models/lstm/KORE_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.07500000298023224,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "KO",
+      "path": "models/lstm/KO_lstm.pt",
+      "ok": false,
+      "bytes": 268607,
+      "test_acc": 0.36250001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "KRMD",
+      "path": "models/lstm/KRMD_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4312500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LBRDP",
+      "path": "models/lstm/LBRDP_lstm.pt",
+      "ok": false,
+      "bytes": 279925,
+      "test_acc": 0.32926830649375916,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LFAI",
+      "path": "models/lstm/LFAI_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3717948794364929,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LFDR",
+      "path": "models/lstm/LFDR_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.27659574151039124,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LFT",
+      "path": "models/lstm/LFT_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.2562499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LGCB",
+      "path": "models/lstm/LGCB_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.2142857164144516,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LLY",
+      "path": "models/lstm/LLY_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.4312500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LOAN",
+      "path": "models/lstm/LOAN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.2777777910232544,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LONA",
+      "path": "models/lstm/LONA_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.375,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LPSN",
+      "path": "models/lstm/LPSN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.2750000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "LTTI",
+      "path": "models/lstm/LTTI_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3035714328289032,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MAAS",
+      "path": "models/lstm/MAAS_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.23926380276679993,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MCOW",
+      "path": "models/lstm/MCOW_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.22580644488334656,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MCW",
+      "path": "models/lstm/MCW_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.3812499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MHNC",
+      "path": "models/lstm/MHNC_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.31707316637039185,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MIN",
+      "path": "models/lstm/MIN_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.31677019596099854,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MLDR",
+      "path": "models/lstm/MLDR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3417721390724182,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MLP",
+      "path": "models/lstm/MLP_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.44171780347824097,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MNTK",
+      "path": "models/lstm/MNTK_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4312500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MPLY",
+      "path": "models/lstm/MPLY_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.35555556416511536,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MPV",
+      "path": "models/lstm/MPV_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.3680981695652008,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MRNO",
+      "path": "models/lstm/MRNO_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4437499940395355,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MSFY",
+      "path": "models/lstm/MSFY_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3196721374988556,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MSGY",
+      "path": "models/lstm/MSGY_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.38235294818878174,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MSN",
+      "path": "models/lstm/MSN_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.4049079716205597,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MUNA",
+      "path": "models/lstm/MUNA_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.0,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "MUSQ",
+      "path": "models/lstm/MUSQ_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4492753744125366,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NAUT",
+      "path": "models/lstm/NAUT_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3062500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NBTR",
+      "path": "models/lstm/NBTR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4307692348957062,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NCEW",
+      "path": "models/lstm/NCEW_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.0,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NEE",
+      "path": "models/lstm/NEE_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.32499998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NEON",
+      "path": "models/lstm/NEON_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.41874998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NEPH",
+      "path": "models/lstm/NEPH_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.39263802766799927,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NEWTO",
+      "path": "models/lstm/NEWTO_lstm.pt",
+      "ok": false,
+      "bytes": 276725,
+      "test_acc": 0.1111111119389534,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NFLX",
+      "path": "models/lstm/NFLX_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.23749999701976776,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NIXX",
+      "path": "models/lstm/NIXX_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.40625,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NOVP",
+      "path": "models/lstm/NOVP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.42553192377090454,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NUKX",
+      "path": "models/lstm/NUKX_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.1111111119389534,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "NVNO",
+      "path": "models/lstm/NVNO_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3354037404060364,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "OILT",
+      "path": "models/lstm/OILT_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.365217387676239,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "OPHC",
+      "path": "models/lstm/OPHC_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.24539877474308014,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ORO",
+      "path": "models/lstm/ORO_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.17391304671764374,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "OSRH",
+      "path": "models/lstm/OSRH_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.42953020334243774,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "OVID",
+      "path": "models/lstm/OVID_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "OYSER",
+      "path": "models/lstm/OYSER_lstm.pt",
+      "ok": false,
+      "bytes": 276725,
+      "test_acc": 0.29729729890823364,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PASW",
+      "path": "models/lstm/PASW_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3125,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PBOT",
+      "path": "models/lstm/PBOT_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.0416666679084301,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PCAP",
+      "path": "models/lstm/PCAP_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.0833333358168602,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PCCE",
+      "path": "models/lstm/PCCE_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.42718446254730225,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PCGG",
+      "path": "models/lstm/PCGG_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.40458014607429504,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PDD",
+      "path": "models/lstm/PDD_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.34375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PLMK",
+      "path": "models/lstm/PLMK_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.38983049988746643,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PMTR",
+      "path": "models/lstm/PMTR_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.02500000037252903,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "POM",
+      "path": "models/lstm/POM_lstm.pt",
+      "ok": false,
+      "bytes": 266065,
+      "test_acc": 0.2857142984867096,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PPT",
+      "path": "models/lstm/PPT_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.4409937858581543,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "PRHI",
+      "path": "models/lstm/PRHI_lstm.pt",
+      "ok": false,
+      "bytes": 279907,
+      "test_acc": 0.4110429584980011,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "QSOL",
+      "path": "models/lstm/QSOL_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.2142857164144516,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RADX",
+      "path": "models/lstm/RADX_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3174603283405304,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RBBN",
+      "path": "models/lstm/RBBN_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RCTR",
+      "path": "models/lstm/RCTR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3142857253551483,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "REAX",
+      "path": "models/lstm/REAX_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.38749998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "REED",
+      "path": "models/lstm/REED_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.43558281660079956,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RILYL",
+      "path": "models/lstm/RILYL_lstm.pt",
+      "ok": false,
+      "bytes": 269237,
+      "test_acc": 0.395061731338501,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RMCO",
+      "path": "models/lstm/RMCO_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.42073169350624084,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RMSG",
+      "path": "models/lstm/RMSG_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4409937858581543,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "ROC",
+      "path": "models/lstm/ROC_lstm.pt",
+      "ok": false,
+      "bytes": 279889,
+      "test_acc": 0.4444444477558136,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RVP",
+      "path": "models/lstm/RVP_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.4451219439506531,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RWTQ",
+      "path": "models/lstm/RWTQ_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RYDE",
+      "path": "models/lstm/RYDE_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4356435537338257,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "RZLV",
+      "path": "models/lstm/RZLV_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.44999998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SABR",
+      "path": "models/lstm/SABR_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4437499940395355,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SCAP",
+      "path": "models/lstm/SCAP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4396551847457886,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SCOW",
+      "path": "models/lstm/SCOW_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4193548262119293,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SELF",
+      "path": "models/lstm/SELF_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.4268292784690857,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SIEB",
+      "path": "models/lstm/SIEB_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.32919254899024963,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SMRF",
+      "path": "models/lstm/SMRF_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.4444444477558136,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SNT",
+      "path": "models/lstm/SNT_lstm.pt",
+      "ok": false,
+      "bytes": 278801,
+      "test_acc": 0.3048780560493469,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SRTS",
+      "path": "models/lstm/SRTS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.44999998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "STHH",
+      "path": "models/lstm/STHH_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.0,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "STKS",
+      "path": "models/lstm/STKS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.40993788838386536,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "SXQG",
+      "path": "models/lstm/SXQG_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.44785276055336,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TEC",
+      "path": "models/lstm/TEC_lstm.pt",
+      "ok": false,
+      "bytes": 266065,
+      "test_acc": 0.4166666567325592,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TGE",
+      "path": "models/lstm/TGE_lstm.pt",
+      "ok": false,
+      "bytes": 267089,
+      "test_acc": 0.38461539149284363,
+      "feat_cols": 50,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "THNR",
+      "path": "models/lstm/THNR_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.41489362716674805,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TLIH",
+      "path": "models/lstm/TLIH_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4117647111415863,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TLNC",
+      "path": "models/lstm/TLNC_lstm.pt",
+      "ok": false,
+      "bytes": 279907,
+      "test_acc": 0.20000000298023224,
+      "feat_cols": 62,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TLTX",
+      "path": "models/lstm/TLTX_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.2702702581882477,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TLYS",
+      "path": "models/lstm/TLYS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.42500001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TMH",
+      "path": "models/lstm/TMH_lstm.pt",
+      "ok": false,
+      "bytes": 266065,
+      "test_acc": 0.11538461595773697,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TMLP",
+      "path": "models/lstm/TMLP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4285714328289032,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TMUS",
+      "path": "models/lstm/TMUS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.40625,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TNUK",
+      "path": "models/lstm/TNUK_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.0,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TOPP",
+      "path": "models/lstm/TOPP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.19672131538391113,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TORO",
+      "path": "models/lstm/TORO_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.29801324009895325,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TPRY",
+      "path": "models/lstm/TPRY_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.3333333432674408,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TSLA",
+      "path": "models/lstm/TSLA_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4375,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TSLP",
+      "path": "models/lstm/TSLP_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.41803279519081116,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TSXD",
+      "path": "models/lstm/TSXD_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.1538461595773697,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TTXD",
+      "path": "models/lstm/TTXD_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.0,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "TXBC",
+      "path": "models/lstm/TXBC_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4000000059604645,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UBER",
+      "path": "models/lstm/UBER_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.3375000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UCAR",
+      "path": "models/lstm/UCAR_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.4275861978530884,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UCIB",
+      "path": "models/lstm/UCIB_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.23170731961727142,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UFG",
+      "path": "models/lstm/UFG_lstm.pt",
+      "ok": false,
+      "bytes": 266065,
+      "test_acc": 0.3965517282485962,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "USLN",
+      "path": "models/lstm/USLN_lstm.pt",
+      "ok": false,
+      "bytes": 275683,
+      "test_acc": 0.1111111119389534,
+      "feat_cols": 58,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UST",
+      "path": "models/lstm/UST_lstm.pt",
+      "ok": false,
+      "bytes": 276689,
+      "test_acc": 0.4390243887901306,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "UWMC",
+      "path": "models/lstm/UWMC_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.38749998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VALU",
+      "path": "models/lstm/VALU_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.28834354877471924,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VIVK",
+      "path": "models/lstm/VIVK_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3827160596847534,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VNRX",
+      "path": "models/lstm/VNRX_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.30000001192092896,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VNTG",
+      "path": "models/lstm/VNTG_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.42105263471603394,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VSH",
+      "path": "models/lstm/VSH_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.3375000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "VVOS",
+      "path": "models/lstm/VVOS_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.32499998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WAFU",
+      "path": "models/lstm/WAFU_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.4390243887901306,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WATT",
+      "path": "models/lstm/WATT_lstm.pt",
+      "ok": false,
+      "bytes": 269219,
+      "test_acc": 0.4312500059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WIMI",
+      "path": "models/lstm/WIMI_lstm.pt",
+      "ok": false,
+      "bytes": 267107,
+      "test_acc": 0.39375001192092896,
+      "feat_cols": 50,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WISD",
+      "path": "models/lstm/WISD_lstm.pt",
+      "ok": false,
+      "bytes": 276707,
+      "test_acc": 0.31111112236976624,
+      "feat_cols": 59,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WOLF",
+      "path": "models/lstm/WOLF_lstm.pt",
+      "ok": false,
+      "bytes": 268195,
+      "test_acc": 0.3913043439388275,
+      "feat_cols": 51,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "WYHG",
+      "path": "models/lstm/WYHG_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.29230770468711853,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "XOM",
+      "path": "models/lstm/XOM_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.4000000059604645,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "XRPR",
+      "path": "models/lstm/XRPR_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.3199999928474426,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "YDKG",
+      "path": "models/lstm/YDKG_lstm.pt",
+      "ok": false,
+      "bytes": 266083,
+      "test_acc": 0.23749999701976776,
+      "feat_cols": 49,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "YRD",
+      "path": "models/lstm/YRD_lstm.pt",
+      "ok": false,
+      "bytes": 269201,
+      "test_acc": 0.41874998807907104,
+      "feat_cols": 52,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    },
+    {
+      "ticker": "YTRA",
+      "path": "models/lstm/YTRA_lstm.pt",
+      "ok": false,
+      "bytes": 278819,
+      "test_acc": 0.42331287264823914,
+      "feat_cols": 61,
+      "seq_len": 30,
+      "reason": "weak_test_acc"
+    }
+  ]
+}

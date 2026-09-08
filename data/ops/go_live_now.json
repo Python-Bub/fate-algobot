@@ -1,0 +1,30 @@
+{
+  "ts_utc": "2026-08-17T17:03:03.592896+00:00",
+  "mode": "alpaca_paper_fully_live",
+  "funded_live": false,
+  "alpaca_base": "https://paper-api.alpaca.markets",
+  "paper": true,
+  "policy": {
+    "BUY_THRESHOLD": 0.58,
+    "ORDER_NOTIONAL": 2500.0,
+    "MIN_MODEL_CONFIDENCE": 0.58,
+    "note": "go_autonomous \u2014 trade-enabled; policy agent capped",
+    "updated_at_utc": "2026-08-17T17:03:03.027575+00:00",
+    "autonomous": true
+  },
+  "johnston_missing": [],
+  "core_families_missing": [],
+  "account": {
+    "equity": "72057.25",
+    "buying_power": "218854.64",
+    "status": "ACTIVE",
+    "pattern_day_trader": null,
+    "trading_blocked": false
+  },
+  "note": "Orders route to Alpaca paper. Funded live requires ALPACA_BASE_URL=https://api.alpaca.markets and explicit operator confirm.",
+  "do_not": [
+    "flatten overnight holds",
+    "shrink universe",
+    "disable HFT/day-trade/fortress"
+  ]
+}

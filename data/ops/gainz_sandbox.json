@@ -1,0 +1,43 @@
+{
+  "generation": 17963,
+  "best_score": 1.0,
+  "escapes": 0,
+  "returns": 0,
+  "last_score": {
+    "score": 1.0,
+    "teacher_side": "sell",
+    "student_side": "sell",
+    "teacher_conf": 0.8333333333333334,
+    "student_conf": 1.0,
+    "layers": 5,
+    "n_cases": 5,
+    "pairs": [
+      {
+        "teacher": "none",
+        "student": "none",
+        "seed": 7
+      },
+      {
+        "teacher": "buy",
+        "student": "buy",
+        "seed": 3
+      },
+      {
+        "teacher": "sell",
+        "student": "sell",
+        "seed": 11
+      },
+      {
+        "teacher": "buy",
+        "student": "buy",
+        "seed": 19
+      },
+      {
+        "teacher": "sell",
+        "student": "sell",
+        "seed": 29
+      }
+    ]
+  },
+  "updated": 1788845656.898966
+}

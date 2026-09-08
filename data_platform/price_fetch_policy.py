@@ -1,0 +1,97 @@
+"""Shared price-fetch policy — Polygon-first, throttled Yahoo, cache."""
+
+from __future__ import annotations
+
+import os
+
+
+def polygon_configured() -> bool:
+    return bool(os.getenv("POLYGON_API_KEY", "").strip())
+
+
+def use_yahoo_first() -> bool:
+    if os.getenv("USE_YAHOO_ONLY", "false").lower() in ("1", "true", "yes"):
+        return True
+    return os.getenv("USE_YAHOO_FIRST", "true").lower() in ("1", "true", "yes")
+
+
+def use_polygon_first() -> bool:
+    if not polygon_configured():
+        return False
+    # Explicit USE_POLYGON_FIRST wins over the Yahoo-first default.
+    if os.getenv("USE_POLYGON_FIRST", "false").lower() in ("1", "true", "yes"):
+        return True
+    if use_yahoo_first():
+        return False
+    return False
+
+
+def force_yahoo_prices(*, training: bool = False) -> bool:
+    if os.getenv("FORCE_YAHOO_PRICES", "false").lower() in ("1", "true", "yes"):
+        return True
+    if training and os.getenv("TRAIN_FORCE_YAHOO", "false").lower() in ("1", "true", "yes"):
+        return True
+    if os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes"):
+        if os.getenv("PAPER_SIM_FORCE_YAHOO", "false").lower() in ("1", "true", "yes"):
+            return True
+    return False
+
+
+def apply_price_env_defaults(*, training: bool = False) -> None:
+    """Yahoo-first by default (reliable, uncapped). Set USE_POLYGON_FIRST=true for Polygon."""
+    os.environ.setdefault("USE_PRICE_CACHE", "true")
+    if use_polygon_first() and not force_yahoo_prices(training=training):
+        os.environ["PRICE_DATA_SOURCE"] = "hybrid_polygon"
+        os.environ["FORCE_YAHOO_PRICES"] = "false"
+        os.environ["SKIP_YAHOO_FALLBACK"] = "true"
+        os.environ["PAPER_SIM_FORCE_YAHOO"] = "false"
+        if training:
+            os.environ["TRAIN_FORCE_YAHOO"] = "false"
+        return
+    if use_yahoo_first() or force_yahoo_prices(training=training):
+        os.environ["PRICE_DATA_SOURCE"] = "yfinance"
+        os.environ["FORCE_YAHOO_PRICES"] = "true"
+        os.environ["SKIP_YAHOO_FALLBACK"] = "false"
+        if training:
+            os.environ["TRAIN_FORCE_YAHOO"] = "true"
+        return
+    if not polygon_configured():
+        os.environ["PRICE_DATA_SOURCE"] = "yfinance"
+        os.environ["FORCE_YAHOO_PRICES"] = "true"
+        return
+    os.environ["PRICE_DATA_SOURCE"] = "hybrid_polygon"
+    os.environ["FORCE_YAHOO_PRICES"] = "false"
+    os.environ["SKIP_YAHOO_FALLBACK"] = "true"
+    os.environ["PAPER_SIM_FORCE_YAHOO"] = "false"
+    if training:
+        os.environ["TRAIN_FORCE_YAHOO"] = "false"
+
+
+def price_fetch_blocking() -> bool:
+    if os.getenv("PRICE_FETCH_BLOCK", "true").lower() in ("1", "true", "yes"):
+        return True
+    return os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes")
+
+
+def skip_yahoo_fallback() -> bool:
+    if force_yahoo_prices():
+        return False
+    if os.getenv("SKIP_YAHOO_FALLBACK", "true").lower() not in ("1", "true", "yes"):
+        return False
+    if use_polygon_first():
+        return True
+    src = os.getenv("PRICE_DATA_SOURCE", "").strip().lower()
+    return src in ("hybrid_polygon", "hybrid_alpaca")
+
+
+def paper_sim_skip_yahoo_fallback() -> bool:
+    """Back-compat alias."""
+    if os.getenv("PAPER_SIM_FORCE_YAHOO", "false").lower() in ("1", "true", "yes"):
+        return False
+    if os.getenv("PAPER_SIM_SKIP_YAHOO_FALLBACK", "true").lower() not in ("1", "true", "yes"):
+        return skip_yahoo_fallback()
+    return skip_yahoo_fallback() or os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )

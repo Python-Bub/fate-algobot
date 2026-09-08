@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "updated_note": "Context-aware pre-trade gates: M&A caps, sector clusters, manual acquisition locks.",
+  "pending_acquisitions": {
+    "TMHC": {
+      "status": "definitive",
+      "acquirer": "Berkshire Hathaway",
+      "offer_price": 72.5,
+      "currency": "USD",
+      "note": "All-cash acquisition — upside capped at offer; dead money for multi-week holds."
+    }
+  },
+  "sector_clusters": {
+    "AI_INFRA": ["PLTR", "ORCL", "NVDA", "MSFT", "AMZN", "AVGO", "CRM", "SNOW"]
+  },
+  "cluster_leaders": {
+    "AI_INFRA": ["ORCL", "MSFT", "NVDA"]
+  },
+  "sympathy_map": {
+    "PLTR": ["ORCL", "NVDA", "MSFT"],
+    "AVGO": ["NVDA", "AMD", "SMCI"],
+    "SNOW": ["ORCL", "MSFT", "NVDA"],
+    "CRM": ["ORCL", "MSFT"]
+  },
+  "panic_limit_entries": {
+    "AVGO": {
+      "weekly_drop_pct": 5.0,
+      "daily_drop_pct": 5.0,
+      "limit_low": 370.0,
+      "limit_high": 375.0,
+      "note": "Post-panic horizontal support — limit band vs blind market open"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "updated_ms": 1788754034721,
+  "updated_utc": "2026-09-07T04:07:14.721065+00:00",
+  "host": "paper-api.alpaca.markets",
+  "url": "https://paper-api.alpaca.markets/v2/clock",
+  "path": "tcp_connect preferred (HTTP RTT inflated by SSL/VPN stalls)",
+  "tcp_connect_ms": {
+    "mean": 88.86,
+    "p50": 86.74,
+    "p95": 107.85,
+    "min": 78.88,
+    "max": 107.85,
+    "n": 12
+  },
+  "http_rtt_ms": {
+    "mean": 268.95,
+    "p50": 266.28,
+    "p95": 334.85,
+    "min": 241.37,
+    "max": 334.85,
+    "n": 12
+  },
+  "rtt_ms_p50": 86.74,
+  "rtt_ms_p95": 107.85,
+  "rtt_ms_mean": 268.95,
+  "recommended_budget_ms": 113,
+  "samples": 12,
+  "note": "HFT uses recommended_budget_ms (capped) for gates; raw HTTP may be VPN-inflated."
+}

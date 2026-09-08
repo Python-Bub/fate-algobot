@@ -1,0 +1,1016 @@
+{
+"symbols": {
+"TROT": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"IACO": {
+"reason": "insufficient_data",
+"rows": 47
+},
+"SBXE": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"XLIX": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"ABUF": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"BUYB": {
+"reason": "insufficient_data",
+"rows": 29
+},
+"FEIG": {
+"reason": "insufficient_data",
+"rows": 21
+},
+"MUND": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"PCLC": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"RMCA": {
+"reason": "insufficient_data",
+"rows": 46
+},
+"STYL": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"TINS": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"CHTRP": {
+"reason": "insufficient_data",
+"rows": 117
+},
+"GECCO": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"AACO": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"XHYD": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"BANFP": {
+"reason": "insufficient_data",
+"rows": 13
+},
+"CRAQR": {
+"reason": "insufficient_data",
+"rows": 45
+},
+"FSHPR": {
+"reason": "insufficient_data",
+"rows": 34
+},
+"IPOD": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"LFBE": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"MOTO": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"PMJA": {
+"reason": "insufficient_data",
+"rows": 30
+},
+"SCMY": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"EAOM": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"BHAV": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"CARK": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"EPMV": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"FCFY": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"GSKH": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"RESM": {
+"reason": "insufficient_data",
+"rows": 90
+},
+"IBAC": {
+"reason": "insufficient_data",
+"rows": 29
+},
+"LOPP": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"MESH": {
+"reason": "insufficient_data",
+"rows": 33
+},
+"SSMG": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"TEMR": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"XHOA": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"AAUM": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"BBLB": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"CHNL": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"PCEB": {
+"reason": "insufficient_data",
+"rows": 57
+},
+"EBIT": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"IGACR": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"LSEQ": {
+"reason": "insufficient_data",
+"rows": 22
+},
+"IRHO": {
+"reason": "insufficient_data",
+"rows": 41
+},
+"SAPH": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"XDAT": {
+"reason": "insufficient_data",
+"rows": 19
+},
+"XHYC": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"BWIV": {
+"reason": "insufficient_data",
+"rows": 5
+},
+"CIEI": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"MEGX": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"ESBG": {
+"reason": "insufficient_data",
+"rows": 53
+},
+"GXUS": {
+"reason": "insufficient_data",
+"rows": 41
+},
+"LVLN": {
+"reason": "insufficient_data",
+"rows": 29
+},
+"MBNE": {
+"reason": "insufficient_data",
+"rows": 46
+},
+"PMMR": {
+"reason": "insufficient_data",
+"rows": 30
+},
+"SGRW": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"TOT": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"XCBE": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"AACPR": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"INDE": {
+"reason": "insufficient_data",
+"rows": 58
+},
+"BOXA": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"GTOH": {
+"reason": "insufficient_data",
+"rows": 31
+},
+"GIXXR": {
+"reason": "insufficient_data",
+"rows": 28
+},
+"IWDL": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"LCO": {
+"reason": "insufficient_data",
+"rows": 5
+},
+"MYX": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"ARLI": {
+"reason": "insufficient_data",
+"rows": 19
+},
+"PBMR": {
+"reason": "insufficient_data",
+"rows": 73
+},
+"TIIV": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"TPFG": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"XHYF": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"ARKI": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"CABZ": {
+"reason": "insufficient_data",
+"rows": 48
+},
+"GJR": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"IOR": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"LAPR": {
+"reason": "insufficient_data",
+"rows": 49
+},
+"MLCIL": {
+"reason": "insufficient_data",
+"rows": 27
+},
+"PZIV": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"STBQ": {
+"reason": "insufficient_data",
+"rows": 18
+},
+"TABD": {
+"reason": "insufficient_data",
+"rows": 21
+},
+"XHYH": {
+"reason": "insufficient_data",
+"rows": 57
+},
+"AGRH": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"EAOA": {
+"reason": "insufficient_data",
+"rows": 22
+},
+"GJH": {
+"reason": "insufficient_data",
+"rows": 39
+},
+"IWFG": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"MRGR": {
+"reason": "insufficient_data",
+"rows": 41
+},
+"ARCM": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"PRIZ": {
+"reason": "insufficient_data",
+"rows": 38
+},
+"TYYY": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"XCOM": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"BFJL": {
+"reason": "insufficient_data",
+"rows": 19
+},
+"BILD": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"CDEI": {
+"reason": "insufficient_data",
+"rows": 23
+},
+"GJP": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"ILLU": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"MMTX": {
+"reason": "insufficient_data",
+"rows": 31
+},
+"SPYA": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"SENEB": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"PMNV": {
+"reason": "insufficient_data",
+"rows": 19
+},
+"ARTC": {
+"reason": "insufficient_data",
+"rows": 34
+},
+"TEMD": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"BROL": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"CVSM": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"GVUS": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"CBOA": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"IPEXR": {
+"reason": "insufficient_data",
+"rows": 50
+},
+"MNSBP": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"SPDG": {
+"reason": "insufficient_data",
+"rows": 24
+},
+"TFJL": {
+"reason": "insufficient_data",
+"rows": 111
+},
+"XLBX": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"AFGR": {
+"reason": "insufficient_data",
+"rows": 70
+},
+"BREW": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"CPSP": {
+"reason": "insufficient_data",
+"rows": 99
+},
+"INFH": {
+"reason": "insufficient_data",
+"rows": 481
+},
+"MANI": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"PSMJ": {
+"reason": "insufficient_data",
+"rows": 52
+},
+"SNPD": {
+"reason": "insufficient_data",
+"rows": 38
+},
+"TXBC": {
+"reason": "insufficient_data",
+"rows": 54
+},
+"XTAP": {
+"reason": "insufficient_data",
+"rows": 34
+},
+"ALOV": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"XKRE": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"AGRW": {
+"reason": "insufficient_data",
+"rows": 21
+},
+"BAY": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"IMPPP": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"MUSE": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"PSCQ": {
+"reason": "insufficient_data",
+"rows": 34
+},
+"SURE": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"PCFI": {
+"reason": "insufficient_data",
+"rows": 34
+},
+"TIPA": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"ARWG": {
+"reason": "insufficient_data",
+"rows": 21
+},
+"CBTA": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"GENW": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"IVRS": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"MEMY": {
+"reason": "insufficient_data",
+"rows": 64
+},
+"PSMR": {
+"reason": "insufficient_data",
+"rows": 80
+},
+"GSRFR": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"SCII": {
+"reason": "insufficient_data",
+"rows": 42
+},
+"TSCV": {
+"reason": "insufficient_data",
+"rows": 64
+},
+"CAS": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"BPH": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"GSIG": {
+"reason": "insufficient_data",
+"rows": 37
+},
+"IQSM": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"MARU": {
+"reason": "insufficient_data",
+"rows": 99
+},
+"GARA": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"SCLZ": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"CVGD": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"TEC": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"SPXE": {
+"reason": "insufficient_data",
+"rows": 43
+},
+"BFJA": {
+"reason": "insufficient_data",
+"rows": 11
+},
+"GMUN": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"BWTG": {
+"reason": "insufficient_data",
+"rows": 35
+},
+"IQHI": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"PMAP": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"STAX": {
+"reason": "insufficient_data",
+"rows": 28
+},
+"AUSM": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"AACP": {
+"reason": "insufficient_data",
+"rows": 36
+},
+"BRCE": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"IBFR": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"ACGC": {
+"reason": "insufficient_data",
+"rows": 26
+},
+"MAKX": {
+"reason": "insufficient_data",
+"rows": 36
+},
+"SSCP": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"TWLV": {
+"reason": "insufficient_data",
+"rows": 15
+},
+"ALUB": {
+"reason": "insufficient_data",
+"rows": 23
+},
+"BREZ": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"TCBS": {
+"reason": "insufficient_data",
+"rows": 29
+},
+"CBXY": {
+"reason": "insufficient_data",
+"rows": 74
+},
+"MLDR": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"PCLO": {
+"reason": "insufficient_data",
+"rows": 96
+},
+"SIFI": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"TREO": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"ABXB": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"CLOC": {
+"reason": "insufficient_data",
+"rows": 26
+},
+"MIDE": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"PCSG": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"SASS": {
+"reason": "insufficient_data",
+"rows": 23
+},
+"TBFC": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"AV": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"CBOT": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"MSTQ": {
+"reason": "insufficient_data",
+"rows": 36
+},
+"PEVC": {
+"reason": "insufficient_data",
+"rows": 33
+},
+"SPEG": {
+"reason": "insufficient_data",
+"rows": 21
+},
+"TRNI": {
+"reason": "insufficient_data",
+"rows": 134
+},
+"CPSO": {
+"reason": "insufficient_data",
+"rows": 75
+},
+"MAUG": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"PSCX": {
+"reason": "insufficient_data",
+"rows": 82
+},
+"ICRC": {
+"reason": "insufficient_data",
+"rows": 11
+},
+"SRHR": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"ATTR": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"CAQ": {
+"reason": "insufficient_data",
+"rows": 6
+},
+"CAPN": {
+"reason": "insufficient_data",
+"rows": 47
+},
+"ACVT": {
+"reason": "insufficient_data",
+"rows": 140
+},
+"MDEV": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"TEMX": {
+"reason": "insufficient_data",
+"rows": 5
+},
+"ACSV": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"TIPC": {
+"reason": "insufficient_data",
+"rows": 2
+},
+"CHEC": {
+"reason": "insufficient_data",
+"rows": 18
+},
+"PMSE": {
+"reason": "insufficient_data",
+"rows": 59
+},
+"SQLT": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"CUVL": {
+"reason": "insufficient_data",
+"rows": 63
+},
+"SAWG": {
+"reason": "insufficient_data",
+"rows": 44
+},
+"MOTG": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"PCCE": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"MAYZ": {
+"reason": "insufficient_data",
+"rows": 119
+},
+"TAVIR": {
+"reason": "insufficient_data",
+"rows": 39
+},
+"ARKT": {
+"reason": "insufficient_data",
+"rows": 42
+},
+"MTRA": {
+"reason": "insufficient_data",
+"rows": 28
+},
+"PMFB": {
+"reason": "insufficient_data",
+"rows": 19
+},
+"ACAA": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"TOAO": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"CBOJ": {
+"reason": "insufficient_data",
+"rows": 172
+},
+"MAPP": {
+"reason": "insufficient_data",
+"rows": 17
+},
+"PIEL": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"PSFM": {
+"reason": "insufficient_data",
+"rows": 39
+},
+"AINT": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"PPIE": {
+"reason": "insufficient_data",
+"rows": 24
+},
+"CPRA": {
+"reason": "insufficient_data",
+"rows": 35
+},
+"PCR": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"MARZ": {
+"reason": "insufficient_data",
+"rows": 148
+},
+"TMDV": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"CBXL": {
+"reason": "insufficient_data",
+"rows": 7
+},
+"MJSC": {
+"reason": "insufficient_data",
+"rows": 88
+},
+"PEMX": {
+"reason": "insufficient_data",
+"rows": 32
+},
+"TAVI": {
+"reason": "insufficient_data",
+"rows": 38
+},
+"AGGS": {
+"reason": "insufficient_data",
+"rows": 23
+},
+"CHPG": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"PZLV": {
+"reason": "insufficient_data",
+"rows": 4
+},
+"AUC": {
+"reason": "insufficient_data",
+"rows": 100
+},
+"CGRO": {
+"reason": "insufficient_data",
+"rows": 20
+},
+"PRAB": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"APRP": {
+"reason": "insufficient_data",
+"rows": 61
+},
+"CMAG": {
+"reason": "insufficient_data",
+"rows": 16
+},
+"TPFI": {
+"reason": "insufficient_data",
+"rows": 5
+},
+"APUR": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"CMAY": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"PAII": {
+"reason": "insufficient_data",
+"rows": 60
+},
+"APDB": {
+"reason": "insufficient_data",
+"rows": 9
+},
+"CTAA": {
+"reason": "insufficient_data",
+"rows": 12
+},
+"PCL": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"ABOT": {
+"reason": "insufficient_data",
+"rows": 14
+},
+"CRAN": {
+"reason": "insufficient_data",
+"rows": 40
+},
+"PTNT": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"PJUS": {
+"reason": "insufficient_data",
+"rows": 1
+},
+"CTWO": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"PMOC": {
+"reason": "insufficient_data",
+"rows": 18
+},
+"CCZ": {
+"reason": "insufficient_data",
+"rows": 0
+},
+"COMD": {
+"reason": "insufficient_data",
+"rows": 13
+},
+"CMCI": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"ARCI": {
+"reason": "insufficient_data",
+"rows": 18
+},
+"AAUA": {
+"reason": "insufficient_data",
+"rows": 10
+},
+"ALRG": {
+"reason": "insufficient_data",
+"rows": 8
+},
+"CCOM": {
+"reason": "insufficient_data",
+"rows": 3
+},
+"CLUB": {
+"reason": "insufficient_data",
+"rows": 42
+}
+}
+}

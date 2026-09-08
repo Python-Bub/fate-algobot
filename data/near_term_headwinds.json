@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "updated_note": "Manual + auto headwinds for mega-cap news/technicals (not long-term thesis).",
+  "symbols": {
+    "META": {
+      "stance": "volatile_caution",
+      "p_penalty": 0.14,
+      "score_penalty": 0.45,
+      "block_playbook": true,
+      "block_horizons": ["next_trading_day", "this_week", "this_month"],
+      "reasons": [
+        "High AI CapEx ($125B–$145B) — near-term volatility",
+        "Citi Underweight; price broke 200-day MA",
+        "Equity dilution fears (rumored multi-billion stock sale)"
+      ]
+    },
+    "MSFT": {
+      "stance": "block_near_term",
+      "p_penalty": 0.2,
+      "score_penalty": 0.65,
+      "block_playbook": true,
+      "block_horizons": ["next_trading_day", "this_week", "this_month"],
+      "reasons": [
+        "9.5% weekly drop; technical gap down",
+        "Failed to hold 200-day MA",
+        "Soft Q4 revenue guide ($87.25B vs $87.56B expected)"
+      ]
+    },
+    "AVGO": {
+      "stance": "dip_watch_only",
+      "p_penalty": 0.1,
+      "score_penalty": 0.25,
+      "block_playbook": false,
+      "block_horizons": ["next_trading_day", "this_week"],
+      "reasons": [
+        "16% monthly drop — AI revenue whisper miss",
+        "Sector rotation headwind; wait for stabilization despite upgrade chatter"
+      ]
+    },
+    "ORCL": {
+      "stance": "volatile_caution",
+      "p_penalty": 0.12,
+      "score_penalty": 0.4,
+      "block_playbook": true,
+      "block_horizons": ["next_trading_day", "this_week"],
+      "reasons": [
+        "Q4 earnings binary event — new CFO guidance framework",
+        "Large single-session drop; avoid pre-earnings dip-buy"
+      ]
+    },
+    "PLTR": {
+      "stance": "volatile_caution",
+      "p_penalty": 0.08,
+      "score_penalty": 0.3,
+      "block_playbook": true,
+      "block_horizons": ["next_trading_day", "this_week"],
+      "reasons": [
+        "AI infra sympathy — cluster leader ORCL earnings imminent",
+        "Enterprise cloud CapEx/guidance spillover risk"
+      ]
+    },
+    "TMHC": {
+      "stance": "block_near_term",
+      "p_penalty": 0.35,
+      "score_penalty": 1.0,
+      "block_playbook": true,
+      "block_horizons": ["next_trading_day", "this_week", "this_month", "two_months"],
+      "reasons": [
+        "Berkshire all-cash acquisition at $72.50 — upside capped (dead money)"
+      ]
+    }
+  }
+}

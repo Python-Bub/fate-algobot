@@ -1,0 +1,96 @@
+{
+  "objective": "reconstruct public GainzAlgo 1m-1h math; never fetch invite-only V2",
+  "legal": true,
+  "started_utc": "2026-08-17T16:57:22.007760+00:00",
+  "deadline_unix": 1786987642.007534,
+  "dies_utc": "2026-08-17T17:27:22.007534+00:00",
+  "cycles": 36,
+  "llm_ok": 0,
+  "llm_applied": 0,
+  "evolves": 36,
+  "escapes": 0,
+  "blocked": [],
+  "fetches": [
+    {
+      "url": "https://www.tradingview.com/script/HKBMUhq3-Smart-Money-Structure-GainzAlgo/",
+      "ok": true,
+      "status": 200,
+      "formula_lines": 4
+    },
+    {
+      "url": "https://www.tradingview.com/script/uGCtOz0Y-Machine-Learning-Smart-Money-Concepts-GainzAlgo/",
+      "ok": true,
+      "status": 200,
+      "formula_lines": 4
+    },
+    {
+      "url": "https://www.investopedia.com/terms/a/atr.asp",
+      "ok": true,
+      "status": 200,
+      "formula_lines": 0
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Average_true_range",
+      "ok": true,
+      "status": 200,
+      "formula_lines": 1
+    },
+    {
+      "url": "https://www.investopedia.com/terms/v/vwap.asp",
+      "ok": true,
+      "status": 403,
+      "formula_lines": 0
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Volume-weighted_average_price",
+      "ok": true,
+      "status": 200,
+      "formula_lines": 0
+    }
+  ],
+  "last_score": {
+    "score": 1.0,
+    "n_cases": 5,
+    "pairs": [
+      {
+        "teacher": "none",
+        "student": "none",
+        "seed": 7
+      },
+      {
+        "teacher": "buy",
+        "student": "buy",
+        "seed": 3
+      },
+      {
+        "teacher": "sell",
+        "student": "sell",
+        "seed": 11
+      },
+      {
+        "teacher": "buy",
+        "student": "buy",
+        "seed": 19
+      },
+      {
+        "teacher": "sell",
+        "student": "sell",
+        "seed": 29
+      }
+    ],
+    "teacher_side": "sell",
+    "student_side": "sell"
+  },
+  "status": "dead",
+  "brain": {
+    "ok": true,
+    "loss": 0.0354,
+    "acc": 0.9336,
+    "steps": 576,
+    "sec": 4.09
+  },
+  "brain_ok": 36,
+  "local_ok": 36,
+  "ended_utc": "2026-08-17T17:27:22.013318+00:00",
+  "lived_sec": 1800.0
+}

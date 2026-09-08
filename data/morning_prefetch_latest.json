@@ -1,0 +1,122 @@
+{
+  "at_et": "2026-09-07T05:58:40.359865-04:00",
+  "symbols": [
+    "PNC",
+    "APP",
+    "WMT",
+    "DUK",
+    "NOC",
+    "NVDA",
+    "AAPL",
+    "GOOGL",
+    "GOOG",
+    "MSFT",
+    "AMZN",
+    "TSM",
+    "AVGO",
+    "SPCX",
+    "META",
+    "TSLA",
+    "BRK-B",
+    "SKHY",
+    "LLY",
+    "MU",
+    "JPM",
+    "AMD",
+    "ASML",
+    "XOM"
+  ],
+  "finnhub_general": 100,
+  "finnhub_sentiment": 0,
+  "headlines_warmed": 24,
+  "polygon_snapshots": 0,
+  "llm_batch": true,
+  "morning_club": {
+    "tone": "mixed",
+    "tickers": 7,
+    "date": "2026-09-07",
+    "parser": "heuristic"
+  },
+  "power_people": {
+    "ingested": 3,
+    "items": 170,
+    "by_speaker": {
+      "trump": 2,
+      "powell": 0,
+      "yellen": 0,
+      "bessent": 1,
+      "musk": 0,
+      "buffett": 0,
+      "ackman": 0,
+      "lutnick": 0
+    },
+    "memory_bootstrap": 7
+  },
+  "coverage": {
+    "intel_window": {
+      "open": true,
+      "reason": "intel_open"
+    },
+    "newsapi_window": {
+      "open": false,
+      "reason": "outside 06:00-10:00 ET"
+    },
+    "intel_start_et": "04:00",
+    "auto_unpause_et": "04:00",
+    "budget": {
+      "date": "2026-09-07",
+      "providers": {
+        "newsapi": {
+          "used": 4,
+          "limit": 80
+        },
+        "finnhub": {
+          "used": 1310,
+          "limit": 2000
+        },
+        "finnhub_earnings": {
+          "used": 1129,
+          "limit": 2500
+        },
+        "llm": {
+          "used": 0,
+          "limit": 400
+        },
+        "cramer_llm": {
+          "used": 0,
+          "limit": 12
+        },
+        "industry_llm": {
+          "used": 0,
+          "limit": 2500
+        },
+        "cramer_newsapi": {
+          "used": 0,
+          "limit": 40
+        },
+        "polygon": {
+          "used": 0,
+          "limit": 120
+        },
+        "tavily": {
+          "used": 0,
+          "limit": 30
+        },
+        "alpaca_data": {
+          "used": 0,
+          "limit": 5000
+        }
+      }
+    },
+    "strategies": {
+      "finnhub": "1 call /news-sentiment per ticker (cached 2h); skip company-news if sentiment fresh; 1 /news?category=general batch shared across watchlist at 6 AM",
+      "newsapi": "Only 06:00\u201310:00 ET; skip if Finnhub \u22658 headlines; shared morning query cache",
+      "cramer_newsapi": "Skip when CRAMER.jsonl replay has recent mentions (free local)",
+      "llm": "Allowed 06:00\u201320:00 ET intel window; 1 batched morning call for playbook; per-ticker cache 1h",
+      "polygon": "Batch snapshot up to 50 tickers per request; 5 min cache during prep",
+      "alpaca_data": "Read-only quotes/bars free in intel window \u2014 warm prices before RTH",
+      "tavily": "AI pick review only; capped daily; skip if Finnhub+LLM already strong",
+      "fred": "Macro series cached 6h \u2014 no live pull during scans"
+    }
+  }
+}

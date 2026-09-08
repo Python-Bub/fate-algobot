@@ -1,0 +1,126 @@
+{
+  "ts_utc": "2026-09-08T05:34:15.401911+00:00",
+  "source": "Investopedia Johnston 2025 \u2014 entry/exit/size + persistent inefficiency",
+  "johnston_buckets": {
+    "technical": {
+      "present": [
+        "momentum_trend",
+        "classic_quant_features",
+        "gainz_v2_intraday",
+        "jp_candles",
+        "structure_patterns",
+        "mean_reversion"
+      ],
+      "expected": [
+        "momentum_trend",
+        "classic_quant_features",
+        "gainz_v2_intraday",
+        "jp_candles",
+        "structure_patterns",
+        "mean_reversion"
+      ],
+      "ok": true
+    },
+    "statistical": {
+      "present": [
+        "stat_arb_pairs",
+        "cross_company_links",
+        "market_imbalance",
+        "hedge_fund_composite"
+      ],
+      "expected": [
+        "stat_arb_pairs",
+        "cross_company_links",
+        "market_imbalance",
+        "hedge_fund_composite"
+      ],
+      "ok": true
+    },
+    "fundamental": {
+      "present": [
+        "earnings_surprise",
+        "value_investing",
+        "investing_book"
+      ],
+      "expected": [
+        "earnings_surprise",
+        "value_investing",
+        "investing_book"
+      ],
+      "ok": true
+    },
+    "news_macro": {
+      "present": [
+        "news_sentiment",
+        "regime_macro",
+        "open_web_intel"
+      ],
+      "expected": [
+        "news_sentiment",
+        "regime_macro",
+        "open_web_intel"
+      ],
+      "ok": true
+    },
+    "microstructure": {
+      "present": [
+        "obi_tape",
+        "micro_mean_reversion",
+        "micro_scalp"
+      ],
+      "expected": [
+        "obi_tape",
+        "micro_mean_reversion",
+        "micro_scalp"
+      ],
+      "ok": true
+    }
+  },
+  "missing_buckets": [],
+  "core_families_missing": [],
+  "sleeves": {
+    "day_trade": {
+      "entry": "analytics.day_trade_setups.scan_setups + day_trade_rank",
+      "exit": "analytics.day_trade_engine stop/target (Gainz ATR+R:R when present)",
+      "size": "analytics.day_trade_risk.size_position (1% risk, notional cap)",
+      "inefficiency": "1m\u20131h structure/momentum (persistent, not one-print news)",
+      "paper": "DAY_TRADE_MODE paper Alpaca"
+    },
+    "fortress": {
+      "entry": "fortress_live rank + BUY_THRESHOLD (ML heads + technical/stat stack)",
+      "exit": "fortress_live thesis stop / hygiene (overnight holds allowed)",
+      "size": "analytics.quant_risk.half_kelly + heat cap + MAX_ORDER_NOTIONAL",
+      "inefficiency": "multi-day forecastable drift + factor tilts",
+      "paper": "PAPER_USE_FORTRESS"
+    },
+    "hft": {
+      "entry": "hft/src/obi-tape OBI + tape burst",
+      "exit": "IOC unfilled cancel + target/stop bps",
+      "size": "OBI_NOTIONAL_USD / HFT_MAX_ORDER_NOTIONAL",
+      "inefficiency": "order-book imbalance (microstructure, persistent at ms)",
+      "paper": "subsecond-obi paper"
+    },
+    "gainz_1m_1h": {
+      "entry": "analytics.gainz_v2.assess BUY/SELL \u2265 GAINZ_MIN_LAYERS",
+      "exit": "ATR stop \u00d7 GAINZ_ATR_STOP_MULT, target GAINZ_RR",
+      "size": "day_trade_risk.size_position when routed through day-trade",
+      "inefficiency": "volatility-adaptive momentum + 7-TF EMA/VWAP + CVD",
+      "paper": "GAINZ_V2_ENABLED"
+    }
+  },
+  "components": [
+    "entry",
+    "exit",
+    "size"
+  ],
+  "backtest": "backtest.py performance_stats (Sharpe, max DD, hit rate)",
+  "paper_first": true,
+  "own_model": "analytics.gainz_local_brain \u2014 local weights, no vendor 429",
+  "do_not_disable": [
+    "fortress",
+    "hft",
+    "day_trade",
+    "lstm",
+    "gainz"
+  ]
+}

@@ -1,0 +1,5496 @@
+{
+  "before": {
+    "scanned": 1351,
+    "complete": 387,
+    "missing_file": [
+      "ABLV",
+      "ACFN",
+      "ACIU",
+      "ACN",
+      "ADP",
+      "AFRI",
+      "AIRI",
+      "AKBA",
+      "ALP",
+      "AMZE",
+      "AREC",
+      "ARGX",
+      "ATOS",
+      "AZO",
+      "BAND",
+      "BCS",
+      "BLZR",
+      "BN",
+      "BNS",
+      "BNY",
+      "BPRN",
+      "BRT",
+      "BSBK",
+      "BSX",
+      "BZFD",
+      "CACC",
+      "CAN",
+      "CBNA",
+      "CCM",
+      "CCTG",
+      "CDTG",
+      "CDXS",
+      "CEG",
+      "CEPO",
+      "CEPS",
+      "CEPV",
+      "CFFI",
+      "CHGG",
+      "CHWM",
+      "CM",
+      "CMBY",
+      "CMCSA",
+      "CME",
+      "CMI",
+      "CNCK",
+      "CNDT",
+      "COP",
+      "CORT",
+      "CP",
+      "CRAC",
+      "CRDF",
+      "CSQR",
+      "CTAS",
+      "CVGI",
+      "DAAQ",
+      "DHY",
+      "DMAA",
+      "DNMX",
+      "DOCN",
+      "DPC",
+      "DSC",
+      "ED",
+      "EGHT",
+      "ELV",
+      "ENB",
+      "EPD",
+      "EQNR",
+      "ESBA",
+      "EU",
+      "FC",
+      "FCBM",
+      "FDBC",
+      "FEED",
+      "FISN",
+      "FLUX",
+      "FOIL",
+      "FRBT",
+      "FTNT",
+      "FWAC",
+      "FWACR",
+      "GENN",
+      "GINT",
+      "GLW",
+      "GSK",
+      "GTERA",
+      "GWAV",
+      "GYGY",
+      "HBB",
+      "HCWB",
+      "HDB",
+      "HNNA",
+      "HNUC",
+      "HPE",
+      "HWM",
+      "HYFM",
+      "IBN",
+      "IESC",
+      "IFRX",
+      "IGX",
+      "IMC",
+      "ININ",
+      "INTU",
+      "IOND",
+      "ITG",
+      "ITUB",
+      "ITW",
+      "IXHL",
+      "JMKE",
+      "JMM",
+      "JPO",
+      "KARD",
+      "KFDE",
+      "KIIU",
+      "KKR",
+      "KOEI",
+      "LAGH",
+      "LDI",
+      "LGCL",
+      "LIME",
+      "LPAA",
+      "LTGO",
+      "LUNR",
+      "LVWR",
+      "LYFT",
+      "LYNX",
+      "MCK",
+      "MCO",
+      "MELI",
+      "MENW",
+      "MFG",
+      "MKLY",
+      "MLM",
+      "MLP",
+      "MMT",
+      "MNTK",
+      "MOT",
+      "MPX",
+      "MRSH",
+      "MSH",
+      "NAK",
+      "NAUT",
+      "NCO",
+      "NCOOR",
+      "NCOU",
+      "NEM",
+      "NEXM",
+      "NNDM",
+      "NRT",
+      "NTRP",
+      "NUOX",
+      "NXDR",
+      "OCLT",
+      "OPHC",
+      "ORKT",
+      "OSCR",
+      "OSRH",
+      "OST",
+      "PASW",
+      "PBLS",
+      "PBR",
+      "PCAP",
+      "PDD",
+      "PED",
+      "PGR",
+      "PH",
+      "PLG",
+      "PLMK",
+      "PMTR",
+      "PSHG",
+      "PTI",
+      "PTNM",
+      "PWR",
+      "QMLS",
+      "RACD",
+      "RC",
+      "REE",
+      "REF",
+      "RETO",
+      "RGCO",
+      "RKLB",
+      "RMSG",
+      "ROC",
+      "RVPH",
+      "RZLV",
+      "SANM",
+      "SBXD",
+      "SCTX",
+      "SDEV",
+      "SDUR",
+      "SEB",
+      "SEQC",
+      "SGRP",
+      "SHOP",
+      "SIAI",
+      "SIMO",
+      "SIND",
+      "SINI",
+      "SKHY",
+      "SLB",
+      "SLDP",
+      "SNFCA",
+      "SNPS",
+      "SNY",
+      "SPGH",
+      "SPOT",
+      "SQFT",
+      "SRE",
+      "STDN",
+      "STRL",
+      "SVAQ",
+      "SYTN",
+      "SZZL",
+      "TARX",
+      "TC",
+      "TCGX",
+      "TII",
+      "TIWD",
+      "TRCX",
+      "TROO",
+      "TRV",
+      "TRX",
+      "TT",
+      "TUYA",
+      "UBER",
+      "UEIC",
+      "UI",
+      "UL",
+      "UTHR",
+      "VALN",
+      "VATE",
+      "VEEA",
+      "VFF",
+      "VIIU",
+      "VLN",
+      "VOGX",
+      "VRT",
+      "WALD",
+      "WEA",
+      "WELL",
+      "WHK",
+      "WM",
+      "WMB",
+      "XBIO",
+      "XCH",
+      "XLK",
+      "XSD",
+      "YLUZ",
+      "YTRA",
+      "ZVIA"
+    ],
+    "corrupt": [],
+    "blank": {
+      "AAP": [
+        "model_daily"
+      ],
+      "ABCL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ABTC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ABVC": [
+        "model_xlong"
+      ],
+      "ACET": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ACIW": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ACMR": [
+        "model_daily"
+      ],
+      "ACR": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ACVA": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ADBE": [
+        "model_xlong"
+      ],
+      "ADNT": [
+        "model_daily"
+      ],
+      "AEF": [
+        "model_daily",
+        "model_meta"
+      ],
+      "AEHL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AEO": [
+        "model_meta"
+      ],
+      "AESI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "AFCG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AGMB": [
+        "model_xlong"
+      ],
+      "AIFF": [
+        "model_daily",
+        "model_meta"
+      ],
+      "AIFU": [
+        "model_xlong"
+      ],
+      "AIR": [
+        "model_meta"
+      ],
+      "AISP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AKTS": [
+        "model_meta"
+      ],
+      "ALCO": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ALDF": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ALG": [
+        "model_meta"
+      ],
+      "ALIT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ALLO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ALLT": [
+        "model_meta"
+      ],
+      "ALNY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ALTG": [
+        "model_meta"
+      ],
+      "AMBA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "AMBR": [
+        "model_xlong"
+      ],
+      "AMCX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AMN": [
+        "model_xlong"
+      ],
+      "AMP": [
+        "model_meta"
+      ],
+      "AMS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AMSF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ANGX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ANIP": [
+        "model_xlong"
+      ],
+      "ANPA": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AOUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "APO": [
+        "model_meta"
+      ],
+      "APPS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ARBB": [
+        "model_meta"
+      ],
+      "ARCB": [
+        "model_meta"
+      ],
+      "ARWR": [
+        "model_meta"
+      ],
+      "ARXS": [
+        "model_xlong"
+      ],
+      "ASO": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ASPN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ASST": [
+        "model_meta"
+      ],
+      "ATEN": [
+        "model_meta"
+      ],
+      "ATGL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ATKR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ATYR": [
+        "model_meta"
+      ],
+      "AUBN": [
+        "model_xlong"
+      ],
+      "AVEX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AVLN": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AVXL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AWR": [
+        "model_xlong"
+      ],
+      "AXG": [
+        "model_daily"
+      ],
+      "AXIL": [
+        "model_meta"
+      ],
+      "AXIN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "AXON": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AZTA": [
+        "model_xlong"
+      ],
+      "BATL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBBY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBOT": [
+        "model_xlong"
+      ],
+      "BBSI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBUC": [
+        "model_xlong"
+      ],
+      "BBVA": [
+        "model_meta"
+      ],
+      "BC": [
+        "model_meta"
+      ],
+      "BCC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BCX": [
+        "model_meta"
+      ],
+      "BDCI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BDSX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BDTX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BETA": [
+        "model_xlong"
+      ],
+      "BFAM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGSI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BHST": [
+        "model_xlong"
+      ],
+      "BHVN": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BIOX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BJ": [
+        "model_xlong"
+      ],
+      "BKNG": [
+        "model_xlong"
+      ],
+      "BKV": [
+        "model_xlong"
+      ],
+      "BLTE": [
+        "model_meta"
+      ],
+      "BNAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BNC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BNL": [
+        "model_daily",
+        "model_meta"
+      ],
+      "BNR": [
+        "model_meta"
+      ],
+      "BOH": [
+        "model_xlong"
+      ],
+      "BOLT": [
+        "model_xlong"
+      ],
+      "BON": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BORR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BOX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BPOP": [
+        "model_meta"
+      ],
+      "BR": [
+        "model_xlong"
+      ],
+      "BSRR": [
+        "model_meta"
+      ],
+      "BTAI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BTCT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BTE": [
+        "model_meta"
+      ],
+      "BUSE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BUUU": [
+        "model_daily"
+      ],
+      "BVC": [
+        "model_daily"
+      ],
+      "BWAY": [
+        "model_meta"
+      ],
+      "BWB": [
+        "model_meta"
+      ],
+      "BWEN": [
+        "model_xlong"
+      ],
+      "BWLP": [
+        "model_xlong"
+      ],
+      "BXSL": [
+        "model_xlong"
+      ],
+      "BYFC": [
+        "model_daily"
+      ],
+      "BYRN": [
+        "model_xlong"
+      ],
+      "BZ": [
+        "model_xlong"
+      ],
+      "BZAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BZUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CAI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CALM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CANG": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CARG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CARL": [
+        "model_daily"
+      ],
+      "CB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CBAN": [
+        "model_meta"
+      ],
+      "CBNK": [
+        "model_meta"
+      ],
+      "CBRE": [
+        "model_xlong"
+      ],
+      "CBRL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CC": [
+        "model_meta"
+      ],
+      "CCG": [
+        "model_xlong"
+      ],
+      "CCI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CCLD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CCS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CDLR": [
+        "model_meta"
+      ],
+      "CDNL": [
+        "model_xlong"
+      ],
+      "CDNS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CDRO": [
+        "model_meta"
+      ],
+      "CE": [
+        "model_meta"
+      ],
+      "CF": [
+        "model_meta"
+      ],
+      "CFR": [
+        "model_meta"
+      ],
+      "CGNT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CGTL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CIGL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CION": [
+        "model_xlong"
+      ],
+      "CIVB": [
+        "model_meta"
+      ],
+      "CLAR": [
+        "model_daily"
+      ],
+      "CLBK": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CLIR": [
+        "model_daily"
+      ],
+      "CLMB": [
+        "model_xlong"
+      ],
+      "CLMT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CLYM": [
+        "model_xlong"
+      ],
+      "CMRC": [
+        "model_daily"
+      ],
+      "CMTG": [
+        "model_xlong"
+      ],
+      "CMTL": [
+        "model_meta"
+      ],
+      "CNC": [
+        "model_xlong"
+      ],
+      "CNI": [
+        "model_xlong"
+      ],
+      "CNMD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CNNE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CNTX": [
+        "model_meta"
+      ],
+      "COAG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "COGT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "COHN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CON": [
+        "model_daily",
+        "model_meta"
+      ],
+      "COOT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "COPL": [
+        "model_xlong"
+      ],
+      "COR": [
+        "model_meta"
+      ],
+      "CPHI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CPS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CPT": [
+        "model_meta"
+      ],
+      "CRCT": [
+        "model_xlong"
+      ],
+      "CSAN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CSQ": [
+        "model_meta"
+      ],
+      "CSTL": [
+        "model_xlong"
+      ],
+      "CSX": [
+        "model_meta"
+      ],
+      "CTBI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CTKB": [
+        "model_meta"
+      ],
+      "CTS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CTSH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CTVA": [
+        "model_xlong"
+      ],
+      "CUBI": [
+        "model_meta"
+      ],
+      "CURB": [
+        "model_meta"
+      ],
+      "CURI": [
+        "model_xlong"
+      ],
+      "CVEO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CVKD": [
+        "model_xlong"
+      ],
+      "CVLT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CVSA": [
+        "model_meta"
+      ],
+      "CW": [
+        "model_meta"
+      ],
+      "CYD": [
+        "model_meta"
+      ],
+      "DAIO": [
+        "model_meta"
+      ],
+      "DAL": [
+        "model_meta"
+      ],
+      "DAO": [
+        "model_meta"
+      ],
+      "DARE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DASH": [
+        "model_xlong"
+      ],
+      "DC": [
+        "model_xlong"
+      ],
+      "DCTH": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DCX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DDOG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "DDS": [
+        "model_meta"
+      ],
+      "DETX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "DFLI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "DFTX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DGNX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DH": [
+        "model_xlong"
+      ],
+      "DHR": [
+        "model_xlong"
+      ],
+      "DHT": [
+        "model_meta"
+      ],
+      "DIBS": [
+        "model_meta"
+      ],
+      "DKI": [
+        "model_daily"
+      ],
+      "DKNG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DLB": [
+        "model_xlong"
+      ],
+      "DLO": [
+        "model_xlong"
+      ],
+      "DMRA": [
+        "model_xlong"
+      ],
+      "DNN": [
+        "model_meta"
+      ],
+      "DNUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DOCS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "DOMH": [
+        "model_xlong"
+      ],
+      "DORM": [
+        "model_xlong"
+      ],
+      "DOUG": [
+        "model_xlong"
+      ],
+      "DOYU": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DPG": [
+        "model_meta"
+      ],
+      "DPRO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DRIO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DSGN": [
+        "model_xlong"
+      ],
+      "DT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DTM": [
+        "model_daily"
+      ],
+      "DUK": [
+        "model_xlong"
+      ],
+      "DUO": [
+        "model_meta"
+      ],
+      "DVN": [
+        "model_xlong"
+      ],
+      "DXC": [
+        "model_xlong"
+      ],
+      "DYAI": [
+        "model_xlong"
+      ],
+      "EBMT": [
+        "model_daily"
+      ],
+      "ECAT": [
+        "model_meta"
+      ],
+      "ECHO": [
+        "model_meta"
+      ],
+      "ECX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "EDIT": [
+        "model_daily"
+      ],
+      "EFC": [
+        "model_meta"
+      ],
+      "EFSC": [
+        "model_meta"
+      ],
+      "EFX": [
+        "model_xlong"
+      ],
+      "EGAN": [
+        "model_xlong"
+      ],
+      "EGO": [
+        "model_meta"
+      ],
+      "EIG": [
+        "model_meta"
+      ],
+      "EIM": [
+        "model_meta"
+      ],
+      "ELA": [
+        "model_meta"
+      ],
+      "ELME": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ELVN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EME": [
+        "model_daily",
+        "model_meta"
+      ],
+      "EMPD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "EMPG": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ENGN": [
+        "model_meta"
+      ],
+      "ENGS": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ENOV": [
+        "model_daily"
+      ],
+      "ENS": [
+        "model_meta"
+      ],
+      "ENTX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "EP": [
+        "model_xlong"
+      ],
+      "EPC": [
+        "model_meta"
+      ],
+      "EPRT": [
+        "model_xlong"
+      ],
+      "EQ": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQIX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQT": [
+        "model_meta"
+      ],
+      "EQX": [
+        "model_xlong"
+      ],
+      "ERIC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ESOA": [
+        "model_meta"
+      ],
+      "ET": [
+        "model_xlong"
+      ],
+      "EVC": [
+        "model_xlong"
+      ],
+      "EVER": [
+        "model_daily",
+        "model_meta"
+      ],
+      "EXFY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EXPE": [
+        "model_meta"
+      ],
+      "EYPT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FABC": [
+        "model_meta"
+      ],
+      "FBIN": [
+        "model_daily"
+      ],
+      "FBNC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FCCO": [
+        "model_meta"
+      ],
+      "FCX": [
+        "model_xlong"
+      ],
+      "FDX": [
+        "model_meta"
+      ],
+      "FEBO": [
+        "model_xlong"
+      ],
+      "FEDU": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FENG": [
+        "model_xlong"
+      ],
+      "FERG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FET": [
+        "model_daily"
+      ],
+      "FFAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FFBC": [
+        "model_meta"
+      ],
+      "FHTX": [
+        "model_meta"
+      ],
+      "FIGS": [
+        "model_meta"
+      ],
+      "FINW": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FIS": [
+        "model_xlong"
+      ],
+      "FKWL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FLNT": [
+        "model_meta"
+      ],
+      "FLO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FLYW": [
+        "model_meta"
+      ],
+      "FMBH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FMC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FNKO": [
+        "model_xlong"
+      ],
+      "FNWD": [
+        "model_xlong"
+      ],
+      "FORR": [
+        "model_meta"
+      ],
+      "FOXX": [
+        "model_daily"
+      ],
+      "FSLR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FSLY": [
+        "model_meta"
+      ],
+      "FSS": [
+        "model_xlong"
+      ],
+      "FSSL": [
+        "model_daily"
+      ],
+      "FSUN": [
+        "model_xlong"
+      ],
+      "FTDR": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FTEK": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTHY": [
+        "model_xlong"
+      ],
+      "FTI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTRE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTRK": [
+        "model_xlong"
+      ],
+      "FUBO": [
+        "model_xlong"
+      ],
+      "FUND": [
+        "model_meta"
+      ],
+      "FURY": [
+        "model_xlong"
+      ],
+      "FWONK": [
+        "model_xlong"
+      ],
+      "GAMB": [
+        "model_xlong"
+      ],
+      "GANX": [
+        "model_meta"
+      ],
+      "GAUZ": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GCT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GCV": [
+        "model_meta"
+      ],
+      "GDDY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GDTC": [
+        "model_meta"
+      ],
+      "GEG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GENK": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GETY": [
+        "model_xlong"
+      ],
+      "GGB": [
+        "model_meta"
+      ],
+      "GGRP": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GIBO": [
+        "model_xlong"
+      ],
+      "GIFT": [
+        "model_daily"
+      ],
+      "GIW": [
+        "model_xlong"
+      ],
+      "GLBE": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GLNG": [
+        "model_meta"
+      ],
+      "GLOO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GLV": [
+        "model_meta"
+      ],
+      "GM": [
+        "model_meta"
+      ],
+      "GNS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GOF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GOLF": [
+        "model_meta"
+      ],
+      "GPC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GPRE": [
+        "model_meta"
+      ],
+      "GRCE": [
+        "model_meta"
+      ],
+      "GREE": [
+        "model_meta"
+      ],
+      "GRFS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GROV": [
+        "model_xlong"
+      ],
+      "GRWG": [
+        "model_daily"
+      ],
+      "GSBC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GSIW": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "GTEC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GTEN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GUTS": [
+        "model_daily"
+      ],
+      "GVH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "GWH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GXAI": [
+        "model_daily"
+      ],
+      "HAFC": [
+        "model_meta"
+      ],
+      "HAIN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HBAN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HBM": [
+        "model_daily"
+      ],
+      "HBNC": [
+        "model_daily"
+      ],
+      "HCA": [
+        "model_meta"
+      ],
+      "HCKT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HCSG": [
+        "model_meta"
+      ],
+      "HDRN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HELE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HEPS": [
+        "model_meta"
+      ],
+      "HGBL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HIND": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HIT": [
+        "model_meta"
+      ],
+      "HL": [
+        "model_xlong"
+      ],
+      "HLLY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HLN": [
+        "model_meta"
+      ],
+      "HLXC": [
+        "model_xlong"
+      ],
+      "HNI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "HNST": [
+        "model_meta"
+      ],
+      "HODO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HOUR": [
+        "model_xlong"
+      ],
+      "HOVR": [
+        "model_meta"
+      ],
+      "HPQ": [
+        "model_xlong"
+      ],
+      "HQI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HR": [
+        "model_meta"
+      ],
+      "HROW": [
+        "model_xlong"
+      ],
+      "HTT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HTZ": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "HUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HWH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "HYPD": [
+        "model_daily"
+      ],
+      "ICMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "IDXX": [
+        "model_xlong"
+      ],
+      "IDYA": [
+        "model_xlong"
+      ],
+      "IFF": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "IGC": [
+        "model_daily"
+      ],
+      "IHRT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "III": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "IMA": [
+        "model_meta"
+      ],
+      "IMAX": [
+        "model_meta"
+      ],
+      "IMMP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "IMMX": [
+        "model_xlong"
+      ],
+      "INAB": [
+        "model_xlong"
+      ],
+      "ING": [
+        "model_meta"
+      ],
+      "INGN": [
+        "model_xlong"
+      ],
+      "INGR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INHD": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INTA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INTG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "INTZ": [
+        "model_xlong"
+      ],
+      "INVE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "IOSP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "IRDM": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ITT": [
+        "model_meta"
+      ],
+      "IVVD": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "JBDI": [
+        "model_xlong"
+      ],
+      "JBGS": [
+        "model_xlong"
+      ],
+      "JBLU": [
+        "model_xlong"
+      ],
+      "JBSS": [
+        "model_xlong"
+      ],
+      "JD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "JEM": [
+        "model_xlong"
+      ],
+      "JL": [
+        "model_meta"
+      ],
+      "JUNS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "JXN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "KHC": [
+        "model_xlong"
+      ],
+      "KINS": [
+        "model_xlong"
+      ],
+      "KOS": [
+        "model_meta"
+      ],
+      "KRSP": [
+        "model_meta"
+      ],
+      "KT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "KURA": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "KVUE": [
+        "model_xlong"
+      ],
+      "LASE": [
+        "model_daily"
+      ],
+      "LAWR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LBTYB": [
+        "model_daily"
+      ],
+      "LCTX": [
+        "model_xlong"
+      ],
+      "LEE": [
+        "model_xlong"
+      ],
+      "LEGN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "LFMD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LFUS": [
+        "model_meta"
+      ],
+      "LFWD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LGIH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LHSW": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LII": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LKFN": [
+        "model_xlong"
+      ],
+      "LKFT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LNC": [
+        "model_meta"
+      ],
+      "LND": [
+        "model_xlong"
+      ],
+      "LOAR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LODE": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LOT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "LPG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LRE": [
+        "model_meta"
+      ],
+      "LSE": [
+        "model_meta"
+      ],
+      "LTRX": [
+        "model_daily"
+      ],
+      "LUV": [
+        "model_meta"
+      ],
+      "LVO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LX": [
+        "model_xlong"
+      ],
+      "LYEL": [
+        "model_meta"
+      ],
+      "MACI": [
+        "model_daily"
+      ],
+      "MAKO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MAT": [
+        "model_xlong"
+      ],
+      "MATH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MBI": [
+        "model_xlong"
+      ],
+      "MCHP": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MCHX": [
+        "model_xlong"
+      ],
+      "MCS": [
+        "model_xlong"
+      ],
+      "MDCX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MEDS": [
+        "model_meta"
+      ],
+      "MEGI": [
+        "model_meta"
+      ],
+      "MENS": [
+        "model_daily"
+      ],
+      "MESO": [
+        "model_xlong"
+      ],
+      "METC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "METCB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MLKN": [
+        "model_daily",
+        "model_meta"
+      ],
+      "MNST": [
+        "model_meta"
+      ],
+      "MNY": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MODD": [
+        "model_xlong"
+      ],
+      "MOS": [
+        "model_daily"
+      ],
+      "MREO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MRNA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MRT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MSLE": [
+        "model_daily"
+      ],
+      "MTSI": [
+        "model_xlong"
+      ],
+      "MVIS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MVST": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MWH": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MXE": [
+        "model_meta"
+      ],
+      "MYO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NA": [
+        "model_xlong"
+      ],
+      "NAD": [
+        "model_daily"
+      ],
+      "NATL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NBB": [
+        "model_meta"
+      ],
+      "NBBK": [
+        "model_meta"
+      ],
+      "NBH": [
+        "model_meta"
+      ],
+      "NBN": [
+        "model_meta"
+      ],
+      "NCDL": [
+        "model_meta"
+      ],
+      "NCNO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NDLS": [
+        "model_xlong"
+      ],
+      "NERV": [
+        "model_meta"
+      ],
+      "NESR": [
+        "model_meta"
+      ],
+      "NET": [
+        "model_meta"
+      ],
+      "NEWT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NEXT": [
+        "model_daily"
+      ],
+      "NHP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NICE": [
+        "model_xlong"
+      ],
+      "NIU": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NMAX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NMFC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NMIH": [
+        "model_meta"
+      ],
+      "NML": [
+        "model_xlong"
+      ],
+      "NMM": [
+        "model_meta"
+      ],
+      "NMRA": [
+        "model_meta"
+      ],
+      "NMTC": [
+        "model_daily"
+      ],
+      "NNE": [
+        "model_xlong"
+      ],
+      "NOC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NOMA": [
+        "model_xlong"
+      ],
+      "NOMD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NOW": [
+        "model_xlong"
+      ],
+      "NPK": [
+        "model_meta"
+      ],
+      "NPV": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NRG": [
+        "model_xlong"
+      ],
+      "NRGV": [
+        "model_meta"
+      ],
+      "NSP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NSPR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTCL": [
+        "model_xlong"
+      ],
+      "NTES": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTGR": [
+        "model_xlong"
+      ],
+      "NTHI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTR": [
+        "model_meta"
+      ],
+      "NTRB": [
+        "model_xlong"
+      ],
+      "NUAI": [
+        "model_meta"
+      ],
+      "NUTX": [
+        "model_meta"
+      ],
+      "NVCT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NVST": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NVX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NWFL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NXPL": [
+        "model_xlong"
+      ],
+      "NXTC": [
+        "model_daily"
+      ],
+      "NXTS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NXTT": [
+        "model_meta"
+      ],
+      "NXXT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OCGN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OFG": [
+        "model_meta"
+      ],
+      "OKTA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "OKYO": [
+        "model_xlong"
+      ],
+      "ONL": [
+        "model_daily"
+      ],
+      "ONMD": [
+        "model_daily"
+      ],
+      "OPK": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ORGO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OTF": [
+        "model_xlong"
+      ],
+      "OZ": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PAI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PALI": [
+        "model_meta"
+      ],
+      "PBT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "PCB": [
+        "model_meta"
+      ],
+      "PCF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PCRX": [
+        "model_meta"
+      ],
+      "PD": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PDM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PDSB": [
+        "model_daily"
+      ],
+      "PEGA": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PEO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PERF": [
+        "model_xlong"
+      ],
+      "PFL": [
+        "model_daily",
+        "model_meta"
+      ],
+      "PGNY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PHK": [
+        "model_meta"
+      ],
+      "PHR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PHUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PIM": [
+        "model_daily"
+      ],
+      "PLD": [
+        "model_xlong"
+      ],
+      "PLUS": [
+        "model_meta"
+      ],
+      "PMO": [
+        "model_meta"
+      ],
+      "PNC": [
+        "model_meta"
+      ],
+      "PPL": [
+        "model_xlong"
+      ],
+      "PRCH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PRMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PRME": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PSA": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PSBD": [
+        "model_xlong"
+      ],
+      "PSF": [
+        "model_meta"
+      ],
+      "PSKY": [
+        "model_daily"
+      ],
+      "PSQH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PSTV": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PTCT": [
+        "model_meta"
+      ],
+      "PWP": [
+        "model_xlong"
+      ],
+      "PYPL": [
+        "model_xlong"
+      ],
+      "PYXS": [
+        "model_meta"
+      ],
+      "RACE": [
+        "model_daily"
+      ],
+      "RAY": [
+        "model_meta"
+      ],
+      "RCG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RCL": [
+        "model_meta"
+      ],
+      "RCS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RDZN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "REFR": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "REGN": [
+        "model_xlong"
+      ],
+      "RES": [
+        "model_xlong"
+      ],
+      "RFMZ": [
+        "model_xlong"
+      ],
+      "RGLD": [
+        "model_meta"
+      ],
+      "RIVN": [
+        "model_daily"
+      ],
+      "RKTO": [
+        "model_xlong"
+      ],
+      "RLI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RLX": [
+        "model_xlong"
+      ],
+      "RLYB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RMAX": [
+        "model_xlong"
+      ],
+      "RNGR": [
+        "model_meta"
+      ],
+      "RNR": [
+        "model_meta"
+      ],
+      "ROIV": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ROK": [
+        "model_meta"
+      ],
+      "RPD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "RPRX": [
+        "model_meta"
+      ],
+      "RPT": [
+        "model_meta"
+      ],
+      "RR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RRGB": [
+        "model_daily",
+        "model_meta"
+      ],
+      "RSG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "RSI": [
+        "model_meta"
+      ],
+      "RVI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SBI": [
+        "model_daily"
+      ],
+      "SBLK": [
+        "model_xlong"
+      ],
+      "SCOR": [
+        "model_xlong"
+      ],
+      "SEGG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "SERV": [
+        "model_xlong"
+      ],
+      "SFBC": [
+        "model_meta"
+      ],
+      "SGI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SGML": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SGRY": [
+        "model_daily",
+        "model_meta"
+      ],
+      "SHW": [
+        "model_daily"
+      ],
+      "SI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SIGI": [
+        "model_xlong"
+      ],
+      "SJT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SLMT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SLVM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SM": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SNOW": [
+        "model_xlong"
+      ],
+      "SO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SOFI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SOGP": [
+        "model_xlong"
+      ],
+      "SOUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPGI": [
+        "model_xlong"
+      ],
+      "SPPL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SPRO": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "SPWH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPWR": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPY": [
+        "model_daily"
+      ],
+      "SQNS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SRFM": [
+        "model_xlong"
+      ],
+      "SRL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "SSTI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "STEX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "STFS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "STHO": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "STVN": [
+        "model_xlong"
+      ],
+      "SUNE": [
+        "model_daily"
+      ],
+      "SUPX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SWVL": [
+        "model_xlong"
+      ],
+      "SYPR": [
+        "model_meta"
+      ],
+      "TAC": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TACH": [
+        "model_daily"
+      ],
+      "TCBI": [
+        "model_xlong"
+      ],
+      "TDAY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TDS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TEVA": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TFC": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TGEN": [
+        "model_xlong"
+      ],
+      "TGT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "THRY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TIL": [
+        "model_xlong"
+      ],
+      "TLPH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TLSI": [
+        "model_meta"
+      ],
+      "TNC": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TNXP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TNYA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TOP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TOPW": [
+        "model_daily"
+      ],
+      "TPET": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "TPG": [
+        "model_xlong"
+      ],
+      "TRAW": [
+        "model_daily"
+      ],
+      "TREX": [
+        "model_meta"
+      ],
+      "TRSG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "TSQ": [
+        "model_meta"
+      ],
+      "TTI": [
+        "model_meta"
+      ],
+      "TTWO": [
+        "model_xlong"
+      ],
+      "TVTX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TWFG": [
+        "model_meta"
+      ],
+      "TWI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TWIN": [
+        "model_xlong"
+      ],
+      "TWST": [
+        "model_xlong"
+      ],
+      "TXG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TXMD": [
+        "model_xlong"
+      ],
+      "TXO": [
+        "model_meta"
+      ],
+      "TYGO": [
+        "model_daily",
+        "model_meta"
+      ],
+      "UHS": [
+        "model_daily",
+        "model_meta"
+      ],
+      "UMBF": [
+        "model_meta"
+      ],
+      "UMC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "UPS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "UPXI": [
+        "model_meta"
+      ],
+      "USB": [
+        "model_meta"
+      ],
+      "VCIG": [
+        "model_meta"
+      ],
+      "VENU": [
+        "model_xlong"
+      ],
+      "VLO": [
+        "model_xlong"
+      ],
+      "VNET": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "VOC": [
+        "model_xlong"
+      ],
+      "VRTX": [
+        "model_xlong"
+      ],
+      "VSXY": [
+        "model_meta"
+      ],
+      "VTSI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "WATT": [
+        "model_meta"
+      ],
+      "WF": [
+        "model_meta"
+      ],
+      "WHR": [
+        "model_daily",
+        "model_meta"
+      ],
+      "WPRT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "XJR": [
+        "model_meta"
+      ],
+      "XLFI": [
+        "model_meta"
+      ],
+      "XLII": [
+        "model_daily",
+        "model_meta"
+      ],
+      "XLSI": [
+        "model_daily"
+      ],
+      "XPL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "XPP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "XRPM": [
+        "model_xlong"
+      ],
+      "XYZ": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "YELP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "YUMC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "YYAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ZBAO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ZENA": [
+        "model_xlong"
+      ],
+      "ZS": [
+        "model_xlong"
+      ],
+      "ZTEK": [
+        "model_meta"
+      ],
+      "ZVOL": [
+        "model_xlong",
+        "model_meta"
+      ]
+    },
+    "n_blank": 715
+  },
+  "after": {
+    "scanned": 1351,
+    "complete": 423,
+    "missing_file": [
+      "ATOS",
+      "AZO",
+      "BAND",
+      "BCS",
+      "BLZR",
+      "BN",
+      "BNS",
+      "BNY",
+      "BPRN",
+      "BRT",
+      "BSBK",
+      "BSX",
+      "BZFD",
+      "CACC",
+      "CAN",
+      "CBNA",
+      "CCM",
+      "CCTG",
+      "CDTG",
+      "CDXS",
+      "CEG",
+      "CEPO",
+      "CEPS",
+      "CEPV",
+      "CFFI",
+      "CHGG",
+      "CHWM",
+      "CM",
+      "CMBY",
+      "CMCSA",
+      "CME",
+      "CMI",
+      "CNCK",
+      "CNDT",
+      "COP",
+      "CORT",
+      "CP",
+      "CRAC",
+      "CRDF",
+      "CSQR",
+      "CTAS",
+      "CVGI",
+      "DAAQ",
+      "DHY",
+      "DMAA",
+      "DNMX",
+      "DOCN",
+      "DPC",
+      "DSC",
+      "ED",
+      "EGHT",
+      "ELV",
+      "ENB",
+      "EPD",
+      "EQNR",
+      "ESBA",
+      "EU",
+      "FC",
+      "FCBM",
+      "FDBC",
+      "FEED",
+      "FISN",
+      "FLUX",
+      "FOIL",
+      "FRBT",
+      "FTNT",
+      "FWAC",
+      "FWACR",
+      "GENN",
+      "GINT",
+      "GLW",
+      "GSK",
+      "GTERA",
+      "GWAV",
+      "GYGY",
+      "HBB",
+      "HCWB",
+      "HDB",
+      "HNNA",
+      "HNUC",
+      "HPE",
+      "HWM",
+      "HYFM",
+      "IBN",
+      "IESC",
+      "IFRX",
+      "IGX",
+      "IMC",
+      "ININ",
+      "INTU",
+      "IOND",
+      "ITG",
+      "ITUB",
+      "ITW",
+      "IXHL",
+      "JMKE",
+      "JMM",
+      "JPO",
+      "KARD",
+      "KFDE",
+      "KIIU",
+      "KKR",
+      "KOEI",
+      "LAGH",
+      "LDI",
+      "LGCL",
+      "LIME",
+      "LPAA",
+      "LTGO",
+      "LUNR",
+      "LVWR",
+      "LYFT",
+      "LYNX",
+      "MCK",
+      "MCO",
+      "MELI",
+      "MENW",
+      "MFG",
+      "MKLY",
+      "MLM",
+      "MLP",
+      "MMT",
+      "MNTK",
+      "MOT",
+      "MPX",
+      "MRSH",
+      "MSH",
+      "NAK",
+      "NAUT",
+      "NCO",
+      "NCOOR",
+      "NCOU",
+      "NEM",
+      "NEXM",
+      "NNDM",
+      "NRT",
+      "NTRP",
+      "NUOX",
+      "NXDR",
+      "OCLT",
+      "OPHC",
+      "ORKT",
+      "OSCR",
+      "OSRH",
+      "OST",
+      "PASW",
+      "PBLS",
+      "PBR",
+      "PCAP",
+      "PDD",
+      "PED",
+      "PGR",
+      "PH",
+      "PLG",
+      "PLMK",
+      "PMTR",
+      "PSHG",
+      "PTI",
+      "PTNM",
+      "PWR",
+      "QMLS",
+      "RACD",
+      "RC",
+      "REE",
+      "REF",
+      "RETO",
+      "RGCO",
+      "RKLB",
+      "RMSG",
+      "ROC",
+      "RVPH",
+      "RZLV",
+      "SANM",
+      "SBXD",
+      "SCTX",
+      "SDEV",
+      "SDUR",
+      "SEB",
+      "SEQC",
+      "SGRP",
+      "SHOP",
+      "SIAI",
+      "SIMO",
+      "SIND",
+      "SINI",
+      "SKHY",
+      "SLB",
+      "SLDP",
+      "SNFCA",
+      "SNPS",
+      "SNY",
+      "SPGH",
+      "SPOT",
+      "SQFT",
+      "SRE",
+      "STDN",
+      "STRL",
+      "SVAQ",
+      "SYTN",
+      "SZZL",
+      "TARX",
+      "TC",
+      "TCGX",
+      "TII",
+      "TIWD",
+      "TRCX",
+      "TROO",
+      "TRV",
+      "TRX",
+      "TT",
+      "TUYA",
+      "UBER",
+      "UEIC",
+      "UI",
+      "UL",
+      "UTHR",
+      "VALN",
+      "VATE",
+      "VEEA",
+      "VFF",
+      "VIIU",
+      "VLN",
+      "VOGX",
+      "VRT",
+      "WALD",
+      "WEA",
+      "WELL",
+      "WHK",
+      "WM",
+      "WMB",
+      "XBIO",
+      "XCH",
+      "XLK",
+      "XSD",
+      "YLUZ",
+      "YTRA",
+      "ZVIA"
+    ],
+    "corrupt": [],
+    "blank": {
+      "AGMB": [
+        "model_xlong"
+      ],
+      "ALIT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ALLO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ALLT": [
+        "model_meta"
+      ],
+      "ALNY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ALTG": [
+        "model_meta"
+      ],
+      "AMBA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "AMBR": [
+        "model_xlong"
+      ],
+      "AMCX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AMN": [
+        "model_xlong"
+      ],
+      "AMP": [
+        "model_meta"
+      ],
+      "AMS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AMSF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ANGX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ANIP": [
+        "model_xlong"
+      ],
+      "ANPA": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AOUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "APO": [
+        "model_meta"
+      ],
+      "APPS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ARBB": [
+        "model_meta"
+      ],
+      "ARCB": [
+        "model_meta"
+      ],
+      "ARWR": [
+        "model_meta"
+      ],
+      "ARXS": [
+        "model_xlong"
+      ],
+      "ASO": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ASPN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ASST": [
+        "model_meta"
+      ],
+      "ATEN": [
+        "model_meta"
+      ],
+      "ATGL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ATKR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ATYR": [
+        "model_meta"
+      ],
+      "AUBN": [
+        "model_xlong"
+      ],
+      "AVEX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AVLN": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "AVXL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AWR": [
+        "model_xlong"
+      ],
+      "AXG": [
+        "model_daily"
+      ],
+      "AXIL": [
+        "model_meta"
+      ],
+      "AXIN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "AXON": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "AZTA": [
+        "model_xlong"
+      ],
+      "BATL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBBY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBOT": [
+        "model_xlong"
+      ],
+      "BBSI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BBUC": [
+        "model_xlong"
+      ],
+      "BBVA": [
+        "model_meta"
+      ],
+      "BC": [
+        "model_meta"
+      ],
+      "BCC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BCX": [
+        "model_meta"
+      ],
+      "BDCI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BDSX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BDTX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BETA": [
+        "model_xlong"
+      ],
+      "BFAM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BGSI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BHST": [
+        "model_xlong"
+      ],
+      "BHVN": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BIOX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BJ": [
+        "model_xlong"
+      ],
+      "BKNG": [
+        "model_xlong"
+      ],
+      "BKV": [
+        "model_xlong"
+      ],
+      "BLTE": [
+        "model_meta"
+      ],
+      "BNAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BNC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BNL": [
+        "model_daily",
+        "model_meta"
+      ],
+      "BNR": [
+        "model_meta"
+      ],
+      "BOH": [
+        "model_xlong"
+      ],
+      "BOLT": [
+        "model_xlong"
+      ],
+      "BON": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BORR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BOX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BPOP": [
+        "model_meta"
+      ],
+      "BR": [
+        "model_xlong"
+      ],
+      "BSRR": [
+        "model_meta"
+      ],
+      "BTAI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "BTCT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "BTE": [
+        "model_meta"
+      ],
+      "BUSE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BUUU": [
+        "model_daily"
+      ],
+      "BVC": [
+        "model_daily"
+      ],
+      "BWAY": [
+        "model_meta"
+      ],
+      "BWB": [
+        "model_meta"
+      ],
+      "BWEN": [
+        "model_xlong"
+      ],
+      "BWLP": [
+        "model_xlong"
+      ],
+      "BXSL": [
+        "model_xlong"
+      ],
+      "BYFC": [
+        "model_daily"
+      ],
+      "BYRN": [
+        "model_xlong"
+      ],
+      "BZ": [
+        "model_xlong"
+      ],
+      "BZAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "BZUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CAI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CALM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CANG": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CARG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CARL": [
+        "model_daily"
+      ],
+      "CB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CBAN": [
+        "model_meta"
+      ],
+      "CBNK": [
+        "model_meta"
+      ],
+      "CBRE": [
+        "model_xlong"
+      ],
+      "CBRL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CC": [
+        "model_meta"
+      ],
+      "CCG": [
+        "model_xlong"
+      ],
+      "CCI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CCLD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CCS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CDLR": [
+        "model_meta"
+      ],
+      "CDNL": [
+        "model_xlong"
+      ],
+      "CDNS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CDRO": [
+        "model_meta"
+      ],
+      "CE": [
+        "model_meta"
+      ],
+      "CF": [
+        "model_meta"
+      ],
+      "CFR": [
+        "model_meta"
+      ],
+      "CGNT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CGTL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CIGL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CION": [
+        "model_xlong"
+      ],
+      "CIVB": [
+        "model_meta"
+      ],
+      "CLAR": [
+        "model_daily"
+      ],
+      "CLBK": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CLIR": [
+        "model_daily"
+      ],
+      "CLMB": [
+        "model_xlong"
+      ],
+      "CLMT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CLYM": [
+        "model_xlong"
+      ],
+      "CMRC": [
+        "model_daily"
+      ],
+      "CMTG": [
+        "model_xlong"
+      ],
+      "CMTL": [
+        "model_meta"
+      ],
+      "CNC": [
+        "model_xlong"
+      ],
+      "CNI": [
+        "model_xlong"
+      ],
+      "CNMD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CNNE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CNTX": [
+        "model_meta"
+      ],
+      "COAG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "COGT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "COHN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CON": [
+        "model_daily",
+        "model_meta"
+      ],
+      "COOT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "COPL": [
+        "model_xlong"
+      ],
+      "COR": [
+        "model_meta"
+      ],
+      "CPHI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CPS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CPT": [
+        "model_meta"
+      ],
+      "CRCT": [
+        "model_xlong"
+      ],
+      "CSAN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CSQ": [
+        "model_meta"
+      ],
+      "CSTL": [
+        "model_xlong"
+      ],
+      "CSX": [
+        "model_meta"
+      ],
+      "CTBI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CTKB": [
+        "model_meta"
+      ],
+      "CTS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "CTSH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "CTVA": [
+        "model_xlong"
+      ],
+      "CUBI": [
+        "model_meta"
+      ],
+      "CURB": [
+        "model_meta"
+      ],
+      "CURI": [
+        "model_xlong"
+      ],
+      "CVEO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CVKD": [
+        "model_xlong"
+      ],
+      "CVLT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "CVSA": [
+        "model_meta"
+      ],
+      "CW": [
+        "model_meta"
+      ],
+      "CYD": [
+        "model_meta"
+      ],
+      "DAIO": [
+        "model_meta"
+      ],
+      "DAL": [
+        "model_meta"
+      ],
+      "DAO": [
+        "model_meta"
+      ],
+      "DARE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DASH": [
+        "model_xlong"
+      ],
+      "DC": [
+        "model_xlong"
+      ],
+      "DCTH": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DCX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DDOG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "DDS": [
+        "model_meta"
+      ],
+      "DETX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "DFLI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "DFTX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DGNX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DH": [
+        "model_xlong"
+      ],
+      "DHR": [
+        "model_xlong"
+      ],
+      "DHT": [
+        "model_meta"
+      ],
+      "DIBS": [
+        "model_meta"
+      ],
+      "DKI": [
+        "model_daily"
+      ],
+      "DKNG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DLB": [
+        "model_xlong"
+      ],
+      "DLO": [
+        "model_xlong"
+      ],
+      "DMRA": [
+        "model_xlong"
+      ],
+      "DNN": [
+        "model_meta"
+      ],
+      "DNUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DOCS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "DOMH": [
+        "model_xlong"
+      ],
+      "DORM": [
+        "model_xlong"
+      ],
+      "DOUG": [
+        "model_xlong"
+      ],
+      "DOYU": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "DPG": [
+        "model_meta"
+      ],
+      "DPRO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DRIO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DSGN": [
+        "model_xlong"
+      ],
+      "DT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "DTM": [
+        "model_daily"
+      ],
+      "DUK": [
+        "model_xlong"
+      ],
+      "DUO": [
+        "model_meta"
+      ],
+      "DVN": [
+        "model_xlong"
+      ],
+      "DXC": [
+        "model_xlong"
+      ],
+      "DYAI": [
+        "model_xlong"
+      ],
+      "EBMT": [
+        "model_daily"
+      ],
+      "ECAT": [
+        "model_meta"
+      ],
+      "ECHO": [
+        "model_meta"
+      ],
+      "ECX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "EDIT": [
+        "model_daily"
+      ],
+      "EFC": [
+        "model_meta"
+      ],
+      "EFSC": [
+        "model_meta"
+      ],
+      "EFX": [
+        "model_xlong"
+      ],
+      "EGAN": [
+        "model_xlong"
+      ],
+      "EGO": [
+        "model_meta"
+      ],
+      "EIG": [
+        "model_meta"
+      ],
+      "EIM": [
+        "model_meta"
+      ],
+      "ELA": [
+        "model_meta"
+      ],
+      "ELME": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ELVN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EME": [
+        "model_daily",
+        "model_meta"
+      ],
+      "EMPD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "EMPG": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ENGN": [
+        "model_meta"
+      ],
+      "ENGS": [
+        "model_daily",
+        "model_meta"
+      ],
+      "ENOV": [
+        "model_daily"
+      ],
+      "ENS": [
+        "model_meta"
+      ],
+      "ENTX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "EP": [
+        "model_xlong"
+      ],
+      "EPC": [
+        "model_meta"
+      ],
+      "EPRT": [
+        "model_xlong"
+      ],
+      "EQ": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQIX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EQT": [
+        "model_meta"
+      ],
+      "EQX": [
+        "model_xlong"
+      ],
+      "ERIC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ESOA": [
+        "model_meta"
+      ],
+      "ET": [
+        "model_xlong"
+      ],
+      "EVC": [
+        "model_xlong"
+      ],
+      "EVER": [
+        "model_daily",
+        "model_meta"
+      ],
+      "EXFY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "EXPE": [
+        "model_meta"
+      ],
+      "EYPT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FABC": [
+        "model_meta"
+      ],
+      "FBIN": [
+        "model_daily"
+      ],
+      "FBNC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FCCO": [
+        "model_meta"
+      ],
+      "FCX": [
+        "model_xlong"
+      ],
+      "FDX": [
+        "model_meta"
+      ],
+      "FEBO": [
+        "model_xlong"
+      ],
+      "FEDU": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FENG": [
+        "model_xlong"
+      ],
+      "FERG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FET": [
+        "model_daily"
+      ],
+      "FFAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FFBC": [
+        "model_meta"
+      ],
+      "FHTX": [
+        "model_meta"
+      ],
+      "FIGS": [
+        "model_meta"
+      ],
+      "FINW": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FIS": [
+        "model_xlong"
+      ],
+      "FKWL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FLNT": [
+        "model_meta"
+      ],
+      "FLO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FLYW": [
+        "model_meta"
+      ],
+      "FMBH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FMC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "FNKO": [
+        "model_xlong"
+      ],
+      "FNWD": [
+        "model_xlong"
+      ],
+      "FORR": [
+        "model_meta"
+      ],
+      "FOXX": [
+        "model_daily"
+      ],
+      "FSLR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FSLY": [
+        "model_meta"
+      ],
+      "FSS": [
+        "model_xlong"
+      ],
+      "FSSL": [
+        "model_daily"
+      ],
+      "FSUN": [
+        "model_xlong"
+      ],
+      "FTDR": [
+        "model_daily",
+        "model_meta"
+      ],
+      "FTEK": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTHY": [
+        "model_xlong"
+      ],
+      "FTI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTRE": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "FTRK": [
+        "model_xlong"
+      ],
+      "FUBO": [
+        "model_xlong"
+      ],
+      "FUND": [
+        "model_meta"
+      ],
+      "FURY": [
+        "model_xlong"
+      ],
+      "FWONK": [
+        "model_xlong"
+      ],
+      "GAMB": [
+        "model_xlong"
+      ],
+      "GANX": [
+        "model_meta"
+      ],
+      "GAUZ": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GCT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GCV": [
+        "model_meta"
+      ],
+      "GDDY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GDTC": [
+        "model_meta"
+      ],
+      "GEG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GENK": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GETY": [
+        "model_xlong"
+      ],
+      "GGB": [
+        "model_meta"
+      ],
+      "GGRP": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GIBO": [
+        "model_xlong"
+      ],
+      "GIFT": [
+        "model_daily"
+      ],
+      "GIW": [
+        "model_xlong"
+      ],
+      "GLBE": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GLNG": [
+        "model_meta"
+      ],
+      "GLOO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GLV": [
+        "model_meta"
+      ],
+      "GM": [
+        "model_meta"
+      ],
+      "GNS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GOF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GOLF": [
+        "model_meta"
+      ],
+      "GPC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GPRE": [
+        "model_meta"
+      ],
+      "GRCE": [
+        "model_meta"
+      ],
+      "GREE": [
+        "model_meta"
+      ],
+      "GRFS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GROV": [
+        "model_xlong"
+      ],
+      "GRWG": [
+        "model_daily"
+      ],
+      "GSBC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GSIW": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "GTEC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "GTEN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GUTS": [
+        "model_daily"
+      ],
+      "GVH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "GWH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "GXAI": [
+        "model_daily"
+      ],
+      "HAFC": [
+        "model_meta"
+      ],
+      "HAIN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HBAN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HBM": [
+        "model_daily"
+      ],
+      "HBNC": [
+        "model_daily"
+      ],
+      "HCA": [
+        "model_meta"
+      ],
+      "HCKT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HCSG": [
+        "model_meta"
+      ],
+      "HDRN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HELE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HEPS": [
+        "model_meta"
+      ],
+      "HGBL": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HIND": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HIT": [
+        "model_meta"
+      ],
+      "HL": [
+        "model_xlong"
+      ],
+      "HLLY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HLN": [
+        "model_meta"
+      ],
+      "HLXC": [
+        "model_xlong"
+      ],
+      "HNI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "HNST": [
+        "model_meta"
+      ],
+      "HODO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HOUR": [
+        "model_xlong"
+      ],
+      "HOVR": [
+        "model_meta"
+      ],
+      "HPQ": [
+        "model_xlong"
+      ],
+      "HQI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "HR": [
+        "model_meta"
+      ],
+      "HROW": [
+        "model_xlong"
+      ],
+      "HTT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HTZ": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "HUT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "HWH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "HYPD": [
+        "model_daily"
+      ],
+      "ICMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "IDXX": [
+        "model_xlong"
+      ],
+      "IDYA": [
+        "model_xlong"
+      ],
+      "IFF": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "IGC": [
+        "model_daily"
+      ],
+      "IHRT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "III": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "IMA": [
+        "model_meta"
+      ],
+      "IMAX": [
+        "model_meta"
+      ],
+      "IMMP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "IMMX": [
+        "model_xlong"
+      ],
+      "INAB": [
+        "model_xlong"
+      ],
+      "ING": [
+        "model_meta"
+      ],
+      "INGN": [
+        "model_xlong"
+      ],
+      "INGR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INHD": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INTA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "INTG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "INTZ": [
+        "model_xlong"
+      ],
+      "INVE": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "IOSP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "IRDM": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ITT": [
+        "model_meta"
+      ],
+      "IVVD": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "JBDI": [
+        "model_xlong"
+      ],
+      "JBGS": [
+        "model_xlong"
+      ],
+      "JBLU": [
+        "model_xlong"
+      ],
+      "JBSS": [
+        "model_xlong"
+      ],
+      "JD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "JEM": [
+        "model_xlong"
+      ],
+      "JL": [
+        "model_meta"
+      ],
+      "JUNS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "JXN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "KHC": [
+        "model_xlong"
+      ],
+      "KINS": [
+        "model_xlong"
+      ],
+      "KOS": [
+        "model_meta"
+      ],
+      "KRSP": [
+        "model_meta"
+      ],
+      "KT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "KURA": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "KVUE": [
+        "model_xlong"
+      ],
+      "LASE": [
+        "model_daily"
+      ],
+      "LAWR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LBTYB": [
+        "model_daily"
+      ],
+      "LCTX": [
+        "model_xlong"
+      ],
+      "LEE": [
+        "model_xlong"
+      ],
+      "LEGN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "LFMD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LFUS": [
+        "model_meta"
+      ],
+      "LFWD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LGIH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LHSW": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LII": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LKFN": [
+        "model_xlong"
+      ],
+      "LKFT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LNC": [
+        "model_meta"
+      ],
+      "LND": [
+        "model_xlong"
+      ],
+      "LOAR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "LODE": [
+        "model_daily",
+        "model_meta"
+      ],
+      "LOT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "LPG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LRE": [
+        "model_meta"
+      ],
+      "LSE": [
+        "model_meta"
+      ],
+      "LTRX": [
+        "model_daily"
+      ],
+      "LUV": [
+        "model_meta"
+      ],
+      "LVO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "LX": [
+        "model_xlong"
+      ],
+      "LYEL": [
+        "model_meta"
+      ],
+      "MACI": [
+        "model_daily"
+      ],
+      "MAKO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MAT": [
+        "model_xlong"
+      ],
+      "MATH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MBI": [
+        "model_xlong"
+      ],
+      "MCHP": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MCHX": [
+        "model_xlong"
+      ],
+      "MCS": [
+        "model_xlong"
+      ],
+      "MDCX": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MEDS": [
+        "model_meta"
+      ],
+      "MEGI": [
+        "model_meta"
+      ],
+      "MENS": [
+        "model_daily"
+      ],
+      "MESO": [
+        "model_xlong"
+      ],
+      "METC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "METCB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MLKN": [
+        "model_daily",
+        "model_meta"
+      ],
+      "MNST": [
+        "model_meta"
+      ],
+      "MNY": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MODD": [
+        "model_xlong"
+      ],
+      "MOS": [
+        "model_daily"
+      ],
+      "MREO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MRNA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MRT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MSLE": [
+        "model_daily"
+      ],
+      "MTSI": [
+        "model_xlong"
+      ],
+      "MVIS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "MVST": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "MWH": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "MXE": [
+        "model_meta"
+      ],
+      "MYO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NA": [
+        "model_xlong"
+      ],
+      "NAD": [
+        "model_daily"
+      ],
+      "NATL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NBB": [
+        "model_meta"
+      ],
+      "NBBK": [
+        "model_meta"
+      ],
+      "NBH": [
+        "model_meta"
+      ],
+      "NBN": [
+        "model_meta"
+      ],
+      "NCDL": [
+        "model_meta"
+      ],
+      "NCNO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NDLS": [
+        "model_xlong"
+      ],
+      "NERV": [
+        "model_meta"
+      ],
+      "NESR": [
+        "model_meta"
+      ],
+      "NET": [
+        "model_meta"
+      ],
+      "NEWT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NEXT": [
+        "model_daily"
+      ],
+      "NHP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NICE": [
+        "model_xlong"
+      ],
+      "NIU": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NMAX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NMFC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NMIH": [
+        "model_meta"
+      ],
+      "NML": [
+        "model_xlong"
+      ],
+      "NMM": [
+        "model_meta"
+      ],
+      "NMRA": [
+        "model_meta"
+      ],
+      "NMTC": [
+        "model_daily"
+      ],
+      "NNE": [
+        "model_xlong"
+      ],
+      "NOC": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NOMA": [
+        "model_xlong"
+      ],
+      "NOMD": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NOW": [
+        "model_xlong"
+      ],
+      "NPK": [
+        "model_meta"
+      ],
+      "NPV": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NRG": [
+        "model_xlong"
+      ],
+      "NRGV": [
+        "model_meta"
+      ],
+      "NSP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "NSPR": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTCL": [
+        "model_xlong"
+      ],
+      "NTES": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTGR": [
+        "model_xlong"
+      ],
+      "NTHI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NTR": [
+        "model_meta"
+      ],
+      "NTRB": [
+        "model_xlong"
+      ],
+      "NUAI": [
+        "model_meta"
+      ],
+      "NUTX": [
+        "model_meta"
+      ],
+      "NVCT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NVST": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NVX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "NWFL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "NXPL": [
+        "model_xlong"
+      ],
+      "NXTC": [
+        "model_daily"
+      ],
+      "NXTS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "NXTT": [
+        "model_meta"
+      ],
+      "NXXT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OCGN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OFG": [
+        "model_meta"
+      ],
+      "OKTA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "OKYO": [
+        "model_xlong"
+      ],
+      "ONL": [
+        "model_daily"
+      ],
+      "ONMD": [
+        "model_daily"
+      ],
+      "OPK": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ORGO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "OTF": [
+        "model_xlong"
+      ],
+      "OZ": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PAI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PALI": [
+        "model_meta"
+      ],
+      "PBT": [
+        "model_daily",
+        "model_meta"
+      ],
+      "PCB": [
+        "model_meta"
+      ],
+      "PCF": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PCRX": [
+        "model_meta"
+      ],
+      "PD": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PDM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PDSB": [
+        "model_daily"
+      ],
+      "PEGA": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PEO": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PERF": [
+        "model_xlong"
+      ],
+      "PFL": [
+        "model_daily",
+        "model_meta"
+      ],
+      "PGNY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PHK": [
+        "model_meta"
+      ],
+      "PHR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PHUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PIM": [
+        "model_daily"
+      ],
+      "PLD": [
+        "model_xlong"
+      ],
+      "PLUS": [
+        "model_meta"
+      ],
+      "PMO": [
+        "model_meta"
+      ],
+      "PNC": [
+        "model_meta"
+      ],
+      "PPL": [
+        "model_xlong"
+      ],
+      "PRCH": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PRMB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PRME": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "PSA": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PSBD": [
+        "model_xlong"
+      ],
+      "PSF": [
+        "model_meta"
+      ],
+      "PSKY": [
+        "model_daily"
+      ],
+      "PSQH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "PSTV": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "PTCT": [
+        "model_meta"
+      ],
+      "PWP": [
+        "model_xlong"
+      ],
+      "PYPL": [
+        "model_xlong"
+      ],
+      "PYXS": [
+        "model_meta"
+      ],
+      "RACE": [
+        "model_daily"
+      ],
+      "RAY": [
+        "model_meta"
+      ],
+      "RCG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RCL": [
+        "model_meta"
+      ],
+      "RCS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RDZN": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "REFR": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "REGN": [
+        "model_xlong"
+      ],
+      "RES": [
+        "model_xlong"
+      ],
+      "RFMZ": [
+        "model_xlong"
+      ],
+      "RGLD": [
+        "model_meta"
+      ],
+      "RIVN": [
+        "model_daily"
+      ],
+      "RKTO": [
+        "model_xlong"
+      ],
+      "RLI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RLX": [
+        "model_xlong"
+      ],
+      "RLYB": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RMAX": [
+        "model_xlong"
+      ],
+      "RNGR": [
+        "model_meta"
+      ],
+      "RNR": [
+        "model_meta"
+      ],
+      "ROIV": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "ROK": [
+        "model_meta"
+      ],
+      "RPD": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "RPRX": [
+        "model_meta"
+      ],
+      "RPT": [
+        "model_meta"
+      ],
+      "RR": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "RRGB": [
+        "model_daily",
+        "model_meta"
+      ],
+      "RSG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "RSI": [
+        "model_meta"
+      ],
+      "RVI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SBI": [
+        "model_daily"
+      ],
+      "SBLK": [
+        "model_xlong"
+      ],
+      "SCOR": [
+        "model_xlong"
+      ],
+      "SEGG": [
+        "model_daily",
+        "model_meta"
+      ],
+      "SERV": [
+        "model_xlong"
+      ],
+      "SFBC": [
+        "model_meta"
+      ],
+      "SGI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SGML": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SGRY": [
+        "model_daily",
+        "model_meta"
+      ],
+      "SHW": [
+        "model_daily"
+      ],
+      "SI": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SIGI": [
+        "model_xlong"
+      ],
+      "SJT": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SLMT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SLVM": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SM": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SNOW": [
+        "model_xlong"
+      ],
+      "SO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SOFI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SOGP": [
+        "model_xlong"
+      ],
+      "SOUN": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPGI": [
+        "model_xlong"
+      ],
+      "SPPL": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SPRO": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "SPWH": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPWR": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "SPY": [
+        "model_daily"
+      ],
+      "SQNS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SRFM": [
+        "model_xlong"
+      ],
+      "SRL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "SSTI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "STEX": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "STFS": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "STHO": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "STVN": [
+        "model_xlong"
+      ],
+      "SUNE": [
+        "model_daily"
+      ],
+      "SUPX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "SWVL": [
+        "model_xlong"
+      ],
+      "SYPR": [
+        "model_meta"
+      ],
+      "TAC": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TACH": [
+        "model_daily"
+      ],
+      "TCBI": [
+        "model_xlong"
+      ],
+      "TDAY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TDS": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TEVA": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TFC": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TGEN": [
+        "model_xlong"
+      ],
+      "TGT": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "THRY": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TIL": [
+        "model_xlong"
+      ],
+      "TLPH": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TLSI": [
+        "model_meta"
+      ],
+      "TNC": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TNXP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TNYA": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TOP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "TOPW": [
+        "model_daily"
+      ],
+      "TPET": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "TPG": [
+        "model_xlong"
+      ],
+      "TRAW": [
+        "model_daily"
+      ],
+      "TREX": [
+        "model_meta"
+      ],
+      "TRSG": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "TSQ": [
+        "model_meta"
+      ],
+      "TTI": [
+        "model_meta"
+      ],
+      "TTWO": [
+        "model_xlong"
+      ],
+      "TVTX": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TWFG": [
+        "model_meta"
+      ],
+      "TWI": [
+        "model_daily",
+        "model_meta"
+      ],
+      "TWIN": [
+        "model_xlong"
+      ],
+      "TWST": [
+        "model_xlong"
+      ],
+      "TXG": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "TXMD": [
+        "model_xlong"
+      ],
+      "TXO": [
+        "model_meta"
+      ],
+      "TYGO": [
+        "model_daily",
+        "model_meta"
+      ],
+      "UHS": [
+        "model_daily",
+        "model_meta"
+      ],
+      "UMBF": [
+        "model_meta"
+      ],
+      "UMC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "UPS": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "UPXI": [
+        "model_meta"
+      ],
+      "USB": [
+        "model_meta"
+      ],
+      "VCIG": [
+        "model_meta"
+      ],
+      "VENU": [
+        "model_xlong"
+      ],
+      "VLO": [
+        "model_xlong"
+      ],
+      "VNET": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "VOC": [
+        "model_xlong"
+      ],
+      "VRTX": [
+        "model_xlong"
+      ],
+      "VSXY": [
+        "model_meta"
+      ],
+      "VTSI": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "WATT": [
+        "model_meta"
+      ],
+      "WF": [
+        "model_meta"
+      ],
+      "WHR": [
+        "model_daily",
+        "model_meta"
+      ],
+      "WPRT": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "XJR": [
+        "model_meta"
+      ],
+      "XLFI": [
+        "model_meta"
+      ],
+      "XLII": [
+        "model_daily",
+        "model_meta"
+      ],
+      "XLSI": [
+        "model_daily"
+      ],
+      "XPL": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "XPP": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "XRPM": [
+        "model_xlong"
+      ],
+      "XYZ": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "YELP": [
+        "model_daily",
+        "model_meta"
+      ],
+      "YUMC": [
+        "model_xlong",
+        "model_meta"
+      ],
+      "YYAI": [
+        "model_daily",
+        "model_xlong",
+        "model_meta"
+      ],
+      "ZBAO": [
+        "model_daily",
+        "model_xlong"
+      ],
+      "ZENA": [
+        "model_xlong"
+      ],
+      "ZS": [
+        "model_xlong"
+      ],
+      "ZTEK": [
+        "model_meta"
+      ],
+      "ZVOL": [
+        "model_xlong",
+        "model_meta"
+      ]
+    },
+    "n_blank": 691
+  }
+}

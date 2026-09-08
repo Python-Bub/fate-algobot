@@ -1,0 +1,11 @@
+{
+  "triggers": [
+    {
+      "ticker": "ORCL",
+      "dip_pct": 3.0,
+      "notional_usd": 3500.0,
+      "fired": false,
+      "created_at_utc": "2026-06-10T13:44:43.231017+00:00"
+    }
+  ]
+}

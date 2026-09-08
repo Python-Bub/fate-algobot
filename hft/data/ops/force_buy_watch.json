@@ -1,0 +1,46 @@
+{
+  "symbols": [
+    "BX",
+    "SBUX",
+    "COST",
+    "WMT",
+    "NOW",
+    "CRM",
+    "JNJ",
+    "AAPL",
+    "AMZN",
+    "META",
+    "NVDA",
+    "AMD",
+    "AVGO",
+    "MSFT"
+  ],
+  "note": "RTH FORCE/STICK priority \u2014 high-conviction UP + Cramer hot + earnings radar; fortress PRED_FORCE + EARNINGS_STICK; index ETF rebuys banned",
+  "updated": "2026-07-30",
+  "updated_at_utc": "2026-07-30T03:11:25.527509+00:00",
+  "rules": {
+    "PRED_FORCE_BUY": true,
+    "PRED_FORCE_MIN_P": 0.6,
+    "EARNINGS_STICK_FORCE_BUY": true,
+    "FORTRESS_BAN_INDEX_BUYS": true,
+    "max_single_frac": 0.1,
+    "no_index_rebuy": [
+      "SPY",
+      "QQQ",
+      "IWM",
+      "DIA",
+      "VOO",
+      "VTI",
+      "SOXX",
+      "XLK",
+      "XLF",
+      "XLE"
+    ]
+  },
+  "held_do_not_churn": [
+    "SBUX"
+  ],
+  "must_buy_if_pred_up": [
+    "BX"
+  ]
+}

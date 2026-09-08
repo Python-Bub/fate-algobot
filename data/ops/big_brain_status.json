@@ -1,0 +1,232 @@
+{
+  "ok": true,
+  "updated_at_utc": "2026-09-08T05:27:56.674802+00:00",
+  "pipeline": {
+    "pipeline": "big_brain",
+    "ok": true,
+    "finished_at_utc": "2026-09-08T05:27:56.673322+00:00",
+    "stages": [
+      {
+        "name": "cramer_hot_picks",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 1,
+        "result": {
+          "hot_buys": [
+            "COST",
+            "WMT",
+            "NOW",
+            "CRM",
+            "JNJ"
+          ],
+          "jsonl_lines": 0
+        }
+      },
+      {
+        "name": "cramer_post_market",
+        "ok": true,
+        "optional": true,
+        "elapsed_ms": 4437,
+        "result": {
+          "ok": true,
+          "ingested": false,
+          "skipped": true,
+          "picks": 2,
+          "reason": "already_synced_today"
+        }
+      },
+      {
+        "name": "investor_succession",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 1328,
+        "result": {
+          "ok": true,
+          "updated_at_utc": "2026-09-08T05:27:50.888107+00:00",
+          "failover_active": false,
+          "primary": {
+            "stale": false,
+            "min_age_hours": 0.0,
+            "stale_threshold_h": 36.0,
+            "primary_urls_ok": 3,
+            "details": {
+              "transcript_age_h": 2.61,
+              "cramer_post_market_latest.json": 2.64,
+              "morning_club_latest.json": 2.61,
+              "cramer_hot_picks.json": 0.0,
+              "cramer_cnbc_top10_sync.json": 101.55,
+              "https://www.cnbc.com/mad-money/": {
+                "ok": true,
+                "reason": "http_200"
+              },
+              "https://www.cnbc.com/jim-cramer/": {
+                "ok": true,
+                "reason": "http_200"
+              },
+              "https://www.cnbc.com/investingclub/": {
+                "ok": true,
+                "reason": "http_200"
+              }
+            }
+          },
+          "weights": {
+            "primary_cramer": 1.0,
+            "alternates": 0.1
+          },
+          "roster": [
+            {
+              "id": "cramer_primary",
+              "role": "primary",
+              "urls": [
+                "https://www.cnbc.com/mad-money/",
+                "https://www.cnbc.com/jim-cramer/",
+                "https://www.cnbc.com/investingclub/"
+              ],
+              "weight": 1.0
+            },
+            {
+              "id": "cnbc_markets",
+              "role": "alternate",
+              "urls": [
+                "https://www.cnbc.com/markets/"
+              ],
+              "weight": 0.55
+            },
+            {
+              "id": "yahoo_finance_news",
+              "role": "alternate",
+              "urls": [
+                "https://finance.yahoo.com/topic/stock-market-news/"
+              ],
+              "weight": 0.45
+            },
+            {
+              "id": "sec_edgar_atom",
+              "role": "alternate",
+              "urls": [
+                "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&output=atom"
+              ],
+              "weight": 0.35
+            },
+            {
+              "id": "federal_reserve",
+              "role": "alternate",
+              "urls": [
+                "https://www.federalreserve.gov/json/ne-press.json"
+              ],
+              "weight": 0.3
+            }
+          ],
+          "alt_n_tickers": 0,
+          "eternal": true,
+          "note": "Lives as long as markets + allowlisted public feeds exist"
+        }
+      },
+      {
+        "name": "safe_knowledge",
+        "ok": true,
+        "optional": true,
+        "elapsed_ms": 4285,
+        "result": {
+          "ok": true,
+          "pairs": 56,
+          "n_wiki": 40,
+          "n_arxiv": 20,
+          "path": "/Users/demirgenc/FATE_AlgoBot/data/talk_brain/knowledge_teacher.txt",
+          "chars": 3088006
+        }
+      },
+      {
+        "name": "talk_brain",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 1476,
+        "result": {
+          "ready": true,
+          "codebase": true,
+          "edits": false,
+          "backend": "local_char_lstm",
+          "sha256_16": "4c4e156f7e3a8852",
+          "path": "/Users/demirgenc/FATE_AlgoBot/data/talk_brain/brain.pt",
+          "not_qwen": true,
+          "edit_gate": {
+            "ts": 1788845276.6513338,
+            "problems_done": 23519643900,
+            "billion_threshold": 1000000000,
+            "billion_unlocked": true,
+            "pct_of_1b": 2351.96439,
+            "remaining_to_1b": 0,
+            "env_TALK_ALLOW_EDITS": false,
+            "edits_allowed": false,
+            "note": "Edits stay locked until problems_done >= 1e9 AND TALK_ALLOW_EDITS=true. Closing the Mac stops local caffeinate/daemons; resume with ./tools/resume_massive_training.sh --continue",
+            "sources": {
+              "checkpoint": "data/talk_brain/massive_harness_checkpoint.json",
+              "progress_jsonl": "data/talk_brain/trillion_progress.jsonl"
+            }
+          }
+        }
+      },
+      {
+        "name": "browser_allowlist",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 0,
+        "result": {
+          "browser": true,
+          "lookup": true,
+          "allowlist_n": 42,
+          "has_wiki": true,
+          "has_arxiv": true
+        }
+      },
+      {
+        "name": "letter_coverage",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 21,
+        "result": {
+          "models_gb": 4.78,
+          "target_gb": 100,
+          "weak_letters": [
+            "E",
+            "F",
+            "I",
+            "O",
+            "R"
+          ],
+          "train_prioritize": "letter_rr (top100 then A\u2013Z round-robin)"
+        }
+      },
+      {
+        "name": "events",
+        "ok": true,
+        "optional": false,
+        "elapsed_ms": 0,
+        "result": {
+          "n": 3,
+          "events": [
+            {
+              "path": "data/intel/cramer_hot_picks.json",
+              "mtime": 1788845265.1239378
+            },
+            {
+              "path": "data/intel/cramer_post_market_latest.json",
+              "mtime": 1788835773.821106
+            },
+            {
+              "path": "data/intel/investor_succession.json",
+              "mtime": 1788845270.8890269
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "config": {
+    "TALK_TEACHER_PROBLEMS": "1000000000000",
+    "TALK_TEST_ITERS": "10000000",
+    "USE_CRAMER_HOT_PICKS": "true",
+    "USE_INVESTOR_SUCCESSION": "true",
+    "TRAIN_PRIORITIZE": "letter_rr"
+  }
+}

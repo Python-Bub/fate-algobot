@@ -1,0 +1,467 @@
+{
+  "podcast": {
+    "ts": 1787285864.7828321,
+    "n": 8,
+    "items": [
+      {
+        "title": "Walmart sales under strain as US shoppers pull back",
+        "link": "https://www.bbc.co.uk/news/articles/cpq8rjy7vxlo?at_medium=RSS&at_campaign=rss",
+        "summary": "High gas prices and weaker pharmacy sales pushed Walmart's growth to its slowest pace in six years",
+        "sentiment": 0.3333333333333333,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "Stifling heat and broken toilets: TUI River Cruise passengers tell of their holiday hell",
+        "link": "https://www.bbc.co.uk/news/articles/cy07exrz5lpo?at_medium=RSS&at_campaign=rss",
+        "summary": "Holidaymakers tell the BBC they paid for luxury breaks but faulty air conditioning left them in sweltering heat.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "Millennials are struggling to buy a home - but is it actually getting easier?",
+        "link": "https://www.bbc.co.uk/news/articles/cgewlld498xo?at_medium=RSS&at_campaign=rss",
+        "summary": "Twenty-somethings are much less likely to own a home than previous generations. But data suggests things may be turning a corner.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "Why the US economy is ringing alarm bells",
+        "link": "https://www.bbc.co.uk/news/articles/c9d8z72nn02o?at_medium=RSS&at_campaign=rss",
+        "summary": "The US hit a debt milestone this week, but just how worried should we be about the world's largest economy?",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "How much could Trump's 'economic D-Day' hurt Iran?",
+        "link": "https://www.bbc.co.uk/news/articles/cre4gdvlj9ro?at_medium=RSS&at_campaign=rss",
+        "summary": "Iran has so far proved adept at finding ways around years of already punishing sanctions on its economy.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "Travelodge boss resigns as chain tackles security after sex assault at hotel",
+        "link": "https://www.bbc.co.uk/news/articles/c2k7e7zwxvyo?at_medium=RSS&at_campaign=rss",
+        "summary": "Jo Boydell had been criticised for the company's handling of issues with its safety and security.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "How landscape gardening is being electrified",
+        "link": "https://www.bbc.co.uk/news/articles/cpq3w3v19veo?at_medium=RSS&at_campaign=rss",
+        "summary": "The switch to quieter electric equipment is not going as fast as some would like.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      },
+      {
+        "title": "US national debt passes $40tn after doubling in a decade",
+        "link": "https://www.bbc.co.uk/news/articles/c70gp8252ejo?at_medium=RSS&at_campaign=rss",
+        "summary": "It comes after the interest rate on 30-year bonds reached the highest level in almost 20 years.",
+        "sentiment": 0.0,
+        "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
+      }
+    ]
+  },
+  "youtube": [],
+  "symbols": {
+    "NVDA": {
+      "symbol": "NVDA",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "AAPL": {
+      "symbol": "AAPL",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "GOOGL": {
+      "symbol": "GOOGL",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "GOOG": {
+      "symbol": "GOOG",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "MSFT": {
+      "symbol": "MSFT",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "AMZN": {
+      "symbol": "AMZN",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "TSM": {
+      "symbol": "TSM",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "AVGO": {
+      "symbol": "AVGO",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "SPCX": {
+      "symbol": "SPCX",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "META": {
+      "symbol": "META",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "TSLA": {
+      "symbol": "TSLA",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "BRK-B": {
+      "symbol": "BRK-B",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "SKHY": {
+      "symbol": "SKHY",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "LLY": {
+      "symbol": "LLY",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "MU": {
+      "symbol": "MU",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "WMT": {
+      "symbol": "WMT",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "JPM": {
+      "symbol": "JPM",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "AMD": {
+      "symbol": "AMD",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "ASML": {
+      "symbol": "ASML",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "XOM": {
+      "symbol": "XOM",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "ORCL": {
+      "symbol": "ORCL",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "JNJ": {
+      "symbol": "JNJ",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "INTC": {
+      "symbol": "INTC",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "CSCO": {
+      "symbol": "CSCO",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "MA": {
+      "symbol": "MA",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "COST": {
+      "symbol": "COST",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "CAT": {
+      "symbol": "CAT",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "ABBV": {
+      "symbol": "ABBV",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "QH": {
+      "symbol": "QH",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "BAC": {
+      "symbol": "BAC",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "LRCX": {
+      "symbol": "LRCX",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "CVX": {
+      "symbol": "CVX",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "ARM": {
+      "symbol": "ARM",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "UNH": {
+      "symbol": "UNH",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "AMAT": {
+      "symbol": "AMAT",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "HSBC": {
+      "symbol": "HSBC",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "NFLX": {
+      "symbol": "NFLX",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "GE": {
+      "symbol": "GE",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "KO": {
+      "symbol": "KO",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    },
+    "PG": {
+      "symbol": "PG",
+      "boost": 0.0,
+      "sentiment": 0.0,
+      "n_hits": 1,
+      "sources": [
+        "transcripts"
+      ],
+      "titles": []
+    }
+  }
+}

@@ -1,0 +1,454 @@
+{
+  "built_at_utc": "2026-08-07T08:16:00.018882+00:00",
+  "built_at_et": "2026-08-07T04:15:59.989817-04:00",
+  "target_session": "Monday RTH",
+  "trade_start_et": "06:00",
+  "trade_end_et": "20:00",
+  "trade_session_mode": "extended",
+  "holdings_skip": [
+    "AMZN",
+    "ORCL",
+    "QH"
+  ],
+  "preorders": [
+    {
+      "ticker": "PNC",
+      "p_adj": 0.5574276049931844,
+      "score": 0.56,
+      "signal": "UP",
+      "source": "family_forecast",
+      "horizon": "one_day",
+      "rank": 1
+    },
+    {
+      "ticker": "APP",
+      "p_adj": 0.8201479752573615,
+      "score": 0.82,
+      "signal": "UP",
+      "source": "family_forecast",
+      "horizon": "one_week",
+      "rank": 2
+    },
+    {
+      "ticker": "WMT",
+      "p_adj": 0.9495768323710797,
+      "score": 0.95,
+      "signal": "UP",
+      "source": "family_forecast",
+      "horizon": "one_month",
+      "rank": 3
+    },
+    {
+      "ticker": "DUK",
+      "p_adj": 0.6656576751866372,
+      "score": 0.67,
+      "signal": "UP",
+      "source": "family_forecast",
+      "horizon": "one_week",
+      "rank": 4
+    },
+    {
+      "ticker": "NOC",
+      "p_adj": 0.7103174603174603,
+      "score": 0.71,
+      "signal": "UP",
+      "source": "family_forecast",
+      "horizon": "one_month",
+      "rank": 5
+    }
+  ],
+  "family_forecast": {
+    "as_of": "2026-08-07T08:15:47.854582+00:00",
+    "report": "paper_sim_20260729_093608.json",
+    "report_age_hours": 214.66,
+    "report_quality": {
+      "tradeable": 107,
+      "top100": 85,
+      "universe": 160,
+      "coverage": 0.6687
+    },
+    "stale": true,
+    "market_bull_bear": {
+      "bull_bear_score": 0.1290818288770866,
+      "bull_bear_label": "NEUTRAL",
+      "bull_bear_read": "mixed / range \u2014 no strong market direction",
+      "regime": "low_vol_range",
+      "vix": 18.329999923706055,
+      "macro_score": 0.38491666666666713,
+      "hmm_market_score": 0.08164024064238763
+    },
+    "best_per_horizon": [
+      {
+        "ticker": "PNC",
+        "label": "one_day",
+        "title": "1 day",
+        "days": 1,
+        "chance_pct": 56,
+        "p_up": 0.5574276049931844,
+        "signal": "UP",
+        "head": "model_daily",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "same_day_eod",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 sell same day before close (3:45 PM ET).",
+        "momentum_5d": -0.0019988806268489423,
+        "rally_signal": 0.0,
+        "rally_continuation": false,
+        "model_note": "",
+        "industry_primary": "regional_banks",
+        "industry_note": "Regional Banks (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "regional_banks",
+            "weight": 0.4481,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2688,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.138,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0743,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "application_software",
+            "weight": 0.0709,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "APP",
+        "label": "one_week",
+        "title": "1 week",
+        "days": 5,
+        "chance_pct": 82,
+        "p_up": 0.8201479752573615,
+        "signal": "UP",
+        "head": "model_short",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "week_eod",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold through the week, sell Friday at close (3:45 PM ET).",
+        "momentum_5d": -0.07669476822735888,
+        "rally_signal": 0.55,
+        "rally_continuation": true,
+        "model_note": "",
+        "industry_primary": "interactive_media",
+        "industry_note": "Interactive Media (+ biotech, aerospace defense)",
+        "industries": [
+          {
+            "industry_id": "interactive_media",
+            "weight": 0.3934,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1602,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.155,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "entertainment_streaming",
+            "weight": 0.1529,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.1385,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "WMT",
+        "label": "one_month",
+        "title": "1 month",
+        "days": 21,
+        "chance_pct": 95,
+        "p_up": 0.9495768323710797,
+        "signal": "UP",
+        "head": "bounce_recovery",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "month_eod",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold ~1 month (~21 trading days), sell at close on exit day (3:45 PM ET).",
+        "momentum_5d": -0.0417541730765314,
+        "rally_signal": 0.49500000000000005,
+        "rally_continuation": true,
+        "model_note": "bounce recovery (xlong-weighted; not a 1-day/week trade)",
+        "industry_primary": "hypermarkets_discount",
+        "industry_note": "Hypermarkets & Discount (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "hypermarkets_discount",
+            "weight": 0.5398,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2068,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1397,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0957,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "air_freight_logistics",
+            "weight": 0.018,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "WMT",
+        "label": "six_months",
+        "title": "6 months",
+        "days": 126,
+        "chance_pct": 95,
+        "p_up": 0.9891854188381098,
+        "signal": "UP",
+        "head": "model_xlong",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "hold_days_eod",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold ~6 months (~126 trading days), sell at close on exit day (3:45 PM ET).",
+        "momentum_5d": -0.0417541730765314,
+        "rally_signal": 0.49500000000000005,
+        "rally_continuation": true,
+        "model_note": "",
+        "industry_primary": "hypermarkets_discount",
+        "industry_note": "Hypermarkets & Discount (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "hypermarkets_discount",
+            "weight": 0.5398,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2068,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1397,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0957,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "air_freight_logistics",
+            "weight": 0.018,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "WMT",
+        "label": "one_year",
+        "title": "1 year",
+        "days": 252,
+        "chance_pct": 95,
+        "p_up": 0.9891854188381098,
+        "signal": "UP",
+        "head": "model_xlong",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "year_eod",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold ~1 year (~252 trading days), sell at close on exit day (3:45 PM ET).",
+        "momentum_5d": -0.0417541730765314,
+        "rally_signal": 0.49500000000000005,
+        "rally_continuation": true,
+        "model_note": "",
+        "industry_primary": "hypermarkets_discount",
+        "industry_note": "Hypermarkets & Discount (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "hypermarkets_discount",
+            "weight": 0.5398,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2068,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1397,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0957,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "air_freight_logistics",
+            "weight": 0.018,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "WMT",
+        "label": "five_years",
+        "title": "5 years",
+        "days": 1260,
+        "chance_pct": 65,
+        "p_up": 0.6535127187523547,
+        "signal": "UP",
+        "head": "fundamental_proxy",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "long_term_hold",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold ~5 years (investment horizon), review quarterly; exit at close (3:45 PM ET) when target met.",
+        "momentum_5d": -0.0417541730765314,
+        "rally_signal": 0.49500000000000005,
+        "rally_continuation": true,
+        "model_note": "multi-year proxy (xlong + quality/fundamentals)",
+        "industry_primary": "hypermarkets_discount",
+        "industry_note": "Hypermarkets & Discount (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "hypermarkets_discount",
+            "weight": 0.5398,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2068,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1397,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0957,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "air_freight_logistics",
+            "weight": 0.018,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      },
+      {
+        "ticker": "WMT",
+        "label": "ten_years",
+        "title": "10 years",
+        "days": 2520,
+        "chance_pct": 65,
+        "p_up": 0.6535127187523547,
+        "signal": "UP",
+        "head": "fundamental_proxy",
+        "buy_et": "09:00",
+        "sell_et": "15:45",
+        "sell_rule": "long_term_hold",
+        "instructions": "Buy at/after 9:00 AM ET \u2192 hold ~10 years (investment horizon), review quarterly; exit at close (3:45 PM ET) when target met.",
+        "momentum_5d": -0.0417541730765314,
+        "rally_signal": 0.49500000000000005,
+        "rally_continuation": true,
+        "model_note": "multi-year proxy (xlong + quality/fundamentals)",
+        "industry_primary": "hypermarkets_discount",
+        "industry_note": "Hypermarkets & Discount (+ financial data exchanges, biotech)",
+        "industries": [
+          {
+            "industry_id": "hypermarkets_discount",
+            "weight": 0.5398,
+            "role": "primary",
+            "rationale": "rl_adjusted"
+          },
+          {
+            "industry_id": "financial_data_exchanges",
+            "weight": 0.2068,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "biotech",
+            "weight": 0.1397,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "aerospace_defense",
+            "weight": 0.0957,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          },
+          {
+            "industry_id": "air_freight_logistics",
+            "weight": 0.018,
+            "role": "secondary",
+            "rationale": "rl_neighbor"
+          }
+        ]
+      }
+    ],
+    "industry_ai_enabled": true
+  },
+  "paper_sim_top": [],
+  "notes": [
+    "Fortress prioritizes playbook tickers when TRADE_START_ET window opens.",
+    "Remove or clear TRADE_START_ET after Monday if you want 9:30 open again.",
+    "Near-term headwinds: META/MSFT blocked from playbook; AVGO dip-watch only (see data/near_term_headwinds.json)."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "coverage": {
+    "universe_n": 6282,
+    "with_next_date": 5249,
+    "with_session_hour": 738,
+    "with_call_clock": 0,
+    "pct_hour_given_date": 14.06
+  },
+  "samples": {
+    "MSFT": {
+      "next_earnings_date": "2026-10-27",
+      "prev_earnings_date": "2026-07-29",
+      "last_earnings_date": "2026-07-29",
+      "days_since_earnings": 1,
+      "days_to_earnings": 89,
+      "hour": null,
+      "call_time_pt": null
+    },
+    "SBUX": {
+      "next_earnings_date": "2026-10-27",
+      "prev_earnings_date": "2026-07-29",
+      "last_earnings_date": "2026-07-29",
+      "days_since_earnings": 1,
+      "days_to_earnings": 89,
+      "hour": "amc",
+      "call_time_pt": null
+    },
+    "AMZN": {
+      "next_earnings_date": "2026-07-30",
+      "prev_earnings_date": "2026-07-29",
+      "last_earnings_date": "2026-07-30",
+      "days_since_earnings": 1,
+      "days_to_earnings": 0,
+      "hour": "amc",
+      "call_time_pt": null
+    },
+    "AAPL": {
+      "next_earnings_date": "2026-07-30",
+      "prev_earnings_date": "2026-07-29",
+      "last_earnings_date": "2026-07-30",
+      "days_since_earnings": 1,
+      "days_to_earnings": 0,
+      "hour": "amc",
+      "call_time_pt": null
+    },
+    "META": {
+      "next_earnings_date": "2026-10-27",
+      "prev_earnings_date": "2026-07-29",
+      "last_earnings_date": null,
+      "days_since_earnings": 1,
+      "days_to_earnings": 89,
+      "hour": "amc",
+      "call_time_pt": null
+    }
+  },
+  "path": "data/intel/earnings_calendar.json",
+  "export_md": "data/ops/ALL_EARNINGS_DATES.md",
+  "export_json": "data/ops/ALL_EARNINGS_DATES.json"
+}

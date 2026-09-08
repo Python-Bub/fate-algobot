@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "updated_at_utc": "2026-09-08T04:23:10.962211+00:00",
+  "aliases": {
+    "SQ": "XYZ",
+    "FB": "META",
+    "BRK.B": "BRK-B",
+    "BRK.A": "BRK-A",
+    "BRKB": "BRK-B",
+    "BRKA": "BRK-A",
+    "FISV": "FI",
+    "DWAC": "DJT"
+  },
+  "events": [
+    {
+      "kind": "rename",
+      "old": "SQ",
+      "new": "XYZ",
+      "note": "Block Inc (formerly Square)",
+      "source": "seed"
+    },
+    {
+      "kind": "rename",
+      "old": "FB",
+      "new": "META",
+      "note": "Meta Platforms rebrand",
+      "source": "seed"
+    },
+    {
+      "kind": "merge",
+      "old": "TMHC",
+      "new": "",
+      "note": "Berkshire Hathaway definitive all-cash acquisition at $72.50 \u2014 dead money",
+      "source": "manual",
+      "detected_at_utc": "2026-05-30T00:00:00+00:00"
+    },
+    {
+      "kind": "share_class",
+      "old": "GOOG",
+      "new": "GOOGL",
+      "note": "Alphabet class A/C dual listing \u2014 train both; price siblings via symbol_aliases",
+      "source": "seed",
+      "detected_at_utc": "2026-07-28T15:35:45.988390+00:00"
+    },
+    {
+      "kind": "share_class",
+      "old": "BRK-A",
+      "new": "BRK-B",
+      "note": "Berkshire class A/B (~1500:1) \u2014 Yahoo hyphen tickers; train both classes",
+      "source": "seed",
+      "detected_at_utc": "2026-07-28T15:35:45.988516+00:00"
+    },
+    {
+      "kind": "rename",
+      "old": "FISV",
+      "new": "FI",
+      "note": "Fiserv ticker change FISV\u2192FI",
+      "source": "seed"
+    },
+    {
+      "kind": "rename",
+      "old": "DWAC",
+      "new": "DJT",
+      "note": "Digital World Acquisition Corp completed SPAC \u2192 Trump Media (DJT)",
+      "source": "seed"
+    },
+    {
+      "kind": "spinoff",
+      "old": "EBAY",
+      "new": "PYPL",
+      "note": "PayPal spun off from eBay \u2014 both listings kept trading; do not alias EBAY\u2192PYPL",
+      "source": "seed"
+    },
+    {
+      "kind": "delist",
+      "old": "TWTR",
+      "new": "",
+      "note": "Twitter / X taken private \u2014 public listing ended",
+      "source": "seed"
+    }
+  ],
+  "delisted": [
+    {
+      "symbol": "TWTR",
+      "note": "Twitter / X taken private \u2014 public listing ended",
+      "detected_at_utc": "2022-10-28T00:00:00+00:00"
+    }
+  ],
+  "pending_migrations": []
+}

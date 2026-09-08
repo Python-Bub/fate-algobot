@@ -1,0 +1,515 @@
+{
+  "all_ok": true,
+  "results": [
+    {
+      "pass": 1,
+      "ts": "2026-08-17T20:02:44.309841+00:00",
+      "ok": true,
+      "fails": [],
+      "warns": [],
+      "daemons": {
+        "stack-watchdog": {
+          "ok": true,
+          "detail": "pid=2618",
+          "tier": "critical"
+        },
+        "intraday": {
+          "ok": true,
+          "detail": "pid=6692",
+          "tier": "critical"
+        },
+        "weekly": {
+          "ok": true,
+          "detail": "pid=17981",
+          "tier": "critical"
+        },
+        "subsecond-obi": {
+          "ok": true,
+          "detail": "pid=11975",
+          "tier": "critical"
+        },
+        "hft-rotator": {
+          "ok": true,
+          "detail": "pid=11998",
+          "tier": "critical"
+        },
+        "day-trade": {
+          "ok": true,
+          "detail": "pid=7966",
+          "tier": "critical"
+        },
+        "paper-awake": {
+          "ok": true,
+          "detail": "pid=52267",
+          "tier": "critical"
+        },
+        "paper-hygiene": {
+          "ok": true,
+          "detail": "pid=6768",
+          "tier": "critical"
+        },
+        "execution-monitor": {
+          "ok": true,
+          "detail": "pid=18056",
+          "tier": "critical"
+        },
+        "stack-autotune": {
+          "ok": true,
+          "detail": "pid=18174",
+          "tier": "critical"
+        },
+        "self-improve": {
+          "ok": true,
+          "detail": "pid=18201",
+          "tier": "critical"
+        },
+        "cortex-singularity": {
+          "ok": true,
+          "detail": "pid=18225",
+          "tier": "critical"
+        },
+        "free-agent": {
+          "ok": true,
+          "detail": "pid=53571",
+          "tier": "critical"
+        },
+        "bottom-fisher-watch": {
+          "ok": true,
+          "detail": "pid=18095",
+          "tier": "critical"
+        },
+        "industry-ai-watch": {
+          "ok": true,
+          "detail": "pid=18464",
+          "tier": "critical"
+        },
+        "universe-lifecycle-watch": {
+          "ok": true,
+          "detail": "pid=18155",
+          "tier": "critical"
+        },
+        "disk-cleanup": {
+          "ok": true,
+          "detail": "pid=18656",
+          "tier": "critical"
+        },
+        "longterm": {
+          "ok": true,
+          "detail": "pid=18010",
+          "tier": "optional"
+        },
+        "hft-news-watch": {
+          "ok": true,
+          "detail": "pid=18075",
+          "tier": "optional"
+        },
+        "retrain-weak-loop": {
+          "ok": true,
+          "detail": "pid=12172",
+          "tier": "optional"
+        },
+        "gainz-v2": {
+          "ok": true,
+          "detail": "pid=7066",
+          "tier": "optional"
+        },
+        "gainz-escape-watch": {
+          "ok": true,
+          "detail": "pid=7081",
+          "tier": "optional"
+        }
+      },
+      "modules": {
+        "analytics.strategy_registry": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.rank_pipeline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.structure_patterns": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.sequence_discover": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.hidden_pattern_anomaly": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.gainz_v2": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.market_imbalance": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.value_investing": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.catalog": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "bottom_fisher.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "strategy_catalog": {
+          "ok": true,
+          "detail": "n=31"
+        }
+      },
+      "paused": false
+    },
+    {
+      "pass": 2,
+      "ts": "2026-08-17T20:02:46.315778+00:00",
+      "ok": true,
+      "fails": [],
+      "warns": [],
+      "daemons": {
+        "stack-watchdog": {
+          "ok": true,
+          "detail": "pid=2618",
+          "tier": "critical"
+        },
+        "intraday": {
+          "ok": true,
+          "detail": "pid=6692",
+          "tier": "critical"
+        },
+        "weekly": {
+          "ok": true,
+          "detail": "pid=17981",
+          "tier": "critical"
+        },
+        "subsecond-obi": {
+          "ok": true,
+          "detail": "pid=11975",
+          "tier": "critical"
+        },
+        "hft-rotator": {
+          "ok": true,
+          "detail": "pid=11998",
+          "tier": "critical"
+        },
+        "day-trade": {
+          "ok": true,
+          "detail": "pid=7966",
+          "tier": "critical"
+        },
+        "paper-awake": {
+          "ok": true,
+          "detail": "pid=52267",
+          "tier": "critical"
+        },
+        "paper-hygiene": {
+          "ok": true,
+          "detail": "pid=6768",
+          "tier": "critical"
+        },
+        "execution-monitor": {
+          "ok": true,
+          "detail": "pid=18056",
+          "tier": "critical"
+        },
+        "stack-autotune": {
+          "ok": true,
+          "detail": "pid=18174",
+          "tier": "critical"
+        },
+        "self-improve": {
+          "ok": true,
+          "detail": "pid=18201",
+          "tier": "critical"
+        },
+        "cortex-singularity": {
+          "ok": true,
+          "detail": "pid=18225",
+          "tier": "critical"
+        },
+        "free-agent": {
+          "ok": true,
+          "detail": "pid=53571",
+          "tier": "critical"
+        },
+        "bottom-fisher-watch": {
+          "ok": true,
+          "detail": "pid=18095",
+          "tier": "critical"
+        },
+        "industry-ai-watch": {
+          "ok": true,
+          "detail": "pid=18464",
+          "tier": "critical"
+        },
+        "universe-lifecycle-watch": {
+          "ok": true,
+          "detail": "pid=18155",
+          "tier": "critical"
+        },
+        "disk-cleanup": {
+          "ok": true,
+          "detail": "pid=18656",
+          "tier": "critical"
+        },
+        "longterm": {
+          "ok": true,
+          "detail": "pid=18010",
+          "tier": "optional"
+        },
+        "hft-news-watch": {
+          "ok": true,
+          "detail": "pid=18075",
+          "tier": "optional"
+        },
+        "retrain-weak-loop": {
+          "ok": true,
+          "detail": "pid=12172",
+          "tier": "optional"
+        },
+        "gainz-v2": {
+          "ok": true,
+          "detail": "pid=7066",
+          "tier": "optional"
+        },
+        "gainz-escape-watch": {
+          "ok": true,
+          "detail": "pid=7081",
+          "tier": "optional"
+        }
+      },
+      "modules": {
+        "analytics.strategy_registry": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.rank_pipeline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.structure_patterns": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.sequence_discover": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.hidden_pattern_anomaly": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.gainz_v2": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.market_imbalance": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.value_investing": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.catalog": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "bottom_fisher.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "strategy_catalog": {
+          "ok": true,
+          "detail": "n=31"
+        }
+      },
+      "paused": false
+    },
+    {
+      "pass": 3,
+      "ts": "2026-08-17T20:02:48.321230+00:00",
+      "ok": true,
+      "fails": [],
+      "warns": [],
+      "daemons": {
+        "stack-watchdog": {
+          "ok": true,
+          "detail": "pid=2618",
+          "tier": "critical"
+        },
+        "intraday": {
+          "ok": true,
+          "detail": "pid=6692",
+          "tier": "critical"
+        },
+        "weekly": {
+          "ok": true,
+          "detail": "pid=17981",
+          "tier": "critical"
+        },
+        "subsecond-obi": {
+          "ok": true,
+          "detail": "pid=11975",
+          "tier": "critical"
+        },
+        "hft-rotator": {
+          "ok": true,
+          "detail": "pid=11998",
+          "tier": "critical"
+        },
+        "day-trade": {
+          "ok": true,
+          "detail": "pid=7966",
+          "tier": "critical"
+        },
+        "paper-awake": {
+          "ok": true,
+          "detail": "pid=52267",
+          "tier": "critical"
+        },
+        "paper-hygiene": {
+          "ok": true,
+          "detail": "pid=6768",
+          "tier": "critical"
+        },
+        "execution-monitor": {
+          "ok": true,
+          "detail": "pid=18056",
+          "tier": "critical"
+        },
+        "stack-autotune": {
+          "ok": true,
+          "detail": "pid=18174",
+          "tier": "critical"
+        },
+        "self-improve": {
+          "ok": true,
+          "detail": "pid=18201",
+          "tier": "critical"
+        },
+        "cortex-singularity": {
+          "ok": true,
+          "detail": "pid=18225",
+          "tier": "critical"
+        },
+        "free-agent": {
+          "ok": true,
+          "detail": "pid=53571",
+          "tier": "critical"
+        },
+        "bottom-fisher-watch": {
+          "ok": true,
+          "detail": "pid=18095",
+          "tier": "critical"
+        },
+        "industry-ai-watch": {
+          "ok": true,
+          "detail": "pid=18464",
+          "tier": "critical"
+        },
+        "universe-lifecycle-watch": {
+          "ok": true,
+          "detail": "pid=18155",
+          "tier": "critical"
+        },
+        "disk-cleanup": {
+          "ok": true,
+          "detail": "pid=18656",
+          "tier": "critical"
+        },
+        "longterm": {
+          "ok": true,
+          "detail": "pid=18010",
+          "tier": "optional"
+        },
+        "hft-news-watch": {
+          "ok": true,
+          "detail": "pid=18075",
+          "tier": "optional"
+        },
+        "retrain-weak-loop": {
+          "ok": true,
+          "detail": "pid=12172",
+          "tier": "optional"
+        },
+        "gainz-v2": {
+          "ok": true,
+          "detail": "pid=7066",
+          "tier": "optional"
+        },
+        "gainz-escape-watch": {
+          "ok": true,
+          "detail": "pid=7081",
+          "tier": "optional"
+        }
+      },
+      "modules": {
+        "analytics.strategy_registry": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.rank_pipeline": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.structure_patterns": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.sequence_discover": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.hidden_pattern_anomaly": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.gainz_v2": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.market_imbalance": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "analytics.value_investing": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.catalog": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "investing.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "bottom_fisher.integrate": {
+          "ok": true,
+          "detail": "ok"
+        },
+        "strategy_catalog": {
+          "ok": true,
+          "detail": "n=31"
+        }
+      },
+      "paused": false
+    }
+  ]
+}

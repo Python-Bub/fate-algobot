@@ -1,0 +1,2946 @@
+{
+"SNDK": {
+"tokens": [
+"SANDISK",
+"CORPORATION"
+],
+"fetched_at": "2026-08-31T08:20:37.565159+00:00"
+},
+"PM": {
+"tokens": [
+"PHILIP",
+"MORRIS",
+"INTERNATIONAL",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-28T01:35:39.543340+00:00"
+},
+"IBM": {
+"tokens": [
+"INTERNATIONAL",
+"BUSINESS",
+"MACHINES",
+"CORPORATION"
+],
+"fetched_at": "2026-09-02T08:25:22.335862+00:00"
+},
+"DELL": {
+"tokens": [
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-09-07T19:00:43.586051+00:00"
+},
+"MRVL": {
+"tokens": [
+"MARVELL",
+"TECHNOLOGY",
+"INC."
+],
+"fetched_at": "2026-08-27T08:27:41.491876+00:00"
+},
+"KLAC": {
+"tokens": [
+"KLA",
+"CORPORATION"
+],
+"fetched_at": "2026-09-03T08:22:25.790749+00:00"
+},
+"RTX": {
+"tokens": [
+"CORPORATION"
+],
+"fetched_at": "2026-09-05T08:06:10.882328+00:00"
+},
+"SHEL": {
+"tokens": [
+"SHELL",
+"PLC"
+],
+"fetched_at": "2026-08-31T08:27:19.182065+00:00"
+},
+"UCB": {
+"tokens": [],
+"fetched_at": "2026-08-14T01:01:38.363803+00:00"
+},
+"BHP": {
+"tokens": [
+"GROUP",
+"LIMITED"
+],
+"fetched_at": "2026-08-28T01:55:42.445131+00:00"
+},
+"VTRS": {
+"tokens": [
+"VIATRIS",
+"INC."
+],
+"fetched_at": "2026-08-14T05:24:46.264542+00:00"
+},
+"TM": {
+"tokens": [
+"TOYOTA",
+"MOTOR",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T20:18:53.845455+00:00"
+},
+"KEY": {
+"tokens": [
+"KEYCORP"
+],
+"fetched_at": "2026-08-14T05:24:47.192825+00:00"
+},
+"VZ": {
+"tokens": [
+"VERIZON",
+"COMMUNICATIONS",
+"INC."
+],
+"fetched_at": "2026-08-31T08:26:26.678966+00:00"
+},
+"BUI": {
+"tokens": [
+"BLACKROCK",
+"UTILITIES",
+"INFRASTRUCTURE",
+"POWER",
+"OPPORTUNITIES",
+"TRUST"
+],
+"fetched_at": "2026-08-14T05:24:49.916001+00:00"
+},
+"TRNO": {
+"tokens": [
+"TERRENO",
+"REALTY",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T17:58:26.192734+00:00"
+},
+"GFI": {
+"tokens": [
+"GOLD",
+"FIELDS",
+"LIMITED"
+],
+"fetched_at": "2026-08-14T18:02:02.175203+00:00"
+},
+"AMGN": {
+"tokens": [
+"AMGEN",
+"INC."
+],
+"fetched_at": "2026-09-02T08:36:02.265863+00:00"
+},
+"IRM": {
+"tokens": [
+"IRON",
+"MOUNTAIN",
+"INCORPORATED",
+"DEL"
+],
+"fetched_at": "2026-08-14T18:04:43.840267+00:00"
+},
+"NEE": {
+"tokens": [
+"NEXTERA",
+"ENERGY",
+"INC."
+],
+"fetched_at": "2026-09-04T02:24:10.079743+00:00"
+},
+"UBS": {
+"tokens": [
+"GROUP",
+"REGISTERED"
+],
+"fetched_at": "2026-08-14T19:21:15.888716+00:00"
+},
+"CNBC": {
+"tokens": [],
+"fetched_at": "2026-09-04T08:25:02.428690+00:00"
+},
+"JNJ": {
+"tokens": [
+"JOHNSON"
+],
+"fetched_at": "2026-08-31T08:29:51.727581+00:00"
+},
+"CSCO": {
+"tokens": [
+"CISCO",
+"SYSTEMS",
+"INC."
+],
+"fetched_at": "2026-08-28T08:49:37.041752+00:00"
+},
+"MA": {
+"tokens": [
+"MASTERCARD",
+"INCORPORATED"
+],
+"fetched_at": "2026-09-04T19:08:22.272094+00:00"
+},
+"COST": {
+"tokens": [
+"COSTCO",
+"WHOLESALE",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T19:02:05.271452+00:00"
+},
+"CAT": {
+"tokens": [
+"CATERPILLAR",
+"INC."
+],
+"fetched_at": "2026-09-07T19:17:29.893449+00:00"
+},
+"GFS": {
+"tokens": [],
+"fetched_at": "2026-08-14T01:07:03.285848+00:00"
+},
+"LRCX": {
+"tokens": [
+"LAM",
+"RESEARCH",
+"CORPORATION"
+],
+"fetched_at": "2026-08-27T08:24:41.909995+00:00"
+},
+"CVX": {
+"tokens": [
+"CHEVRON",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T19:12:05.487008+00:00"
+},
+"AMAT": {
+"tokens": [
+"APPLIED",
+"MATERIALS",
+"INC."
+],
+"fetched_at": "2026-08-28T08:51:22.625373+00:00"
+},
+"HSBC": {
+"tokens": [
+"HOLDINGS",
+"PLC",
+"PLC."
+],
+"fetched_at": "2026-08-14T02:00:08.386540+00:00"
+},
+"NFLX": {
+"tokens": [
+"NETFLIX",
+"INC."
+],
+"fetched_at": "2026-09-04T18:51:03.821693+00:00"
+},
+"GE": {
+"tokens": [
+"AEROSPACE"
+],
+"fetched_at": "2026-09-04T20:30:25.707048+00:00"
+},
+"KO": {
+"tokens": [
+"THE",
+"COCA-COLA",
+"COMPANY"
+],
+"fetched_at": "2026-09-05T20:22:39.442772+00:00"
+},
+"HD": {
+"tokens": [
+"THE",
+"HOME",
+"DEPOT",
+"INC."
+],
+"fetched_at": "2026-09-04T23:59:45.111261+00:00"
+},
+"WLFC": {
+"tokens": [
+"WILLIS",
+"LEASE",
+"FINANCE",
+"CORPORATION",
+"CORPORATIO"
+],
+"fetched_at": "2026-08-14T18:06:24.298363+00:00"
+},
+"MRK": {
+"tokens": [
+"MERCK",
+"CO.",
+"INC.",
+"COMPANY"
+],
+"fetched_at": "2026-08-28T02:02:47.171242+00:00"
+},
+"RY": {
+"tokens": [
+"ROYAL",
+"BANK",
+"CANADA"
+],
+"fetched_at": "2026-09-07T19:00:59.283067+00:00"
+},
+"APP": {
+"tokens": [
+"APPLOVIN",
+"CORPORATION"
+],
+"fetched_at": "2026-09-05T11:33:36.579495+00:00"
+},
+"TJX": {
+"tokens": [
+"THE",
+"COMPANIES",
+"INC."
+],
+"fetched_at": "2026-09-05T09:44:03.293531+00:00"
+},
+"GEV": {
+"tokens": [
+"VERNOVA",
+"INC."
+],
+"fetched_at": "2026-08-29T21:58:22.122789+00:00"
+},
+"WMT": {
+"tokens": [
+"WALMART",
+"INC."
+],
+"fetched_at": "2026-09-04T23:57:05.894110+00:00"
+},
+"CRS": {
+"tokens": [
+"CARPENTER",
+"TECHNOLOGY",
+"CORPORATION",
+"CORPORATIO"
+],
+"fetched_at": "2026-08-14T05:24:59.772228+00:00"
+},
+"NVDA": {
+"tokens": [
+"NVIDIA",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T14:01:07.323058+00:00"
+},
+"GOOG": {
+"tokens": [
+"ALPHABET",
+"INC."
+],
+"fetched_at": "2026-08-14T14:01:16.465889+00:00"
+},
+"DIS": {
+"tokens": [
+"THE",
+"WALT",
+"DISNEY",
+"COMPANY"
+],
+"fetched_at": "2026-09-05T00:03:18.006025+00:00"
+},
+"ORCL": {
+"tokens": [
+"ORACLE",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T18:58:51.236396+00:00"
+},
+"NOC": {
+"tokens": [
+"NORTHROP",
+"GRUMMAN",
+"CORPORATION"
+],
+"fetched_at": "2026-09-07T18:46:36.556985+00:00"
+},
+"DUK": {
+"tokens": [
+"DUKE",
+"ENERGY",
+"CORPORATION",
+"HOLDIN"
+],
+"fetched_at": "2026-09-07T18:53:12.735881+00:00"
+},
+"META": {
+"tokens": [
+"PLATFORMS",
+"INC."
+],
+"fetched_at": "2026-09-04T18:53:12.636960+00:00"
+},
+"EMC": {
+"tokens": [
+"GLOBAL",
+"EMERGING",
+"MARKETS",
+"GREAT",
+"CONSUMER",
+"ETF"
+],
+"fetched_at": "2026-08-14T18:01:13.480676+00:00"
+},
+"AAPL": {
+"tokens": [
+"APPLE",
+"INC."
+],
+"fetched_at": "2026-09-04T18:52:31.080456+00:00"
+},
+"GOOGL": {
+"tokens": [
+"ALPHABET",
+"INC."
+],
+"fetched_at": "2026-09-04T18:54:04.654572+00:00"
+},
+"AVGO": {
+"tokens": [
+"BROADCOM",
+"INC."
+],
+"fetched_at": "2026-09-04T18:57:42.007835+00:00"
+},
+"TSLA": {
+"tokens": [
+"TESLA",
+"INC."
+],
+"fetched_at": "2026-09-04T21:11:26.959479+00:00"
+},
+"SKHY": {
+"tokens": [
+"HYNIX",
+"INC."
+],
+"fetched_at": "2026-09-04T01:32:25.275026+00:00"
+},
+"XOM": {
+"tokens": [
+"EXXONMOBIL",
+"HOLDINGS",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T19:11:09.672758+00:00"
+},
+"QCOM": {
+"tokens": [
+"QUALCOMM",
+"INCORPORATED"
+],
+"fetched_at": "2026-09-04T20:13:26.925334+00:00"
+},
+"PANW": {
+"tokens": [
+"PALO",
+"ALTO",
+"NETWORKS",
+"INC."
+],
+"fetched_at": "2026-09-07T18:59:18.655007+00:00"
+},
+"SAP": {
+"tokens": [],
+"fetched_at": "2026-08-26T17:33:42.122852+00:00"
+},
+"AXP": {
+"tokens": [
+"AMERICAN",
+"EXPRESS",
+"COMPANY"
+],
+"fetched_at": "2026-08-28T08:48:07.880004+00:00"
+},
+"STX": {
+"tokens": [
+"SEAGATE",
+"TECHNOLOGY",
+"HOLDINGS",
+"PLC"
+],
+"fetched_at": "2026-09-05T10:11:23.102666+00:00"
+},
+"PEP": {
+"tokens": [
+"PEPSICO",
+"INC."
+],
+"fetched_at": "2026-08-31T08:25:36.866946+00:00"
+},
+"SPG": {
+"tokens": [
+"SIMON",
+"PROPERTY",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-17T18:56:17.510220+00:00"
+},
+"PECO": {
+"tokens": [
+"PHILLIPS",
+"EDISON",
+"COMPANY",
+"INC."
+],
+"fetched_at": "2026-08-14T18:08:21.379442+00:00"
+},
+"WSM": {
+"tokens": [],
+"fetched_at": "2026-08-14T02:21:28.886156+00:00"
+},
+"BLK": {
+"tokens": [
+"BLACKROCK",
+"INC."
+],
+"fetched_at": "2026-09-01T08:13:21.738933+00:00"
+},
+"CRM": {
+"tokens": [
+"SALESFORCE",
+"INC."
+],
+"fetched_at": "2026-09-04T18:59:52.633564+00:00"
+},
+"TMUS": {
+"tokens": [
+"T-MOBILE",
+"INC."
+],
+"fetched_at": "2026-08-14T20:33:01.996601+00:00"
+},
+"NVO": {
+"tokens": [
+"NOVO",
+"NORDISK"
+],
+"fetched_at": "2026-08-17T18:27:50.407836+00:00"
+},
+"AMD": {
+"tokens": [
+"ADVANCED",
+"MICRO",
+"DEVICES",
+"INC."
+],
+"fetched_at": "2026-09-04T18:48:37.108996+00:00"
+},
+"MSFT": {
+"tokens": [
+"MICROSOFT",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T18:50:07.152009+00:00"
+},
+"AMZN": {
+"tokens": [
+"AMAZON.COM",
+"INC."
+],
+"fetched_at": "2026-09-04T18:51:44.610947+00:00"
+},
+"SBUX": {
+"tokens": [
+"STARBUCKS",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T18:54:56.127226+00:00"
+},
+"BX": {
+"tokens": [
+"BLACKSTONE",
+"INC."
+],
+"fetched_at": "2026-09-04T18:56:06.344361+00:00"
+},
+"ADBE": {
+"tokens": [
+"ADOBE",
+"INC."
+],
+"fetched_at": "2026-09-04T19:01:16.708299+00:00"
+},
+"JPM": {
+"tokens": [
+"JPMORGAN",
+"CHASE",
+"CO.",
+"MORGAN"
+],
+"fetched_at": "2026-09-04T19:02:54.159205+00:00"
+},
+"BAC": {
+"tokens": [
+"BANK",
+"AMERICA",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T19:04:00.059847+00:00"
+},
+"GS": {
+"tokens": [
+"THE",
+"GOLDMAN",
+"SACHS",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-09-04T19:05:08.741489+00:00"
+},
+"MS": {
+"tokens": [
+"MORGAN",
+"STANLEY"
+],
+"fetched_at": "2026-09-04T19:05:51.148822+00:00"
+},
+"V": {
+"tokens": [
+"VISA",
+"INC."
+],
+"fetched_at": "2026-09-04T19:07:30.611369+00:00"
+},
+"UNH": {
+"tokens": [
+"UNITEDHEALTH",
+"GROUP",
+"INCORPORATED"
+],
+"fetched_at": "2026-09-04T19:09:15.216254+00:00"
+},
+"LLY": {
+"tokens": [
+"ELI",
+"LILLY",
+"AND",
+"COMPANY"
+],
+"fetched_at": "2026-09-04T19:10:07.264435+00:00"
+},
+"NKE": {
+"tokens": [
+"NIKE",
+"INC."
+],
+"fetched_at": "2026-09-05T00:06:04.392586+00:00"
+},
+"PYPL": {
+"tokens": [
+"PAYPAL",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-09-05T00:08:55.161402+00:00"
+},
+"SHOP": {
+"tokens": [
+"SHOPIFY",
+"INC."
+],
+"fetched_at": "2026-09-05T00:10:10.650694+00:00"
+},
+"PLTR": {
+"tokens": [
+"PALANTIR",
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-09-05T00:15:18.525006+00:00"
+},
+"COIN": {
+"tokens": [
+"COINBASE",
+"GLOBAL",
+"INC."
+],
+"fetched_at": "2026-09-05T00:16:51.349265+00:00"
+},
+"UBER": {
+"tokens": [
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-09-04T20:07:51.344256+00:00"
+},
+"ABNB": {
+"tokens": [
+"AIRBNB",
+"INC."
+],
+"fetched_at": "2026-09-04T20:08:27.913033+00:00"
+},
+"SNOW": {
+"tokens": [
+"SNOWFLAKE",
+"INC."
+],
+"fetched_at": "2026-09-04T20:10:48.045589+00:00"
+},
+"MU": {
+"tokens": [
+"MICRON",
+"TECHNOLOGY",
+"INC."
+],
+"fetched_at": "2026-09-04T20:11:27.694646+00:00"
+},
+"INTC": {
+"tokens": [
+"INTEL",
+"CORPORATION"
+],
+"fetched_at": "2026-09-04T20:12:16.614195+00:00"
+},
+"TSM": {
+"tokens": [
+"TAIWAN",
+"SEMICONDUCTOR",
+"MANUFACTURING",
+"COMPANY",
+"LIMITED",
+"MANUFACTUR"
+],
+"fetched_at": "2026-08-27T08:15:57.935696+00:00"
+},
+"TXN": {
+"tokens": [
+"TEXAS",
+"INSTRUMENTS",
+"INCORPORATED"
+],
+"fetched_at": "2026-09-04T20:14:53.617259+00:00"
+},
+"SPCX": {
+"tokens": [
+"SPACE",
+"EXPLORATION",
+"TECHNOLOGIES",
+"CORP."
+],
+"fetched_at": "2026-09-02T08:27:10.432120+00:00"
+},
+"SMCI": {
+"tokens": [
+"SUPER",
+"MICRO",
+"COMPUTER",
+"INC."
+],
+"fetched_at": "2026-09-04T20:15:57.919088+00:00"
+},
+"HPE": {
+"tokens": [
+"HEWLETT",
+"PACKARD",
+"ENTERPRISE",
+"COMPANY",
+"COMP"
+],
+"fetched_at": "2026-09-05T07:32:16.273106+00:00"
+},
+"WELL": {
+"tokens": [
+"WELLTOWER",
+"INC."
+],
+"fetched_at": "2026-09-05T08:09:46.313891+00:00"
+},
+"BA": {
+"tokens": [
+"THE",
+"BOEING",
+"COMPANY"
+],
+"fetched_at": "2026-09-07T19:15:52.675591+00:00"
+},
+"LIN": {
+"tokens": [
+"LINDE",
+"PLC"
+],
+"fetched_at": "2026-08-31T08:32:44.657457+00:00"
+},
+"F": {
+"tokens": [
+"FORD",
+"MOTOR",
+"COMPANY"
+],
+"fetched_at": "2026-09-07T19:20:18.688988+00:00"
+},
+"ANET": {
+"tokens": [
+"ARISTA",
+"NETWORKS",
+"INC."
+],
+"fetched_at": "2026-08-14T18:14:02.125770+00:00"
+},
+"ABBV": {
+"tokens": [
+"ABBVIE",
+"INC."
+],
+"fetched_at": "2026-08-14T18:14:09.603265+00:00"
+},
+"T": {
+"tokens": [
+"AT&T",
+"INC."
+],
+"fetched_at": "2026-09-07T19:21:45.972943+00:00"
+},
+"PFE": {
+"tokens": [
+"PFIZER",
+"INC."
+],
+"fetched_at": "2026-09-05T20:19:09.656294+00:00"
+},
+"ARM": {
+"tokens": [
+"HOLDINGS",
+"PLC"
+],
+"fetched_at": "2026-08-27T08:13:12.636018+00:00"
+},
+"INTU": {
+"tokens": [
+"INTUIT",
+"INC."
+],
+"fetched_at": "2026-08-14T18:18:06.408621+00:00"
+},
+"OTIS": {
+"tokens": [
+"WORLDWIDE",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T18:18:09.387147+00:00"
+},
+"AEM": {
+"tokens": [
+"AGNICO",
+"EAGLE",
+"MINES",
+"LIMITED"
+],
+"fetched_at": "2026-08-14T18:19:04.448721+00:00"
+},
+"KYN": {
+"tokens": [
+"KAYNE",
+"ANDERSON",
+"ENERGY",
+"INFRASTRUCTURE",
+"INC.",
+"MLP"
+],
+"fetched_at": "2026-08-14T18:20:49.513092+00:00"
+},
+"PG": {
+"tokens": [
+"THE",
+"PROCTER",
+"GAMBLE",
+"COMPANY"
+],
+"fetched_at": "2026-09-08T03:14:06.635646+00:00"
+},
+"NOW": {
+"tokens": [
+"SERVICENOW",
+"INC."
+],
+"fetched_at": "2026-08-14T18:25:02.629488+00:00"
+},
+"CRWD": {
+"tokens": [
+"CROWDSTRIKE",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-27T08:35:20.532006+00:00"
+},
+"HON": {
+"tokens": [
+"HONEYWELL",
+"INTERNATIONAL",
+"INC."
+],
+"fetched_at": "2026-08-14T18:26:22.042112+00:00"
+},
+"OMF": {
+"tokens": [
+"ONEMAIN",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-14T18:27:34.048034+00:00"
+},
+"NVS": {
+"tokens": [
+"NOVARTIS"
+],
+"fetched_at": "2026-08-14T18:30:03.517924+00:00"
+},
+"CNA": {
+"tokens": [
+"FINANCIAL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T18:30:55.324315+00:00"
+},
+"BABA": {
+"tokens": [
+"ALIBABA",
+"GROUP",
+"HOLDING",
+"LIMITED"
+],
+"fetched_at": "2026-09-02T08:17:41.045746+00:00"
+},
+"AZN": {
+"tokens": [
+"ASTRAZENECA",
+"PLC"
+],
+"fetched_at": "2026-08-14T18:32:48.752055+00:00"
+},
+"PNC": {
+"tokens": [
+"THE",
+"FINANCIAL",
+"SERVICES",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-14T18:37:04.630915+00:00"
+},
+"WFC": {
+"tokens": [
+"WELLS",
+"FARGO",
+"COMPANY"
+],
+"fetched_at": "2026-09-07T17:54:59.514060+00:00"
+},
+"BP": {
+"tokens": [
+"P.L.C."
+],
+"fetched_at": "2026-08-14T18:49:55.548057+00:00"
+},
+"SCHW": {
+"tokens": [
+"THE",
+"CHARLES",
+"SCHWAB",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T18:50:54.938285+00:00"
+},
+"ASML": {
+"tokens": [
+"HOLDING",
+"N.V.",
+"NEW",
+"YORK"
+],
+"fetched_at": "2026-08-14T19:00:19.951382+00:00"
+},
+"MCD": {
+"tokens": [
+"MCDONALD",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T19:04:16.958227+00:00"
+},
+"APH": {
+"tokens": [
+"AMPHENOL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-14T19:05:57.298380+00:00"
+},
+"ADI": {
+"tokens": [
+"ANALOG",
+"DEVICES",
+"INC."
+],
+"fetched_at": "2026-09-02T08:16:18.153458+00:00"
+},
+"WDC": {
+"tokens": [
+"WESTERN",
+"DIGITAL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-27T08:25:27.953818+00:00"
+},
+"TMO": {
+"tokens": [
+"THERMO",
+"FISHER",
+"SCIENTIFIC",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-14T19:19:54.228390+00:00"
+},
+"DE": {
+"tokens": [
+"DEERE",
+"COMPANY"
+],
+"fetched_at": "2026-08-14T19:29:40.445549+00:00"
+},
+"KKR": {
+"tokens": [
+"CO.",
+"INC."
+],
+"fetched_at": "2026-08-14T20:10:12.336752+00:00"
+},
+"SAN": {
+"tokens": [
+"BANCO",
+"SANTANDER",
+"S.A.",
+"SPONSORED"
+],
+"fetched_at": "2026-08-24T08:20:35.079109+00:00"
+},
+"GILD": {
+"tokens": [
+"GILEAD",
+"SCIENCES",
+"INC."
+],
+"fetched_at": "2026-09-07T18:25:34.812934+00:00"
+},
+"ABT": {
+"tokens": [
+"ABBOTT",
+"LABORATORIES"
+],
+"fetched_at": "2026-08-24T08:17:46.756918+00:00"
+},
+"RIO": {
+"tokens": [
+"TINTO",
+"GROUP",
+"PLC"
+],
+"fetched_at": "2026-08-14T23:17:37.350361+00:00"
+},
+"LMT": {
+"tokens": [
+"LOCKHEED",
+"MARTIN",
+"CORPORATION"
+],
+"fetched_at": "2026-08-15T00:01:03.673000+00:00"
+},
+"GLP": {
+"tokens": [
+"GLOBAL",
+"PARTNERS"
+],
+"fetched_at": "2026-08-15T01:27:53.370503+00:00"
+},
+"HBM": {
+"tokens": [
+"HUDBAY",
+"MINERALS",
+"INC."
+],
+"fetched_at": "2026-08-15T03:58:03.904039+00:00"
+},
+"UPS": {
+"tokens": [
+"UNITED",
+"PARCEL",
+"SERVICE",
+"INC."
+],
+"fetched_at": "2026-08-15T04:24:56.500090+00:00"
+},
+"CVS": {
+"tokens": [
+"HEALTH",
+"CORPORATION"
+],
+"fetched_at": "2026-08-15T06:03:10.677338+00:00"
+},
+"BMO": {
+"tokens": [
+"BANK",
+"MONTREAL"
+],
+"fetched_at": "2026-08-15T07:36:31.753649+00:00"
+},
+"LASR": {
+"tokens": [
+"NLIGHT",
+"INC."
+],
+"fetched_at": "2026-08-15T08:38:27.593970+00:00"
+},
+"IREN": {
+"tokens": [
+"LIMITED"
+],
+"fetched_at": "2026-08-15T12:23:59.065800+00:00"
+},
+"AMPX": {
+"tokens": [
+"AMPRIUS",
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-08-15T13:00:13.393238+00:00"
+},
+"CHWY": {
+"tokens": [
+"CHEWY",
+"INC."
+],
+"fetched_at": "2026-08-15T13:21:48.120093+00:00"
+},
+"CAVA": {
+"tokens": [
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-15T14:19:23.179722+00:00"
+},
+"FDX": {
+"tokens": [
+"FEDEX",
+"CORPORATION"
+],
+"fetched_at": "2026-08-15T14:51:17.270472+00:00"
+},
+"LIVE": {
+"tokens": [
+"VENTURES",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-15T15:45:23.540949+00:00"
+},
+"ADP": {
+"tokens": [
+"AUTOMATIC",
+"DATA",
+"PROCESSING",
+"INC."
+],
+"fetched_at": "2026-08-15T18:23:27.927181+00:00"
+},
+"BTIG": {
+"tokens": [],
+"fetched_at": "2026-08-17T21:30:19.947662+00:00"
+},
+"LLYVA": {
+"tokens": [
+"LIBERTY",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-17T16:21:52.787853+00:00"
+},
+"PAX": {
+"tokens": [
+"PATRIA",
+"INVESTMENTS",
+"LIMITED"
+],
+"fetched_at": "2026-08-17T16:25:06.481231+00:00"
+},
+"MRSH": {
+"tokens": [
+"MARSH",
+"MCLENNAN",
+"COMPANIES",
+"INC."
+],
+"fetched_at": "2026-08-17T16:28:48.094207+00:00"
+},
+"BRO": {
+"tokens": [
+"BROWN",
+"INC."
+],
+"fetched_at": "2026-08-17T16:32:08.295379+00:00"
+},
+"PTY": {
+"tokens": [
+"PIMCO",
+"CORPORATE",
+"INCOME",
+"OPPORTUNITY",
+"OPPORT"
+],
+"fetched_at": "2026-08-17T16:36:26.114271+00:00"
+},
+"KMTS": {
+"tokens": [
+"KESTRA",
+"MEDICAL",
+"TECHNOLOGIES",
+"LTD."
+],
+"fetched_at": "2026-08-17T16:39:05.494083+00:00"
+},
+"GDV": {
+"tokens": [
+"THE",
+"GABELLI",
+"DIVIDEND",
+"INCOME",
+"TRUST"
+],
+"fetched_at": "2026-08-17T16:41:41.040126+00:00"
+},
+"WYNN": {
+"tokens": [
+"RESORTS",
+"LIMITED"
+],
+"fetched_at": "2026-08-17T16:44:42.382258+00:00"
+},
+"HESM": {
+"tokens": [
+"HESS",
+"MIDSTREAM"
+],
+"fetched_at": "2026-08-17T16:48:05.525153+00:00"
+},
+"GLXY": {
+"tokens": [
+"GALAXY",
+"DIGITAL",
+"INC."
+],
+"fetched_at": "2026-08-17T16:50:27.495209+00:00"
+},
+"TD": {
+"tokens": [
+"THE",
+"TORONTO-DOMINION",
+"BANK",
+"TORONTO",
+"DOMINION"
+],
+"fetched_at": "2026-08-28T08:41:09.233090+00:00"
+},
+"SYK": {
+"tokens": [
+"STRYKER",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T16:52:04.374390+00:00"
+},
+"CVSA": {
+"tokens": [
+"COVISTA",
+"INC."
+],
+"fetched_at": "2026-08-17T16:54:09.610712+00:00"
+},
+"NTRS": {
+"tokens": [
+"NORTHERN",
+"TRUST",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T17:01:30.308115+00:00"
+},
+"LAZ": {
+"tokens": [
+"LAZARD",
+"INC."
+],
+"fetched_at": "2026-08-17T17:11:01.739542+00:00"
+},
+"LEU": {
+"tokens": [
+"CENTRUS",
+"ENERGY",
+"CORP."
+],
+"fetched_at": "2026-08-17T17:13:18.609838+00:00"
+},
+"OTEX": {
+"tokens": [
+"TEXT",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T17:15:24.289392+00:00"
+},
+"CNQ": {
+"tokens": [
+"CANADIAN",
+"NATURAL",
+"RESOURCES",
+"LIMITED",
+"LIMI"
+],
+"fetched_at": "2026-08-17T17:21:17.733903+00:00"
+},
+"AMRN": {
+"tokens": [
+"AMARIN",
+"CORPORATION",
+"PLC"
+],
+"fetched_at": "2026-08-17T17:26:32.219404+00:00"
+},
+"ABVX": {
+"tokens": [
+"ABIVAX",
+"SOCI",
+"ANONYME"
+],
+"fetched_at": "2026-08-17T17:31:28.214805+00:00"
+},
+"WBS": {
+"tokens": [
+"WEBSTER",
+"FINANCIAL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T17:36:14.201501+00:00"
+},
+"HUBS": {
+"tokens": [
+"HUBSPOT",
+"INC."
+],
+"fetched_at": "2026-08-17T17:55:01.313699+00:00"
+},
+"ESS": {
+"tokens": [
+"ESSEX",
+"PROPERTY",
+"TRUST",
+"INC."
+],
+"fetched_at": "2026-08-17T17:58:34.693146+00:00"
+},
+"GDDY": {
+"tokens": [
+"GODADDY",
+"INC."
+],
+"fetched_at": "2026-08-17T18:02:30.131917+00:00"
+},
+"ZTG": {
+"tokens": [
+"ZENTA",
+"GROUP",
+"COMPANY",
+"LIMITED"
+],
+"fetched_at": "2026-08-17T18:05:30.154191+00:00"
+},
+"ED": {
+"tokens": [
+"CONSOLIDATED",
+"EDISON",
+"INC."
+],
+"fetched_at": "2026-08-17T18:08:19.337755+00:00"
+},
+"SAH": {
+"tokens": [
+"SONIC",
+"AUTOMOTIVE",
+"INC."
+],
+"fetched_at": "2026-08-17T18:10:34.962862+00:00"
+},
+"QQQ": {
+"tokens": [
+"INVESCO",
+"TRUST",
+"SERIES"
+],
+"fetched_at": "2026-08-17T18:15:29.689335+00:00"
+},
+"MAR": {
+"tokens": [
+"MARRIOTT",
+"INTERNATIONAL",
+"INC."
+],
+"fetched_at": "2026-08-17T18:15:32.613624+00:00"
+},
+"NDAQ": {
+"tokens": [
+"NASDAQ",
+"INC."
+],
+"fetched_at": "2026-08-17T18:17:47.157710+00:00"
+},
+"ING": {
+"tokens": [
+"GROEP",
+"N.V.",
+"GROUP"
+],
+"fetched_at": "2026-08-17T18:25:38.929290+00:00"
+},
+"USFD": {
+"tokens": [
+"FOODS",
+"HOLDING",
+"CORP."
+],
+"fetched_at": "2026-08-17T18:28:12.763347+00:00"
+},
+"QH": {
+"tokens": [
+"QUHUO",
+"LIMITED"
+],
+"fetched_at": "2026-09-02T08:29:57.354646+00:00"
+},
+"UVV": {
+"tokens": [
+"UNIVERSAL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T18:30:34.524882+00:00"
+},
+"PCN": {
+"tokens": [
+"PIMCO",
+"CORPORATE",
+"INCOME",
+"STRATEGY",
+"STRATE"
+],
+"fetched_at": "2026-08-17T18:32:16.480229+00:00"
+},
+"GAM": {
+"tokens": [
+"GENERAL",
+"AMERICAN",
+"INVESTORS",
+"COMPANY",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-17T18:34:26.046174+00:00"
+},
+"KMB": {
+"tokens": [
+"KIMBERLY-CLARK",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T18:36:17.748583+00:00"
+},
+"PTCT": {
+"tokens": [
+"PTC",
+"THERAPEUTICS",
+"INC."
+],
+"fetched_at": "2026-08-17T18:38:13.287481+00:00"
+},
+"NHI": {
+"tokens": [
+"NATIONAL",
+"HEALTH",
+"INVESTORS",
+"INC."
+],
+"fetched_at": "2026-08-17T18:43:09.041431+00:00"
+},
+"UNP": {
+"tokens": [
+"UNION",
+"PACIFIC",
+"CORPORATION"
+],
+"fetched_at": "2026-08-28T09:02:30.075957+00:00"
+},
+"CRC": {
+"tokens": [
+"CALIFORNIA",
+"RESOURCES",
+"CORPORATION",
+"CORPORATIO"
+],
+"fetched_at": "2026-08-17T18:48:52.043239+00:00"
+},
+"PLNT": {
+"tokens": [
+"PLANET",
+"FITNESS",
+"INC."
+],
+"fetched_at": "2026-08-17T18:52:21.857397+00:00"
+},
+"TLN": {
+"tokens": [
+"TALEN",
+"ENERGY",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T18:54:18.921007+00:00"
+},
+"PEG": {
+"tokens": [
+"PUBLIC",
+"SERVICE",
+"ENTERPRISE",
+"GROUP",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-17T18:57:59.439282+00:00"
+},
+"AKTS": {
+"tokens": [
+"AKTIS",
+"ONCOLOGY",
+"INC."
+],
+"fetched_at": "2026-08-17T18:59:28.114153+00:00"
+},
+"MWH": {
+"tokens": [
+"SOLV",
+"ENERGY",
+"INC."
+],
+"fetched_at": "2026-08-17T19:05:47.279598+00:00"
+},
+"INN": {
+"tokens": [
+"SUMMIT",
+"HOTEL",
+"PROPERTIES",
+"INC."
+],
+"fetched_at": "2026-08-17T19:07:12.836560+00:00"
+},
+"EFC": {
+"tokens": [
+"ELLINGTON",
+"FINANCIAL",
+"INC."
+],
+"fetched_at": "2026-08-17T19:09:58.582439+00:00"
+},
+"WBTN": {
+"tokens": [
+"WEBTOON",
+"ENTERTAINMENT",
+"INC."
+],
+"fetched_at": "2026-08-17T19:12:50.594400+00:00"
+},
+"RBLX": {
+"tokens": [
+"ROBLOX",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T19:14:06.121942+00:00"
+},
+"YB": {
+"tokens": [
+"YUANBAO",
+"INC."
+],
+"fetched_at": "2026-08-17T19:15:58.190005+00:00"
+},
+"TRSG": {
+"tokens": [
+"TUNGRAY",
+"TECHNOLOGIES",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-17T19:16:24.147564+00:00"
+},
+"BGDE": {
+"tokens": [
+"BIG",
+"DIGITAL",
+"ENERGY",
+"INC."
+],
+"fetched_at": "2026-08-17T19:16:56.247525+00:00"
+},
+"YUMC": {
+"tokens": [
+"YUM",
+"CHINA",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-17T19:18:34.331873+00:00"
+},
+"ENJ": {
+"tokens": [
+"ENTERGY",
+"UTILITY",
+"GROUP",
+"INC.",
+"MTG",
+"NEW"
+],
+"fetched_at": "2026-08-17T19:20:02.562509+00:00"
+},
+"BGR": {
+"tokens": [
+"BLACKROCK",
+"ENERGY",
+"AND",
+"RESOURCES",
+"TRUST"
+],
+"fetched_at": "2026-08-17T19:20:07.410120+00:00"
+},
+"LYV": {
+"tokens": [
+"NATION",
+"ENTERTAINMENT",
+"INC."
+],
+"fetched_at": "2026-08-17T19:21:37.554898+00:00"
+},
+"COHN": {
+"tokens": [
+"COHEN",
+"COMPANY",
+"INC."
+],
+"fetched_at": "2026-08-17T19:25:44.862990+00:00"
+},
+"CSQ": {
+"tokens": [
+"CALAMOS",
+"STRATEGIC",
+"TOTAL",
+"RETURN"
+],
+"fetched_at": "2026-08-17T19:27:05.245034+00:00"
+},
+"DFP": {
+"tokens": [
+"FLAHERTY",
+"CRUMRINE",
+"DYNAMIC",
+"PREFERRED",
+"AND",
+"INCOME"
+],
+"fetched_at": "2026-08-17T19:30:33.597799+00:00"
+},
+"AZO": {
+"tokens": [
+"AUTOZONE",
+"INC."
+],
+"fetched_at": "2026-08-17T19:32:03.674440+00:00"
+},
+"CEG": {
+"tokens": [
+"CONSTELLATION",
+"ENERGY",
+"CORPORATION",
+"CORPORATIO"
+],
+"fetched_at": "2026-08-17T19:35:02.680602+00:00"
+},
+"APC": {
+"tokens": [
+"ARKO",
+"PETROLEUM",
+"CORP."
+],
+"fetched_at": "2026-08-17T19:40:07.834582+00:00"
+},
+"HQL": {
+"tokens": [
+"ABRDN",
+"LIFE",
+"SCIENCES",
+"INVESTORS",
+"TEKLALIFE"
+],
+"fetched_at": "2026-08-17T19:43:43.340003+00:00"
+},
+"LPLA": {
+"tokens": [
+"LPL",
+"FINANCIAL",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-17T19:45:10.113099+00:00"
+},
+"AFL": {
+"tokens": [
+"AFLAC",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-17T19:48:21.924409+00:00"
+},
+"LIEN": {
+"tokens": [
+"CHICAGO",
+"ATLANTIC",
+"BDC",
+"INC."
+],
+"fetched_at": "2026-08-17T19:55:31.303113+00:00"
+},
+"CB": {
+"tokens": [
+"CHUBB",
+"LIMITED"
+],
+"fetched_at": "2026-08-17T19:57:15.632775+00:00"
+},
+"MUFG": {
+"tokens": [
+"MITSUBISHI",
+"UFJ",
+"FINANCIAL",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-17T19:58:57.596351+00:00"
+},
+"KRYS": {
+"tokens": [
+"KRYSTAL",
+"BIOTECH",
+"INC."
+],
+"fetched_at": "2026-08-17T19:59:16.888426+00:00"
+},
+"UGI": {
+"tokens": [
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T20:00:50.126222+00:00"
+},
+"CSW": {
+"tokens": [
+"INDUSTRIALS",
+"INC."
+],
+"fetched_at": "2026-08-17T20:02:17.692605+00:00"
+},
+"MARA": {
+"tokens": [
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-17T20:03:54.496040+00:00"
+},
+"OI": {
+"tokens": [
+"O-I",
+"GLASS",
+"INC."
+],
+"fetched_at": "2026-08-17T20:05:20.330698+00:00"
+},
+"FFC": {
+"tokens": [
+"FLAHERTY",
+"CRUMRINE",
+"PREFERRED",
+"SECURITIES",
+"INCOME",
+"INC."
+],
+"fetched_at": "2026-08-17T20:08:50.108807+00:00"
+},
+"TTE": {
+"tokens": [
+"TOTALENERGIES"
+],
+"fetched_at": "2026-08-17T20:10:13.074480+00:00"
+},
+"ERIC": {
+"tokens": [
+"TELEFONAKTIEBOLAGET",
+"ERICSSON",
+"PUBL"
+],
+"fetched_at": "2026-08-17T20:10:19.765537+00:00"
+},
+"ACEL": {
+"tokens": [
+"ACCEL",
+"ENTERTAINMENT",
+"INC."
+],
+"fetched_at": "2026-08-17T20:11:36.791383+00:00"
+},
+"XRN": {
+"tokens": [
+"CHIRON",
+"ESTATE",
+"INC."
+],
+"fetched_at": "2026-08-17T20:17:19.594567+00:00"
+},
+"TTWO": {
+"tokens": [
+"TAKE-TWO",
+"INTERACTIVE",
+"SOFTWARE",
+"INC."
+],
+"fetched_at": "2026-08-17T20:18:55.010817+00:00"
+},
+"GL": {
+"tokens": [
+"GLOBE",
+"LIFE",
+"INC."
+],
+"fetched_at": "2026-08-17T20:20:30.189842+00:00"
+},
+"NTWK": {
+"tokens": [
+"NETSOL",
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-08-17T20:21:11.449420+00:00"
+},
+"COTY": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-17T20:22:59.145404+00:00"
+},
+"BALY": {
+"tokens": [
+"BALLY",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T20:23:39.407398+00:00"
+},
+"YUM": {
+"tokens": [
+"BRANDS",
+"INC."
+],
+"fetched_at": "2026-08-17T20:24:53.933985+00:00"
+},
+"SUN": {
+"tokens": [
+"SUNOCO"
+],
+"fetched_at": "2026-08-17T20:27:48.124588+00:00"
+},
+"MNSO": {
+"tokens": [
+"MINISO",
+"GROUP",
+"HOLDING",
+"LIMITED"
+],
+"fetched_at": "2026-08-17T20:31:51.044115+00:00"
+},
+"OHI": {
+"tokens": [
+"OMEGA",
+"HEALTHCARE",
+"INVESTORS",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-17T20:33:31.307554+00:00"
+},
+"CELC": {
+"tokens": [
+"CELCUITY",
+"INC."
+],
+"fetched_at": "2026-08-17T20:36:49.351988+00:00"
+},
+"CAH": {
+"tokens": [
+"CARDINAL",
+"HEALTH",
+"INC."
+],
+"fetched_at": "2026-08-17T20:38:26.697339+00:00"
+},
+"POWL": {
+"tokens": [
+"POWELL",
+"INDUSTRIES",
+"INC."
+],
+"fetched_at": "2026-08-17T20:41:48.648514+00:00"
+},
+"IVT": {
+"tokens": [
+"INVENTRUST",
+"PROPERTIES",
+"CORP."
+],
+"fetched_at": "2026-08-17T20:47:21.058172+00:00"
+},
+"RGT": {
+"tokens": [
+"ROYCE",
+"GLOBAL",
+"TRUST",
+"INC.",
+"VALUE"
+],
+"fetched_at": "2026-08-17T20:49:02.095291+00:00"
+},
+"DRS": {
+"tokens": [
+"LEONARDO",
+"INC."
+],
+"fetched_at": "2026-08-17T20:50:40.218661+00:00"
+},
+"AIG": {
+"tokens": [
+"AMERICAN",
+"INTERNATIONAL",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-17T20:52:40.427567+00:00"
+},
+"SPTX": {
+"tokens": [
+"SEAPORT",
+"THERAPEUTICS",
+"INC."
+],
+"fetched_at": "2026-08-17T20:59:15.822136+00:00"
+},
+"CNO": {
+"tokens": [
+"FINANCIAL",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-17T21:02:47.566083+00:00"
+},
+"SMFG": {
+"tokens": [
+"SUMITOMO",
+"MITSUI",
+"FINANCIAL",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-27T08:33:46.446918+00:00"
+},
+"URI": {
+"tokens": [
+"UNITED",
+"RENTALS",
+"INC."
+],
+"fetched_at": "2026-08-17T21:04:05.121147+00:00"
+},
+"VSTS": {
+"tokens": [
+"VESTIS",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T21:07:01.265976+00:00"
+},
+"ETON": {
+"tokens": [
+"PHARMACEUTICALS",
+"INC."
+],
+"fetched_at": "2026-08-17T21:08:38.422174+00:00"
+},
+"HLIT": {
+"tokens": [
+"HARMONIC",
+"INC."
+],
+"fetched_at": "2026-08-17T21:10:06.123865+00:00"
+},
+"INSM": {
+"tokens": [
+"INSMED",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-17T21:11:11.200294+00:00"
+},
+"JBS": {
+"tokens": [
+"N.V."
+],
+"fetched_at": "2026-08-17T21:12:42.061846+00:00"
+},
+"LULU": {
+"tokens": [
+"LULULEMON",
+"ATHLETICA",
+"INC."
+],
+"fetched_at": "2026-08-17T21:14:25.122275+00:00"
+},
+"MLTX": {
+"tokens": [
+"MOONLAKE",
+"IMMUNOTHERAPEUTICS"
+],
+"fetched_at": "2026-08-17T21:17:52.012482+00:00"
+},
+"WAB": {
+"tokens": [
+"WESTINGHOUSE",
+"AIR",
+"BRAKE",
+"TECHNOLOGIES",
+"CORPORATION",
+"TECHNOLO"
+],
+"fetched_at": "2026-08-17T21:21:17.848598+00:00"
+},
+"ODC": {
+"tokens": [
+"OIL-DRI",
+"CORPORATION",
+"AMERICA"
+],
+"fetched_at": "2026-08-17T21:22:56.951488+00:00"
+},
+"HDSN": {
+"tokens": [
+"HUDSON",
+"TECHNOLOGIES",
+"INC."
+],
+"fetched_at": "2026-08-17T21:26:21.922375+00:00"
+},
+"KRC": {
+"tokens": [
+"KILROY",
+"REALTY",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T21:27:37.029631+00:00"
+},
+"THRM": {
+"tokens": [
+"GENTHERM",
+"INCORPORATED",
+"INC"
+],
+"fetched_at": "2026-08-17T21:29:11.937215+00:00"
+},
+"DKS": {
+"tokens": [
+"DICK",
+"SPORTING",
+"GOODS",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-17T21:31:30.826134+00:00"
+},
+"UP": {
+"tokens": [
+"WHEELS",
+"EXPERIENCE",
+"INC."
+],
+"fetched_at": "2026-08-17T21:34:18.245580+00:00"
+},
+"PHYS": {
+"tokens": [
+"SPROTT",
+"PHYSICAL",
+"GOLD",
+"TRUST"
+],
+"fetched_at": "2026-08-17T21:38:42.851237+00:00"
+},
+"PAA": {
+"tokens": [
+"PLAINS",
+"AMERICAN",
+"PIPELINE",
+"L.P."
+],
+"fetched_at": "2026-08-17T21:41:30.381364+00:00"
+},
+"KR": {
+"tokens": [
+"THE",
+"KROGER",
+"CO.",
+"COMPANY"
+],
+"fetched_at": "2026-08-17T21:44:27.949187+00:00"
+},
+"HQ": {
+"tokens": [
+"HORIZON",
+"QUANTUM",
+"HOLDINGS",
+"LTD."
+],
+"fetched_at": "2026-08-17T22:02:03.021253+00:00"
+},
+"BRK-B": {
+"tokens": [
+"BERKSHIRE",
+"HATHAWAY",
+"INC.",
+"NEW"
+],
+"fetched_at": "2026-08-28T01:50:26.359731+00:00"
+},
+"PGZ": {
+"tokens": [
+"PRINCIPAL",
+"ESTATE",
+"INCOME"
+],
+"fetched_at": "2026-08-17T22:20:16.276931+00:00"
+},
+"VELO": {
+"tokens": [
+"VELO3D",
+"INC."
+],
+"fetched_at": "2026-08-17T22:28:46.724150+00:00"
+},
+"BUD": {
+"tokens": [
+"ANHEUSER-BUSCH",
+"INBEV",
+"SPONSOR"
+],
+"fetched_at": "2026-09-07T18:49:51.959234+00:00"
+},
+"MSCI": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-17T22:34:51.603898+00:00"
+},
+"ASST": {
+"tokens": [
+"STRIVE",
+"INC."
+],
+"fetched_at": "2026-08-17T22:46:38.186692+00:00"
+},
+"AWI": {
+"tokens": [
+"ARMSTRONG",
+"WORLD",
+"INDUSTRIES",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-08-17T22:50:42.962178+00:00"
+},
+"WAFD": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-17T23:00:13.496772+00:00"
+},
+"COF": {
+"tokens": [
+"CAPITAL",
+"ONE",
+"FINANCIAL",
+"CORPORATION",
+"CORPORATI"
+],
+"fetched_at": "2026-08-17T23:02:03.666344+00:00"
+},
+"CSWC": {
+"tokens": [
+"CAPITAL",
+"SOUTHWEST",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T23:03:32.267207+00:00"
+},
+"EOS": {
+"tokens": [
+"EATON",
+"VANCE",
+"ENHANCED",
+"EQUITY",
+"INCOME",
+"ENHANCE"
+],
+"fetched_at": "2026-08-17T23:05:46.978062+00:00"
+},
+"FLR": {
+"tokens": [
+"FLUOR",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T23:07:31.169153+00:00"
+},
+"CNH": {
+"tokens": [
+"INDUSTRIAL",
+"N.V."
+],
+"fetched_at": "2026-08-17T23:14:41.658597+00:00"
+},
+"SCI": {
+"tokens": [
+"SERVICE",
+"CORPORATION",
+"INTERNATIONAL",
+"INTERNATION"
+],
+"fetched_at": "2026-08-17T23:18:47.476009+00:00"
+},
+"ROK": {
+"tokens": [
+"ROCKWELL",
+"AUTOMATION",
+"INC."
+],
+"fetched_at": "2026-08-17T23:29:23.473925+00:00"
+},
+"MTDR": {
+"tokens": [
+"MATADOR",
+"RESOURCES",
+"COMPANY"
+],
+"fetched_at": "2026-08-17T23:41:46.361349+00:00"
+},
+"ENPH": {
+"tokens": [
+"ENPHASE",
+"ENERGY",
+"INC."
+],
+"fetched_at": "2026-08-17T23:43:35.983349+00:00"
+},
+"AR": {
+"tokens": [
+"ANTERO",
+"RESOURCES",
+"CORPORATION"
+],
+"fetched_at": "2026-08-17T23:49:11.815643+00:00"
+},
+"FHI": {
+"tokens": [
+"FEDERATED",
+"HERMES",
+"INC."
+],
+"fetched_at": "2026-08-17T23:58:15.055407+00:00"
+},
+"DOCS": {
+"tokens": [
+"DOXIMITY",
+"INC."
+],
+"fetched_at": "2026-08-18T00:00:18.100524+00:00"
+},
+"EMR": {
+"tokens": [
+"EMERSON",
+"ELECTRIC",
+"CO.",
+"COMPANY"
+],
+"fetched_at": "2026-08-18T00:07:52.906850+00:00"
+},
+"EME": {
+"tokens": [
+"EMCOR",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-18T00:11:02.778509+00:00"
+},
+"DEC": {
+"tokens": [
+"DIVERSIFIED",
+"ENERGY",
+"COMPANY"
+],
+"fetched_at": "2026-08-18T00:12:54.785159+00:00"
+},
+"FICO": {
+"tokens": [
+"FAIR",
+"ISAAC",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T00:17:18.615985+00:00"
+},
+"BXSL": {
+"tokens": [
+"BLACKSTONE",
+"SECURED",
+"LENDING"
+],
+"fetched_at": "2026-08-18T00:18:45.356448+00:00"
+},
+"EFT": {
+"tokens": [
+"EATON",
+"VANCE",
+"FLOATING-RATE",
+"INCOME",
+"TRUST",
+"FLOATING"
+],
+"fetched_at": "2026-08-18T00:20:16.867110+00:00"
+},
+"PSLV": {
+"tokens": [
+"SPROTT",
+"PHYSICAL",
+"SILVER",
+"TRUST"
+],
+"fetched_at": "2026-08-18T00:21:41.594926+00:00"
+},
+"XPEV": {
+"tokens": [
+"XPENG",
+"INC."
+],
+"fetched_at": "2026-08-18T00:23:50.501452+00:00"
+},
+"ALIT": {
+"tokens": [
+"ALIGHT",
+"INC."
+],
+"fetched_at": "2026-08-18T00:26:56.785371+00:00"
+},
+"WRD": {
+"tokens": [
+"WERIDE",
+"INC."
+],
+"fetched_at": "2026-08-18T00:28:17.524702+00:00"
+},
+"FERG": {
+"tokens": [
+"FERGUSON",
+"ENTERPRISES",
+"INC."
+],
+"fetched_at": "2026-08-18T00:31:14.049480+00:00"
+},
+"ACR": {
+"tokens": [
+"ACRES",
+"COMMERCIAL",
+"REALTY",
+"CORP."
+],
+"fetched_at": "2026-08-18T00:35:11.407279+00:00"
+},
+"BBVA": {
+"tokens": [
+"BANCO",
+"BILBAO",
+"VIZCAYA",
+"ARGENTARIA",
+"S.A."
+],
+"fetched_at": "2026-08-18T00:38:10.426486+00:00"
+},
+"NKTR": {
+"tokens": [
+"NEKTAR",
+"THERAPEUTICS"
+],
+"fetched_at": "2026-08-18T00:40:33.951298+00:00"
+},
+"SGI": {
+"tokens": [
+"SOMNIGROUP",
+"INTERNATIONAL",
+"INC."
+],
+"fetched_at": "2026-08-18T00:41:56.788364+00:00"
+},
+"HTO": {
+"tokens": [
+"H2O",
+"AMERICA"
+],
+"fetched_at": "2026-08-18T00:45:29.954883+00:00"
+},
+"TFPM": {
+"tokens": [
+"TRIPLE",
+"FLAG",
+"PRECIOUS",
+"METALS",
+"CORP.",
+"COR"
+],
+"fetched_at": "2026-08-18T00:48:10.214491+00:00"
+},
+"HSY": {
+"tokens": [
+"THE",
+"HERSHEY",
+"COMPANY"
+],
+"fetched_at": "2026-08-18T00:51:14.473454+00:00"
+},
+"DD": {
+"tokens": [
+"DUPONT",
+"NEMOURS",
+"INC."
+],
+"fetched_at": "2026-08-18T00:53:57.234042+00:00"
+},
+"AMP": {
+"tokens": [
+"AMERIPRISE",
+"FINANCIAL",
+"INC."
+],
+"fetched_at": "2026-08-18T00:56:30.926281+00:00"
+},
+"VLGEA": {
+"tokens": [
+"VILLAGE",
+"SUPER",
+"MARKET",
+"INC."
+],
+"fetched_at": "2026-08-18T00:58:08.512484+00:00"
+},
+"ARW": {
+"tokens": [
+"ARROW",
+"ELECTRONICS",
+"INC."
+],
+"fetched_at": "2026-08-18T00:59:45.111396+00:00"
+},
+"VNT": {
+"tokens": [
+"VONTIER",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T01:01:26.311849+00:00"
+},
+"RIOT": {
+"tokens": [
+"PLATFORMS",
+"INC."
+],
+"fetched_at": "2026-08-18T01:03:01.279679+00:00"
+},
+"DCI": {
+"tokens": [
+"DONALDSON",
+"COMPANY",
+"INC."
+],
+"fetched_at": "2026-08-18T01:05:01.599831+00:00"
+},
+"LXP": {
+"tokens": [
+"INDUSTRIAL",
+"TRUST"
+],
+"fetched_at": "2026-08-18T01:08:01.815040+00:00"
+},
+"AFG": {
+"tokens": [
+"AMERICAN",
+"FINANCIAL",
+"GROUP",
+"INC."
+],
+"fetched_at": "2026-08-18T01:09:35.009670+00:00"
+},
+"KTF": {
+"tokens": [
+"DWS",
+"MUNICIPAL",
+"INCOME",
+"TRUST"
+],
+"fetched_at": "2026-08-18T01:11:42.641455+00:00"
+},
+"BIPC": {
+"tokens": [
+"BROOKFIELD",
+"INFRASTRUCTURE",
+"CORPORATION",
+"CORPO"
+],
+"fetched_at": "2026-08-18T01:18:15.330410+00:00"
+},
+"XYL": {
+"tokens": [
+"XYLEM",
+"INC."
+],
+"fetched_at": "2026-08-18T01:22:54.528945+00:00"
+},
+"CEVA": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-18T01:25:06.069995+00:00"
+},
+"EOG": {
+"tokens": [
+"RESOURCES",
+"INC."
+],
+"fetched_at": "2026-08-18T01:28:49.638198+00:00"
+},
+"SFM": {
+"tokens": [
+"SPROUTS",
+"FARMERS",
+"MARKET",
+"INC."
+],
+"fetched_at": "2026-08-18T01:31:49.667036+00:00"
+},
+"HHH": {
+"tokens": [
+"HOWARD",
+"HUGHES",
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-18T01:57:15.576856+00:00"
+},
+"DINO": {
+"tokens": [
+"SINCLAIR",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T02:08:10.211458+00:00"
+},
+"ISRG": {
+"tokens": [
+"INTUITIVE",
+"SURGICAL",
+"INC."
+],
+"fetched_at": "2026-08-18T02:14:10.358472+00:00"
+},
+"RNA": {
+"tokens": [
+"ATRIUM",
+"THERAPEUTICS",
+"INC."
+],
+"fetched_at": "2026-08-18T02:15:54.133294+00:00"
+},
+"ABX": {
+"tokens": [
+"ABACUS",
+"GLOBAL",
+"MANAGEMENT",
+"INC."
+],
+"fetched_at": "2026-08-18T02:20:00.169280+00:00"
+},
+"EQR": {
+"tokens": [
+"EQUITY",
+"RESIDENTIAL"
+],
+"fetched_at": "2026-08-18T02:24:16.263684+00:00"
+},
+"AMBA": {
+"tokens": [
+"AMBARELLA",
+"INC."
+],
+"fetched_at": "2026-08-18T02:39:12.930203+00:00"
+},
+"DASH": {
+"tokens": [
+"DOORDASH",
+"INC."
+],
+"fetched_at": "2026-08-18T02:42:03.517800+00:00"
+},
+"CMI": {
+"tokens": [
+"CUMMINS",
+"INC."
+],
+"fetched_at": "2026-08-18T02:45:07.290828+00:00"
+},
+"RVI": {
+"tokens": [
+"ROBINHOOD",
+"VENTURES"
+],
+"fetched_at": "2026-08-18T04:11:38.222613+00:00"
+},
+"BSY": {
+"tokens": [
+"BENTLEY",
+"SYSTEMS",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-18T04:20:42.126551+00:00"
+},
+"NWG": {
+"tokens": [
+"NATWEST",
+"GROUP",
+"PLC"
+],
+"fetched_at": "2026-08-18T04:28:03.963179+00:00"
+},
+"KIM": {
+"tokens": [
+"KIMCO",
+"REALTY",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T04:30:02.942043+00:00"
+},
+"ATRO": {
+"tokens": [
+"ASTRONICS",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T04:33:26.235530+00:00"
+},
+"MESO": {
+"tokens": [
+"MESOBLAST",
+"LIMITED"
+],
+"fetched_at": "2026-08-18T04:49:19.632928+00:00"
+},
+"PDD": {
+"tokens": [
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-18T04:50:52.913341+00:00"
+},
+"DLR": {
+"tokens": [
+"DIGITAL",
+"REALTY",
+"TRUST",
+"INC."
+],
+"fetched_at": "2026-08-18T04:52:22.897968+00:00"
+},
+"ASO": {
+"tokens": [
+"ACADEMY",
+"SPORTS",
+"AND",
+"OUTDOORS",
+"INC."
+],
+"fetched_at": "2026-08-18T04:53:42.172501+00:00"
+},
+"IRT": {
+"tokens": [
+"INDEPENDENCE",
+"REALTY",
+"TRUST",
+"INC."
+],
+"fetched_at": "2026-08-18T04:56:29.066613+00:00"
+},
+"VYX": {
+"tokens": [
+"NCR",
+"VOYIX",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T04:59:50.403989+00:00"
+},
+"ONC": {
+"tokens": [
+"BEONE",
+"MEDICINES",
+"LTD."
+],
+"fetched_at": "2026-08-18T05:01:08.320319+00:00"
+},
+"UHS": {
+"tokens": [
+"UNIVERSAL",
+"HEALTH",
+"SERVICES",
+"INC."
+],
+"fetched_at": "2026-08-18T05:42:54.210530+00:00"
+},
+"SBI": {
+"tokens": [],
+"fetched_at": "2026-08-18T07:18:01.782711+00:00"
+},
+"BLSH": {
+"tokens": [
+"BULLISH"
+],
+"fetched_at": "2026-08-18T07:40:56.296862+00:00"
+},
+"NGVC": {
+"tokens": [
+"NATURAL",
+"GROCERS",
+"VITAMIN",
+"COTTAGE",
+"INC.",
+"COTT"
+],
+"fetched_at": "2026-08-18T13:00:31.439738+00:00"
+},
+"MSM": {
+"tokens": [
+"MSC",
+"INDUSTRIAL",
+"DIRECT",
+"CO.",
+"INC.",
+"COMPANY"
+],
+"fetched_at": "2026-08-18T13:08:15.965405+00:00"
+},
+"APG": {
+"tokens": [
+"API",
+"GROUP",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T13:32:44.642183+00:00"
+},
+"NVR": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-18T15:53:46.744025+00:00"
+},
+"YETI": {
+"tokens": [
+"HOLDINGS",
+"INC."
+],
+"fetched_at": "2026-08-18T16:34:36.311518+00:00"
+},
+"KURA": {
+"tokens": [
+"ONCOLOGY",
+"INC."
+],
+"fetched_at": "2026-08-18T16:42:55.517854+00:00"
+},
+"BNS": {
+"tokens": [
+"THE",
+"BANK",
+"NOVA",
+"SCOTIA",
+"HALIFAX",
+"PFD"
+],
+"fetched_at": "2026-08-18T16:46:11.801880+00:00"
+},
+"CVI": {
+"tokens": [
+"CVR",
+"ENERGY",
+"INC."
+],
+"fetched_at": "2026-08-18T17:08:57.549649+00:00"
+},
+"GATX": {
+"tokens": [
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T17:09:32.654295+00:00"
+},
+"WHR": {
+"tokens": [
+"WHIRLPOOL",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T17:15:30.257163+00:00"
+},
+"KMI": {
+"tokens": [
+"KINDER",
+"MORGAN",
+"INC."
+],
+"fetched_at": "2026-08-18T17:31:33.132265+00:00"
+},
+"DTF": {
+"tokens": [
+"TAX-FREE",
+"INCOME",
+"TERM",
+"INC."
+],
+"fetched_at": "2026-08-18T17:54:13.912345+00:00"
+},
+"CIEN": {
+"tokens": [
+"CIENA",
+"CORPORATION"
+],
+"fetched_at": "2026-08-18T17:57:50.591504+00:00"
+},
+"CVCO": {
+"tokens": [
+"CAVCO",
+"INDUSTRIES",
+"INC."
+],
+"fetched_at": "2026-09-01T23:07:59.298899+00:00"
+},
+"SRS": {
+"tokens": [
+"PROSHARES",
+"ULTRASHORT",
+"ESTATE",
+"ESTAT"
+],
+"fetched_at": "2026-08-19T17:09:31.658596+00:00"
+},
+"RBC": {
+"tokens": [
+"BEARINGS",
+"INCORPORATED"
+],
+"fetched_at": "2026-08-19T17:25:31.540023+00:00"
+},
+"IPM": {
+"tokens": [
+"INTELLIGENT",
+"PROTECTION",
+"MANAGEMENT",
+"CORP.",
+"MANAGEME"
+],
+"fetched_at": "2026-09-07T19:08:14.962013+00:00"
+},
+"EDOG": {
+"tokens": [
+"ALPS",
+"EMERGING",
+"SECTOR",
+"DIVIDEND",
+"DOGS",
+"ETF"
+],
+"fetched_at": "2026-08-31T08:35:41.062089+00:00"
+},
+"GM": {
+"tokens": [],
+"fetched_at": "2026-09-02T21:17:52.591927+00:00"
+},
+"PL": {
+"tokens": [
+"PLANET",
+"LABS",
+"PBC"
+],
+"fetched_at": "2026-09-03T09:27:56.802588+00:00"
+},
+"AOL": {
+"tokens": [],
+"fetched_at": "2026-08-27T08:20:16.769447+00:00"
+},
+"QXO": {
+"tokens": [
+"INC."
+],
+"fetched_at": "2026-08-27T08:21:45.644820+00:00"
+},
+"CX": {
+"tokens": [
+"CEMEX",
+"S.A.B.",
+"C.V.",
+"SPONSORED"
+],
+"fetched_at": "2026-08-30T21:03:33.554840+00:00"
+},
+"AML": {
+"tokens": [],
+"fetched_at": "2026-09-01T08:17:13.543523+00:00"
+},
+"SLS": {
+"tokens": [
+"SELLAS",
+"LIFE",
+"SCIENCES",
+"GROUP",
+"INC.",
+"INC"
+],
+"fetched_at": "2026-09-01T08:18:39.280410+00:00"
+},
+"FT": {
+"tokens": [
+"FRANKLIN",
+"UNIVERSAL",
+"TRUST"
+],
+"fetched_at": "2026-09-04T07:57:04.611470+00:00"
+},
+"FC": {
+"tokens": [
+"FRANKLIN",
+"COVEY",
+"CO.",
+"COMPANY"
+],
+"fetched_at": "2026-09-04T08:12:32.897752+00:00"
+}
+}

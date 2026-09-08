@@ -1,0 +1,11 @@
+# One name or ticker per line — resolved on each watch cycle when a symbol exists.
+# Pre-IPO private names stay on watch via news until a public ticker appears.
+# SpaceX / OpenAI / Anthropic are PRIVATE as of 2026 — not equity tickers.
+# When/if they list, Finnhub calendar + NewsAPI + name-resolve will enqueue training.
+Anthropic
+OpenAI
+SpaceX
+# Public space-sector proxies (secondary; already trained megacaps skipped by queue):
+# RKLB
+# Add tickers directly when known:
+# RDDT

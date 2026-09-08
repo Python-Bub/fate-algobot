@@ -1,0 +1,2 @@
+"""Guarded self-modification modules."""
+

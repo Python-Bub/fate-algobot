@@ -1,0 +1,20 @@
+[Unit]
+Description=FATE AlgoBot 24/7 paper (Alpaca paper)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=demirgenc
+Group=demirgenc
+WorkingDirectory=/home/demirgenc/FATE_AlgoBot
+Environment=PAPER_USE_FORTRESS=true
+Environment=PAPER_USE_LONGTERM=true
+Environment=SKIP_PAPER_AUTO_TRAIN=true
+Environment=NETWORK_FIRST=true
+TimeoutStartSec=180
+ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./run_all.sh paper >> logs/gcp_paper.log 2>&1'
+
+[Install]
+WantedBy=multi-user.target

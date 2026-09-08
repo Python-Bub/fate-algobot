@@ -1,0 +1,30 @@
+{
+  "name": "fate-hft",
+  "version": "1.0.0",
+  "description": "FATE_AlgoBot ultra-low-latency HFT module — earnings sub-second + OBI/Tape sub-10ms.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf dist",
+    "test": "tsc -p tsconfig.json && node --no-warnings dist/__tests__/smoke.js",
+    "earnings": "node --no-warnings --max-old-space-size=2048 dist/earnings/index.js",
+    "obi-tape": "node --no-warnings --max-old-space-size=2048 dist/obi-tape/index.js",
+    "earnings:perf": "node --no-warnings --max-old-space-size=2048 --max-semi-space-size=256 --predictable-gc-schedule dist/earnings/index.js",
+    "obi-tape:perf": "node --no-warnings --max-old-space-size=2048 --max-semi-space-size=256 --predictable-gc-schedule dist/obi-tape/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "undici": "^6.19.8",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.5.3"
+  }
+}

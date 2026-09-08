@@ -1,0 +1,49 @@
+{
+  "ts": 1785562824.646475,
+  "hygiene": {
+    "strong": [
+      14974
+    ],
+    "killed": [
+      92806
+    ],
+    "monthly_n": 0
+  },
+  "live": {
+    "fortress": true,
+    "hft": true,
+    "day_trade": true,
+    "strong": true,
+    "spcx_loop": true
+  },
+  "gates": {
+    "buy_block": false,
+    "reason": "outside_buy_block_window",
+    "in_buy_block_window": false,
+    "in_trim_window": false
+  },
+  "intel": {
+    "n_podcast": 8,
+    "syms": 25
+  },
+  "models": {
+    "missing": [
+      "SKHY"
+    ],
+    "blank_slots": [],
+    "n_blank_slots": 0
+  },
+  "unified": {
+    "symbol": "NVDA",
+    "boost": 0.6619,
+    "sources": [
+      "news_ai",
+      "institutional",
+      "media_intel",
+      "transcripts",
+      "social"
+    ],
+    "media_boost": 0.0,
+    "block_long": false
+  }
+}

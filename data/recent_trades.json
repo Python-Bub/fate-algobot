@@ -1,0 +1,610 @@
+{
+  "trades": [
+    {
+      "symbol": "BTCUSD",
+      "side": "BUY",
+      "source": "fortress",
+      "ts": "2026-09-03T20:36:39.955665+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.935617+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.935999+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.936445+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.936701+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.936951+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.937209+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.937463+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.937718+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.937974+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.938234+00:00"
+    },
+    {
+      "symbol": "DIS",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.938505+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.938776+00:00"
+    },
+    {
+      "symbol": "SBUX",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.939058+00:00"
+    },
+    {
+      "symbol": "SBUX",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.939513+00:00"
+    },
+    {
+      "symbol": "ESTC",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.939978+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.940443+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.940798+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.941179+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.941517+00:00"
+    },
+    {
+      "symbol": "BTC-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.941834+00:00"
+    },
+    {
+      "symbol": "ETH-USD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.942155+00:00"
+    },
+    {
+      "symbol": "DIS",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.942620+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.943004+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.943336+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.945010+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.945438+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.945827+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.946207+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.946558+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.947019+00:00"
+    },
+    {
+      "symbol": "ESTC",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.947423+00:00"
+    },
+    {
+      "symbol": "SBUX",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.948101+00:00"
+    },
+    {
+      "symbol": "SBUX",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.948654+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.949068+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.949476+00:00"
+    },
+    {
+      "symbol": "DAL",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.949877+00:00"
+    },
+    {
+      "symbol": "DAL",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.950303+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.950877+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.951474+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.952021+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.952514+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.953171+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.953863+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.954405+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.954916+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.955405+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.956113+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.956814+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.957483+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.958050+00:00"
+    },
+    {
+      "symbol": "ESTC",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.959010+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.959801+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.960397+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.960979+00:00"
+    },
+    {
+      "symbol": "ESTC",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.961529+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.962041+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.962569+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.963122+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.963647+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.964164+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.964657+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.965272+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.965804+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.966423+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.966974+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.967640+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.968392+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.969417+00:00"
+    },
+    {
+      "symbol": "WYNN",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.970113+00:00"
+    },
+    {
+      "symbol": "WYNN",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.970669+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.971337+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.972023+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.972619+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.973282+00:00"
+    },
+    {
+      "symbol": "U",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.974041+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.974738+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.975327+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.975928+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.976577+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.977198+00:00"
+    },
+    {
+      "symbol": "GM",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.977839+00:00"
+    },
+    {
+      "symbol": "INTC",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.978725+00:00"
+    },
+    {
+      "symbol": "INTC",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.979368+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.979970+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.980591+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.981196+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.982154+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.983082+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.983799+00:00"
+    },
+    {
+      "symbol": "CVS",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.984844+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.985823+00:00"
+    },
+    {
+      "symbol": "XYZ",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.986658+00:00"
+    },
+    {
+      "symbol": "CVS",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.987514+00:00"
+    },
+    {
+      "symbol": "HOOD",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.988255+00:00"
+    },
+    {
+      "symbol": "CVS",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.989407+00:00"
+    },
+    {
+      "symbol": "NCLH",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.990201+00:00"
+    },
+    {
+      "symbol": "HOOD",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.991032+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "BUY",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.991851+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.992838+00:00"
+    },
+    {
+      "symbol": "NIO",
+      "side": "SELL",
+      "source": "alpaca_sync",
+      "ts": "2026-09-08T05:10:22.993899+00:00"
+    }
+  ]
+}

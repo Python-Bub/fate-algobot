@@ -1,0 +1,131 @@
+{
+  "verified_at_utc": "2026-09-08T05:11:29.368172+00:00",
+  "days": 7,
+  "fills": 100,
+  "journal_rows": 21,
+  "recent_trades_synced": 101,
+  "open_positions": 7,
+  "held_symbols": [
+    "AAPL",
+    "BTCUSD",
+    "ETHUSD",
+    "GOOGL",
+    "META",
+    "MSFT",
+    "SOLUSD"
+  ],
+  "open_sell_orders": 0,
+  "issues": [],
+  "warnings": [],
+  "ok": [
+    "Synced recent_trades from Alpaca fills",
+    "Alpaca fills (7d): 100 | journal rows: 21 | cooldown sync: 101"
+  ],
+  "risk_on_holdings": [
+    {
+      "symbol": "AAPL",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "AAPL",
+        "entry_order_type": "market"
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "BTCUSD",
+        "entry_order_type": "market"
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "ETHUSD",
+        "entry_order_type": "market"
+      }
+    },
+    {
+      "symbol": "GOOGL",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "GOOGL",
+        "entry_order_type": "market"
+      }
+    },
+    {
+      "symbol": "META",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "META",
+        "entry_order_type": "market"
+      }
+    },
+    {
+      "symbol": "MSFT",
+      "approved": false,
+      "warnings": [],
+      "trade_constraints": {}
+    },
+    {
+      "symbol": "SOLUSD",
+      "approved": true,
+      "warnings": [],
+      "trade_constraints": {
+        "symbol": "SOLUSD",
+        "entry_order_type": "market"
+      }
+    }
+  ],
+  "active_constraints": {
+    "AAPL": {
+      "symbol": "AAPL",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-08-25T05:10:08.238728+00:00",
+      "saved_at_utc": "2026-08-25T05:10:08.239098+00:00"
+    },
+    "BTCUSD": {
+      "symbol": "BTCUSD",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-09-03T20:36:27.998505+00:00",
+      "saved_at_utc": "2026-09-03T20:36:27.999071+00:00"
+    },
+    "ETHUSD": {
+      "symbol": "ETHUSD",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-09-03T20:10:30.127806+00:00",
+      "saved_at_utc": "2026-09-03T20:10:30.128899+00:00"
+    },
+    "GOOGL": {
+      "symbol": "GOOGL",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-08-25T05:10:11.899722+00:00",
+      "saved_at_utc": "2026-08-25T05:10:11.900217+00:00"
+    },
+    "META": {
+      "symbol": "META",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-08-31T06:49:47.093368+00:00",
+      "saved_at_utc": "2026-08-31T06:49:47.097677+00:00"
+    },
+    "MSFT": {
+      "symbol": "MSFT",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-08-25T05:10:06.151355+00:00",
+      "saved_at_utc": "2026-08-25T05:10:06.155360+00:00"
+    },
+    "SOLUSD": {
+      "symbol": "SOLUSD",
+      "entry_order_type": "market",
+      "opened_at_utc": "2026-09-01T08:03:46.193109+00:00",
+      "saved_at_utc": "2026-09-01T08:03:46.194292+00:00"
+    }
+  },
+  "passed": true
+}

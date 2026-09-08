@@ -1,0 +1,3 @@
+# Optional: online foundation forecast (Chronos). Statistical fallback works without these.
+chronos-forecasting>=1.4.0
+torch>=2.2.0

@@ -1,0 +1,152 @@
+{
+  "ts": "2026-07-29T16:59:01.535993+00:00",
+  "equity_now": 77384.36,
+  "equity_before_bleed_fix": 77375.84,
+  "day_pnl": -1581.4,
+  "positions": 0,
+  "sbux_holding": false,
+  "rows": [
+    {
+      "name": "fortress/intraday",
+      "pid": "15550",
+      "status": "RUNNING",
+      "keepalive": "daemon_loop+watchdog+launchd"
+    },
+    {
+      "name": "HFT OBI",
+      "pid": "15573",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "day-trade",
+      "pid": "15660",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "micro-scalp",
+      "pid": null,
+      "status": "PAUSED",
+      "keepalive": "PAUSED (bleed) \u2014 sleeve kept"
+    },
+    {
+      "name": "weekly",
+      "pid": "15621",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "longterm",
+      "pid": "15642",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "pattern",
+      "pid": "23742",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "universe-lifecycle",
+      "pid": "15759",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "IPO/listing train",
+      "pid": "15759",
+      "status": "RUNNING",
+      "keepalive": "queue files present"
+    },
+    {
+      "name": "stack-watchdog",
+      "pid": "15408",
+      "status": "RUNNING",
+      "keepalive": "launchd KeepAlive"
+    },
+    {
+      "name": "paper-awake",
+      "pid": "14960",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "cramer",
+      "pid": "15837",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "self-improve",
+      "pid": "15805",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "cortex",
+      "pid": "15818",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "hft-rotator",
+      "pid": "15587",
+      "status": "RUNNING",
+      "keepalive": "watchdog"
+    },
+    {
+      "name": "train-daily",
+      "pid": "19623",
+      "status": "RUNNING",
+      "keepalive": "train-gaps letter_rr"
+    },
+    {
+      "name": "train-intraday",
+      "pid": "23800",
+      "status": "RUNNING",
+      "keepalive": "train-gaps"
+    },
+    {
+      "name": "train-lstm",
+      "pid": null,
+      "status": "STOPPED",
+      "keepalive": "resumed scope=all"
+    },
+    {
+      "name": "enhancement-queue",
+      "pid": null,
+      "status": "STOPPED",
+      "keepalive": "resumed full"
+    },
+    {
+      "name": "retrain-weak",
+      "pid": null,
+      "status": "STOPPED",
+      "keepalive": "resumed"
+    },
+    {
+      "name": "talk-overnight",
+      "pid": "60007",
+      "status": "RUNNING",
+      "keepalive": "caffeinate"
+    },
+    {
+      "name": "talk-harness",
+      "pid": null,
+      "status": "STOPPED",
+      "keepalive": "caffeinate --continue"
+    }
+  ],
+  "honesty": "Cannot permanently prevent market drawdowns. We prevent process downtime and systematic bleed (micro-scalp paused, gates tight, monthly DD halt on).",
+  "morning_commands": [
+    "./run_all.sh",
+    "./run_all.sh install-watchdog-launchd",
+    "./venv/bin/python -u tools/refresh_earnings_calendar.py",
+    "./venv/bin/python -u tools/pipeline_missing_values_audit.py",
+    "NETWORK_FIRST=true ./run_all.sh train-gaps",
+    "caffeinate -dims ./tools/overnight_talk_trillion.sh",
+    "tail -f logs/intraday_latest.log data/talk_brain/overnight_trillion.log"
+  ]
+}

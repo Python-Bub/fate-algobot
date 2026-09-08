@@ -1,0 +1,670 @@
+{
+  "initialNetLiquidation": 100000.0,
+  "trades": [
+    {
+      "timestamp": "2025-07-07T18:08:43.564081",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:45.648579",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:45.958575",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:48.113344",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:49.808207",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:56.060811",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:08:58.176460",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:00.268257",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:00.686772",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:02.592612",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:02.782826",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:04.484523",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:04.886953",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:06.593767",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:08.704844",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:10.814487",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:12.345222",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:12.989295",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:14.431727",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:15.072648",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:15.749769",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:19.715334",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:21.331248",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:23.417141",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:25.504940",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:26.058653",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:27.660529",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:28.432345",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:29.750022",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:30.524272",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:31.891161",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:36.773771",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:38.222934",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:40.309270",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:41.063124",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:42.416935",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:43.157204",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:44.528668",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:46.624953",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:49.482067",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:49.812656",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:51.465037",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:52.963227",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:53.947136",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:09:55.752179",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:02.042123",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:03.533718",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:04.253821",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:08.305919",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:09.104871",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:09.841748",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:11.208739",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:12.417497",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:13.275440",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:14.050772",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:16.174079",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:18.281160",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:18.769424",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:20.854317",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:22.854324",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:27.834260",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:28.810174",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:30.908974",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:33.014810",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:33.188657",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:35.136266",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:35.240625",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:37.243277",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:37.356832",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:43.578055",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:43.952339",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:46.195669",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:47.749136",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:49.810993",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:52.869273",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:53.973652",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:54.671702",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:56.110239",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:10:58.287281",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:00.425256",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:02.502770",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:04.774407",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:06.859442",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:09.489334",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:11.021355",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:13.101986",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:13.608918",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:15.823243",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:17.229455",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:19.436751",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:23.644198",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:24.247780",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:25.549411",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:26.341471",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:27.805659",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:32.002024",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:33.968125",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:34.134600",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:34.816367",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:42.456361",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:46.439779",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:46.645130",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:48.735837",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:50.817281",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:53.082155",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:55.181215",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:56.102924",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:11:58.242968",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:00.363841",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:01.025593",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:05.638384",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:07.737520",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:10.952077",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:11.437177",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:12.111274",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:16.184591",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:18.391294",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:19.427086",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:20.479101",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:22.413070",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:24.024029",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:25.758065",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:26.131804",
+      "ticker": "NVDA",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:26.724724",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:28.163607",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:30.707408",
+      "ticker": "GOOGL",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:32.206043",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:32.408572",
+      "ticker": "META",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:32.995583",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:34.331074",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:35.113384",
+      "ticker": "AMZN",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:38.604362",
+      "ticker": "MSFT",
+      "pnl": NaN
+    },
+    {
+      "timestamp": "2025-07-07T18:12:39.316770",
+      "ticker": "AMZN",
+      "pnl": NaN
+    }
+  ]
+}

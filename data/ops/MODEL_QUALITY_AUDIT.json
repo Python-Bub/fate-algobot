@@ -1,0 +1,145 @@
+{
+  "updated_utc": "2026-07-30T17:32:39.845454+00:00",
+  "thresholds": {
+    "acc_top20": 0.6,
+    "meta_auc": 0.55
+  },
+  "counts": {
+    "pass_structural_daily": 1386,
+    "fail_weak": 0,
+    "fail_weak_top100": 0,
+    "pending_no_daily": null,
+    "universe": null,
+    "daily": 1386,
+    "intraday": 2267,
+    "lstm": 4322
+  },
+  "coverage_pct": {
+    "daily": null,
+    "intraday": null,
+    "lstm": null
+  },
+  "force": [
+    {
+      "symbol": "BX",
+      "daily": true,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "SBUX",
+      "daily": true,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "COST",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "WMT",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "NOW",
+      "daily": true,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "CRM",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "JNJ",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "AAPL",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "AMZN",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "META",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "NVDA",
+      "daily": true,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "AMD",
+      "daily": false,
+      "intra": true,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "AVGO",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "MSFT",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "GOOGL",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "NFLX",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    },
+    {
+      "symbol": "TSLA",
+      "daily": false,
+      "intra": false,
+      "lstm": true,
+      "status": "PENDING_COVERAGE"
+    }
+  ],
+  "note": "Honest counts. Weak metrics not fully rescanned this pass if stats store absent; retrain-weak reported 0 top100 weak. No fabricated uplift.",
+  "blocker": "monthly_dd_halt ~24.8% peak 100k -> equity 75.2k"
+}

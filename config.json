@@ -1,0 +1,13 @@
+{
+    "ticker": "FATE",
+    "mode": "demo",
+    "confidence_threshold": 0.7,
+    "shares_per_trade": 10,
+    "min_delay_seconds": 60,
+    "model_path": "models/xgb_model.pkl",
+    "scaler_path": "models/scaler.pkl",
+    "log_trades": true,
+    "plot_performance": true,
+    "enable_live_listener": true
+  }
+  

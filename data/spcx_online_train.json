@@ -1,0 +1,69 @@
+{
+  "report": [
+    {
+      "ticker": "SKHY",
+      "ok": true,
+      "path": "/Users/demirgenc/FATE_AlgoBot/models/SKHY_model.pkl",
+      "stats": {
+        "ticker": "SKHY",
+        "rows": 226,
+        "train_rows": 180,
+        "test_rows": 46,
+        "short_acc": 0.5882352941176471,
+        "short_top20": NaN,
+        "short_acc_train": 0.9611111111111111,
+        "long_acc": 0.23529411764705882,
+        "long_top20": NaN,
+        "long_acc_train": 0.9388888888888889,
+        "meta_auc": 0.8044444444444444,
+        "daily_acc": 0.47058823529411764,
+        "daily_top20": NaN,
+        "lstm_test_acc": 0.3499999940395355,
+        "strong": true,
+        "heads_fixed": [
+          "daily",
+          "long",
+          "meta",
+          "short",
+          "xlong"
+        ],
+        "short_search": "lgb/d8/n80",
+        "long_search": "lgb/d4/n80",
+        "daily_search": "lgb/d8/n80",
+        "xlong_acc": 0.9285714285714286,
+        "xlong_top20": NaN,
+        "xlong_search": "lgb/d4/n80",
+        "weak_head": true
+      }
+    },
+    {
+      "ticker": "SPCX",
+      "ok": true,
+      "path": "/Users/demirgenc/FATE_AlgoBot/models/SPCX_model.pkl",
+      "stats": {
+        "ticker": "SPCX",
+        "rows": 39,
+        "strong": true,
+        "heads_fixed": [
+          "daily",
+          "long",
+          "meta",
+          "short"
+        ],
+        "short_acc": 0.0,
+        "short_top20": NaN,
+        "short_search": "lgb/d8/n80",
+        "long_acc": 0.0,
+        "long_top20": NaN,
+        "long_search": "lgb/d4/n80",
+        "daily_acc": 0.8333333333333334,
+        "daily_top20": NaN,
+        "daily_search": "lgb/d8/n80",
+        "xlong_acc": 0.3728813559322034,
+        "xlong_top20": 1.0,
+        "xlong_search": "lgb/d4/n150",
+        "meta_auc": 0.5
+      }
+    }
+  ]
+}

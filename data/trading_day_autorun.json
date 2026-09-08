@@ -1,0 +1,31 @@
+{
+  "last_run_date": "2026-09-07",
+  "last_result": {
+    "date": "2026-09-07",
+    "started_at": "2026-09-07T09:58:32.352185+00:00",
+    "steps": [
+      {
+        "morning_prefetch": 124
+      },
+      {
+        "paper_sim": "skipped_in_progress"
+      },
+      {
+        "monday_playbook": 124
+      },
+      {
+        "family_forecast": 124
+      },
+      {
+        "train_untrained": 0
+      },
+      {
+        "ensure_stack": 0
+      },
+      {
+        "verify_trades": 0
+      }
+    ],
+    "finished_at": "2026-09-07T17:52:38.359455+00:00"
+  }
+}

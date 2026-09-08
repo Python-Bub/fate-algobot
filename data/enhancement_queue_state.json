@@ -1,0 +1,19 @@
+{
+  "phase": "done",
+  "started_at": "2026-07-31T20:11:10.117334+00:00",
+  "notes": [
+    "reset: top100 gap-fill in progress; queue will run top100_perfect (no FRESH purge)",
+    "top100_perfect incomplete (9 missing)",
+    "top100_perfect completed (blocking=1 hard_skip_missing=['SPCX'])",
+    "resume lstm_all after false train-lstm already-running",
+    "re-enter lstm_all after batch complete + stuck wait",
+    "auto-resume top100_perfect (completeness)",
+    "auto-resume top100_perfect (completeness)",
+    "lstm_all pending_after=3",
+    "auto-resume lstm_all (completeness)",
+    "auto-resume top100_perfect (completeness)",
+    "lstm_all pending_after=1",
+    "auto-resume lstm_all (completeness)"
+  ],
+  "finished_at": "2026-09-08T02:38:13.488507+00:00"
+}

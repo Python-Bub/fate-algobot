@@ -1,0 +1,17 @@
+pandas>=2.0
+numpy>=1.26
+yfinance>=0.2.40
+scikit-learn>=1.4
+joblib>=1.3
+python-dotenv>=1.0
+ib-insync>=0.9.86
+pyarrow>=14.0
+requests>=2.31
+plotext>=5.2
+xgboost>=2.0
+lightgbm>=4.0
+gymnasium>=0.29
+stable-baselines3>=2.2
+hmmlearn>=0.3.2
+google-api-python-client>=2.100
+google-auth>=2.20

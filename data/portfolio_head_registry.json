@@ -1,0 +1,268 @@
+{
+  "heads": {
+    "CB": "fortress",
+    "NEE": "fortress",
+    "MS": "fortress",
+    "DE": "fortress",
+    "IBM": "fortress",
+    "PH": "fortress",
+    "BLK": "fortress",
+    "SCHW": "fortress",
+    "RTX": "fortress",
+    "NFLX": "fortress",
+    "ABBV": "day_trade",
+    "LRCX": "fortress",
+    "PANW": "fortress",
+    "CVS": "fortress",
+    "STX": "day_trade",
+    "COST": "fortress",
+    "COF": "fortress",
+    "SPY": "fortress",
+    "IQSM": "fortress",
+    "AFGB": "fortress",
+    "DDOG": "fortress",
+    "STRL": "fortress",
+    "HUT": "fortress",
+    "SPG": "fortress",
+    "CW": "fortress",
+    "MSCI": "fortress",
+    "SBUX": "fortress",
+    "FLEX": "fortress",
+    "UI": "fortress",
+    "NET": "fortress",
+    "ZBH": "fortress",
+    "LLY": "fortress",
+    "SRE": "fortress",
+    "ESLT": "fortress",
+    "AMT": "fortress",
+    "CAT": "fortress",
+    "AZO": "fortress",
+    "SITM": "fortress",
+    "STM": "fortress",
+    "UTHR": "fortress",
+    "SNOW": "fortress",
+    "PWR": "fortress",
+    "HOOD": "fortress",
+    "SNDK": "day_trade",
+    "MU": "fortress",
+    "KHC": "fortress",
+    "TDG": "fortress",
+    "REGN": "fortress",
+    "JPM": "fortress",
+    "PSA": "fortress",
+    "NOC": "day_trade",
+    "EXC": "fortress",
+    "BSX": "fortress",
+    "NVDA": "fortress",
+    "PYPL": "fortress",
+    "HPE": "fortress",
+    "EME": "fortress",
+    "TFC": "fortress",
+    "MDT": "fortress",
+    "CVX": "fortress",
+    "BP": "fortress",
+    "INTC": "fortress",
+    "CACC": "fortress",
+    "IESC": "fortress",
+    "AGL": "fortress",
+    "PFE": "fortress",
+    "MO": "fortress",
+    "AVGO": "fortress",
+    "COP": "fortress",
+    "UNP": "fortress",
+    "TSM": "fortress",
+    "WFC": "fortress",
+    "CSCO": "fortress",
+    "UBER": "fortress",
+    "ADBE": "fortress",
+    "SHOP": "fortress",
+    "PLD": "fortress",
+    "QQQ": "fortress",
+    "AAPL": "fortress",
+    "CRM": "fortress",
+    "JNJ": "fortress",
+    "MARM": "fortress",
+    "DNOW": "fortress",
+    "FTPA": "fortress",
+    "TM": "fortress",
+    "PLTR": "fortress",
+    "LIN": "day_trade",
+    "ANET": "fortress",
+    "SKHY": "fortress",
+    "HD": "day_trade",
+    "CRWD": "fortress",
+    "VZ": "fortress",
+    "SMFG": "fortress",
+    "PM": "fortress",
+    "ADI": "fortress",
+    "DIS": "fortress",
+    "NOW": "fortress",
+    "XOM": "fortress",
+    "MCD": "day_trade",
+    "AMGN": "fortress",
+    "NVO": "fortress",
+    "HSBC": "fortress",
+    "BABA": "fortress",
+    "PNC": "fortress",
+    "QCOM": "fortress",
+    "AMD": "fortress",
+    "TTE": "fortress",
+    "SAP": "fortress",
+    "KO": "fortress",
+    "TD": "fortress",
+    "BUD": "fortress",
+    "SHEL": "fortress",
+    "RIO": "fortress",
+    "UBS": "fortress",
+    "SPCX": "fortress",
+    "QH": "day_trade",
+    "RAY": "day_trade",
+    "DUK": "day_trade",
+    "FTEK": "day_trade",
+    "CRS": "day_trade",
+    "ORCL": "fortress",
+    "WMT": "fortress",
+    "GOOG": "fortress",
+    "MRK": "fortress",
+    "UNH": "fortress",
+    "BAC": "fortress",
+    "MSFT": "fortress",
+    "GS": "day_trade",
+    "BTC-USD": "fortress",
+    "ETH-USD": "fortress",
+    "TSLA": "fortress",
+    "SOLUSD": "fortress",
+    "ETHUSD": "fortress",
+    "AMZN": "fortress",
+    "SOL-USD": "fortress",
+    "USB": "fortress",
+    "CSX": "fortress",
+    "LUV": "fortress",
+    "BTCUSD": "fortress",
+    "PATH": "fortress",
+    "MSTR": "fortress",
+    "META": "fortress",
+    "NCLH": "fortress",
+    "SMCI": "fortress",
+    "AAL": "fortress",
+    "RIOT": "fortress",
+    "CMG": "fortress",
+    "NIO": "fortress",
+    "ESTC": "fortress",
+    "XYZ": "fortress",
+    "GM": "fortress",
+    "U": "fortress"
+  },
+  "updated_utc": "2026-09-03T20:36:39.956503+00:00",
+  "qty_by_sleeve": {
+    "SBUX": {
+      "fortress": 138.0
+    },
+    "NVDA": {
+      "fortress": 65.0
+    },
+    "ORCL": {
+      "fortress": 51.0
+    },
+    "WMT": {
+      "fortress": 389.0
+    },
+    "TSM": {
+      "fortress": 4.0
+    },
+    "UNH": {
+      "fortress": 2.0
+    },
+    "BTC-USD": {
+      "fortress": 0.2462872606940249
+    },
+    "ETH-USD": {
+      "fortress": 5.933714741571263
+    },
+    "TSLA": {
+      "micro_scalp": 0.0,
+      "fortress": 14.0
+    },
+    "SOLUSD": {
+      "fortress": 363.0
+    },
+    "ETHUSD": {
+      "fortress": 10.784750334644336
+    },
+    "AMZN": {
+      "fortress": 7.784511230403343
+    },
+    "BAC": {
+      "fortress": 204.0
+    },
+    "SOL-USD": {
+      "fortress": 70.0
+    },
+    "USB": {
+      "fortress": 18.0
+    },
+    "CSX": {
+      "fortress": 72.0
+    },
+    "LUV": {
+      "fortress": 150.0
+    },
+    "BTCUSD": {
+      "fortress": 0.4402638194671235
+    },
+    "PATH": {
+      "fortress": 185.0
+    },
+    "JNJ": {
+      "fortress": 50.0
+    },
+    "MSTR": {
+      "fortress": 54.0
+    },
+    "KO": {
+      "fortress": 78.0
+    },
+    "WFC": {
+      "fortress": 81.0
+    },
+    "META": {
+      "fortress": 11.0
+    },
+    "NCLH": {
+      "fortress": 429.0
+    },
+    "SMCI": {
+      "fortress": 187.0
+    },
+    "AAL": {
+      "fortress": 520.0
+    },
+    "RIOT": {
+      "fortress": 110.0
+    },
+    "CMG": {
+      "fortress": 186.0
+    },
+    "NIO": {
+      "fortress": 5028.0
+    },
+    "MDT": {
+      "fortress": 115.0
+    },
+    "INTC": {
+      "fortress": 81.0
+    },
+    "ESTC": {
+      "fortress": 74.0
+    },
+    "XYZ": {
+      "fortress": 87.0
+    },
+    "GM": {
+      "fortress": 406.0
+    },
+    "U": {
+      "fortress": 166.0
+    }
+  }
+}
