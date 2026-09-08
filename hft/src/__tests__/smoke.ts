@@ -56,6 +56,7 @@ import { execDelayFeeBps, effectiveBudgetMs, loadExecDelayMs } from "../obi-tape
 import { fuseObiMicro, fuseObiTape, expectedBps, shouldEnterEv } from "../obi-tape/trade-ev.js";
 import { plumbingHitsTarget, rollingCount, tpmTarget } from "../obi-tape/pace-governor.js";
 import { clipNotional, combinedHaircut, inventoryHaircut, lagHaircut, sizeHftClip } from "../obi-tape/firm-risk.js";
+import { canEnterBuy, resolveHftNotionalUsd, __setMarginCacheForTest } from "../common/margin-guard.js";
 import { resolveSignalMode, wantsDirection } from "../obi-tape/signal-mode.js";
 import { pickWsTickers } from "../obi-tape/pick-ws.js";
 
@@ -858,6 +859,38 @@ ok("TapeVelocity records lastPx", () => {
   const tape = new TapeVelocity("UBER", 100, 5000);
   tape.onTrade(Date.now(), 91.25, 10);
   assert.equal(tape.lastPx, 91.25);
+});
+
+ok("HFT does not size or enter on negative cash / over-gross", () => {
+  process.env.HFT_SIZE_FROM_CASH = "true";
+  process.env.HFT_MIN_CASH_TO_BUY = "250";
+  process.env.HFT_MAX_GROSS_FRAC = "1.0";
+  process.env.HFT_BP_USE_FRAC = "0.35";
+  process.env.HFT_CASH_RESERVE_USD = "500";
+  __setMarginCacheForTest({
+    buyingPower: 171_000,
+    equity: 70_000,
+    cash: -5_800,
+    longMarketValue: 76_000,
+    maintenanceMargin: 0,
+    regtBuyingPower: 70_000,
+  });
+  const blocked = canEnterBuy(250);
+  assert.equal(blocked.ok, false);
+  assert.ok((blocked.reason || "").includes("cash"));
+  assert.equal(resolveHftNotionalUsd(250), 0);
+  __setMarginCacheForTest({
+    buyingPower: 20_000,
+    equity: 70_000,
+    cash: 8_000,
+    longMarketValue: 62_000,
+    maintenanceMargin: 0,
+    regtBuyingPower: 20_000,
+  });
+  const okBuy = canEnterBuy(250);
+  assert.equal(okBuy.ok, true);
+  assert.ok(resolveHftNotionalUsd(250) >= 80);
+  __setMarginCacheForTest(null);
 });
 
 if (failed > 0) {
