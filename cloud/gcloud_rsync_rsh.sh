@@ -3,4 +3,9 @@
 set -euo pipefail
 host="$1"
 shift
-exec gcloud compute ssh --zone="${GCP_ZONE:-us-central1-a}" "$host" -- "$@"
+# Long model copies were dying ~15–20min with "Connection reset by peer".
+exec gcloud compute ssh --zone="${GCP_ZONE:-us-central1-a}" "$host" \
+  --ssh-flag="-o ServerAliveInterval=30" \
+  --ssh-flag="-o ServerAliveCountMax=20" \
+  --ssh-flag="-o TCPKeepAlive=yes" \
+  -- "$@"
