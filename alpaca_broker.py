@@ -800,6 +800,29 @@ def pending_buy_order(symbol: str) -> dict | None:
     return buys[0] if buys else None
 
 
+def _duplicate_buy_blocked(symbol: str) -> bool:
+    """True if an open buy exists or we just submitted the same ticket."""
+    if pending_buy_order(symbol):
+        return True
+    try:
+        from analytics.order_fingerprint import recently_submitted
+
+        if recently_submitted(symbol, side="buy"):
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _note_buy_submitted(symbol: str) -> None:
+    try:
+        from analytics.order_fingerprint import record_submit
+
+        record_submit(symbol, side="buy")
+    except Exception:
+        pass
+
+
 def cancel_extra_working_buys() -> int:
     """Keep the oldest working buy per symbol; cancel extras (repeat-FIRE residue)."""
     rows = list_open_orders(None)
@@ -2105,6 +2128,8 @@ def place_limit_notional_alpaca(
         _limit_price_str(_round_limit_price(limit_price)),
         qty,
     )
+    if side == "buy":
+        _note_buy_submitted(symbol)
     return True
 
 
@@ -2117,15 +2142,8 @@ def place_smart_buy_alpaca(
 ) -> bool:
     """Route buy as limit band (panic drop / sympathy) or default notional market."""
     # Never stack identical buy orders — causes held_for_orders / double notional spam
-    pending = pending_buy_order(symbol)
-    if pending:
-        log.info(
-            "[ALPACA] BUY skipped %s — open buy already queued (%s) notional/status=%s/%s",
-            symbol,
-            pending.get("id"),
-            pending.get("notional") or pending.get("qty"),
-            pending.get("status"),
-        )
+    if _duplicate_buy_blocked(symbol):
+        log.info("[ALPACA] BUY skipped %s — duplicate open/recent buy", symbol)
         return False
     c = constraints or {}
     if str(c.get("entry_order_type", "")).lower() == "limit":
@@ -2172,7 +2190,7 @@ def place_notional_alpaca(
             dollars = hard_max
         if dollars <= 0:
             return False
-    if side == "buy" and pending_buy_order(symbol):
+    if side == "buy" and _duplicate_buy_blocked(symbol):
         log.info("[ALPACA] notional BUY skipped %s — duplicate open buy", symbol)
         return False
     if side == "sell" and pending_close_order(symbol):
@@ -2182,6 +2200,8 @@ def place_notional_alpaca(
         try:
             _submit_notional_as_limit(symbol, side, dollars, fallback_px=fallback_px)
             log.warning("[ALPACA] Limit-notional %s %s $%.2f submitted", side, symbol, dollars)
+            if side == "buy":
+                _note_buy_submitted(symbol)
             return True
         except Exception as e:
             sess = "unknown"
@@ -2204,6 +2224,8 @@ def place_notional_alpaca(
             log.warning("[ALPACA] limit-notional failed %s %s: %s — market fallback", side, symbol, e)
     submit_market_order(symbol, side=side, notional=dollars)
     log.warning("[ALPACA] Notional %s %s $%.2f submitted", side, symbol, dollars)
+    if side == "buy":
+        _note_buy_submitted(symbol)
     return True
 
 

@@ -1,25 +1,10 @@
 {
-  "symbols": [
-    "BX",
-    "SBUX",
-    "COST",
-    "WMT",
-    "NOW",
-    "CRM",
-    "JNJ",
-    "AAPL",
-    "AMZN",
-    "META",
-    "NVDA",
-    "AMD",
-    "AVGO",
-    "MSFT"
-  ],
-  "note": "RTH FORCE/STICK priority — high-conviction UP + earnings radar. Water names are scored via analytics/water_theme.py (datacenter cooling), not this FORCE list.",
-  "updated": "2026-07-30",
-  "updated_at_utc": "2026-07-30T03:11:25.527509+00:00",
+  "symbols": [],
+  "note": "Empty on purpose — no FORCE/theme predisposition. Earnings STICK still comes from the calendar, not this list. Set FORTRESS_USE_FORCE_WATCH=true and add tickers only if you want scan priority.",
+  "updated": "2026-09-07",
+  "updated_at_utc": "2026-09-08T05:50:00+00:00",
   "rules": {
-    "PRED_FORCE_BUY": true,
+    "PRED_FORCE_BUY": false,
     "PRED_FORCE_MIN_P": 0.6,
     "EARNINGS_STICK_FORCE_BUY": true,
     "FORTRESS_BAN_INDEX_BUYS": true,
@@ -37,10 +22,6 @@
       "XLE"
     ]
   },
-  "held_do_not_churn": [
-    "SBUX"
-  ],
-  "must_buy_if_pred_up": [
-    "BX"
-  ]
+  "held_do_not_churn": [],
+  "must_buy_if_pred_up": []
 }

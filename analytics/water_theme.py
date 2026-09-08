@@ -95,7 +95,7 @@ def _sym(symbol: str) -> str:
 
 
 def enabled() -> bool:
-    return _on("FORTRESS_WATER_THEME", "true")
+    return _on("FORTRESS_WATER_THEME", "false")
 
 
 def include_etfs() -> bool:
@@ -172,7 +172,7 @@ def water_rank_boost(
     if quality <= 0:
         return 0.0, {**meta, "reason": "model_down", "p_up": p_up}
     role = float(_ROLE.get(t, 0.0))
-    w = _f("RANK_W_WATER_DATACENTER", 0.12)
+    w = _f("RANK_W_WATER_DATACENTER", 0.0)
     raw = w * role * _STRUCTURAL_DEMAND * quality
     boost = float(min(w, max(0.0, raw)))
     meta.update(
@@ -204,14 +204,14 @@ def space_rank_boost(
     }
     if sl != "longterm":
         return 0.0, {**meta, "reason": "longterm_only"}
-    if not _on("FORTRESS_SPACE_THEME", "true"):
+    if not _on("FORTRESS_SPACE_THEME", "false"):
         return 0.0, {**meta, "reason": "disabled"}
     if t not in SPACE_LONG_HORIZON:
         return 0.0, {**meta, "reason": "not_space_proxy"}
     quality = _quality_from_p_up(p_up)
     if quality <= 0:
         return 0.0, {**meta, "reason": "model_down", "p_up": p_up}
-    w = _f("RANK_W_SPACE_INFRA", 0.06)
+    w = _f("RANK_W_SPACE_INFRA", 0.0)
     boost = float(min(w, max(0.0, w * 0.80 * quality)))
     meta.update({"quality": quality, "p_up": p_up, "boost": boost})
     return boost, meta

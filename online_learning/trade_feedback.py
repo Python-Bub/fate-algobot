@@ -18,6 +18,25 @@ def learn_from_realized_trade(
     sym = str(ticker).strip().upper()
     if not sym:
         return
+    entry = ""
+    if state:
+        entry = str(
+            state.get("opened_at")
+            or state.get("opened_at_utc")
+            or state.get("entry_ts")
+            or ""
+        )
+    credit_key = ""
+    if entry:
+        try:
+            from analytics.honest_learn import already_credited, trade_key
+
+            credit_key = trade_key(sym, entry_ts=entry, side=side)
+            if already_credited(credit_key):
+                log.info("[LEARN] skip %s — already credited", credit_key)
+                return
+        except Exception:
+            credit_key = ""
     st = state or {
         "p_short": 0.5,
         "p_long": 0.5,
@@ -170,3 +189,10 @@ def learn_from_realized_trade(
             pass
     except Exception as e:
         log.debug("[LEARN] %s %s skipped: %s", source, sym, e)
+    if credit_key:
+        try:
+            from analytics.honest_learn import credit_once
+
+            credit_once(credit_key)
+        except Exception:
+            pass

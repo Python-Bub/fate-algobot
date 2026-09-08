@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from datetime import date, timedelta
 
 import requests
 
@@ -96,10 +95,17 @@ def sentiment_headline_skip(symbol: str) -> bool:
     return buzz is not None or bool(sent.get("bullishPercent"))
 
 
-def fetch_company_news_lite(symbol: str, *, limit: int = 20) -> list[str]:
-    """Company news only when sentiment cache miss — still one call."""
+def fetch_company_news_lite(
+    symbol: str, *, limit: int = 20, as_of: str | None = None
+) -> list[str]:
+    """Company news only when sentiment cache miss — still one call.
+
+    ``as_of`` clamps Finnhub ``to`` so hist bars cannot see later headlines.
+    """
+    from intel.point_in_time import filter_items_as_of, news_window
+
     sym = symbol.strip().upper()
-    if sentiment_headline_skip(sym):
+    if as_of is None and sentiment_headline_skip(sym):
         return []
     key = _key()
     if not key:
@@ -110,8 +116,7 @@ def fetch_company_news_lite(symbol: str, *, limit: int = 20) -> list[str]:
     if not ok:
         return []
     try:
-        end = date.today()
-        start = end - timedelta(days=7)
+        start, end = news_window(as_of, lookback_days=7)
         r = requests.get(
             f"{_FINNHUB}/company-news",
             params={"symbol": sym, "from": start.isoformat(), "to": end.isoformat(), "token": key},
@@ -123,7 +128,8 @@ def fetch_company_news_lite(symbol: str, *, limit: int = 20) -> list[str]:
 
         record("finnhub")
         body = r.json()
-        items = body[:limit] if isinstance(body, list) else []
+        items = body if isinstance(body, list) else []
+        items = filter_items_as_of(items, as_of)[:limit]
         return [(it.get("headline") or "") + " " + (it.get("summary") or "") for it in items]
     except Exception as e:
         log.debug("[FINNHUB-BATCH] company-news %s: %s", sym, e)

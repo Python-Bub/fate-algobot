@@ -1,4 +1,4 @@
-from analytics.order_fingerprint import recently_cancelled, record_cancel
+from analytics.order_fingerprint import recently_cancelled, recently_submitted, record_cancel, record_submit
 from analytics.the_algorithm import refine_live
 from alpaca_broker import fortress_buy_should_cancel
 
@@ -10,6 +10,15 @@ def test_cancel_fingerprint_blocks_repeat(tmp_path, monkeypatch):
     record_cancel("INTU", side="buy", reason="ioc_miss")
     assert recently_cancelled("INTU")
     assert not recently_cancelled("MSFT")
+
+
+def test_submit_fingerprint_blocks_repeat_buy(tmp_path, monkeypatch):
+    monkeypatch.setenv("CANCEL_FINGERPRINT_FILE", str(tmp_path / "fp.json"))
+    monkeypatch.setenv("REBUY_AFTER_SUBMIT_SEC", "90")
+    assert not recently_submitted("AAPL")
+    record_submit("AAPL", side="buy")
+    assert recently_submitted("AAPL", side="buy")
+    assert not recently_submitted("MSFT")
 
 
 def test_algorithm_skips_recent_cancel(tmp_path, monkeypatch):

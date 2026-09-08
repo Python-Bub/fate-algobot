@@ -92,9 +92,9 @@ DAY_TRADE_PCT: dict[str, float] = {
 
 FORTRESS_PCT: dict[str, float] = {
     # --- MATH — model/exec dominate; earnings_stick full mass when horizon-aligned ---
-    "model_edge": 13.0,
+    "model_edge": 17.0,
     "exec_conf": 11.0,
-    "pred_force": 2.0,
+    "pred_force": 0.0,
     "earnings_stick": 6.0,  # dte≤1 on fortress (was 2% — catalyst starved)
     "structure": 5.0,
     "value_dcf": 5.0,
@@ -140,12 +140,12 @@ FORTRESS_PCT: dict[str, float] = {
     "event_learn": 1.0,
     "event_ingenuity": 1.0,
     "proven_online": 2.0,
-    "water_datacenter": 2.0,
+    "water_datacenter": 0.0,
     "space_infra": 0.0,
 }
 
 WEEKLY_PCT: dict[str, float] = {
-    "model_edge_5d": 11.0,
+    "model_edge_5d": 13.0,
     "exec_conf": 8.0,
     "value_dcf": 7.0,
     "structure": 5.0,
@@ -186,12 +186,12 @@ WEEKLY_PCT: dict[str, float] = {
     "event_learn": 1.0,
     "event_ingenuity": 1.0,
     "proven_online": 1.0,
-    "water_datacenter": 2.0,
+    "water_datacenter": 0.0,
     "space_infra": 0.0,
 }
 
 LONGTERM_PCT: dict[str, float] = {
-    "model_edge_20d": 9.0,
+    "model_edge_20d": 12.0,
     "value_dcf": 10.0,
     "buffett_graham": 8.0,
     "book_composite": 7.0,
@@ -231,8 +231,8 @@ LONGTERM_PCT: dict[str, float] = {
     "event_learn": 1.0,
     "event_ingenuity": 1.0,
     "proven_online": 1.0,
-    "water_datacenter": 2.0,
-    "space_infra": 1.0,
+    "water_datacenter": 0.0,
+    "space_infra": 0.0,
 }
 
 _TABLES: dict[Sleeve, dict[str, float]] = {
@@ -283,7 +283,7 @@ _ENV_RAW: dict[Sleeve, dict[str, tuple[str, float]]] = {
         "power_people": ("FORTRESS_POWER_PEOPLE_BLEND", 0.08),
         "algo_memory": ("FORTRESS_ALGO_MEMORY_BLEND", 0.04),
         "institutional": ("FORTRESS_INSTITUTIONAL_BLEND", 0.20),
-        "pred_force": ("PRED_FORCE_SCORE_BOOST", 0.24),
+        "pred_force": ("PRED_FORCE_SCORE_BOOST", 0.0),
         "earnings_stick": ("EARNINGS_STICK_SCORE_BOOST", 0.28),
         "bottom_fisher": ("RANK_W_BOTTOM_FISHER", 0.15),
         "value_dcf": ("RANK_W_VALUE", 0.18),
@@ -316,7 +316,7 @@ _ENV_RAW: dict[Sleeve, dict[str, tuple[str, float]]] = {
         "event_learn": ("RANK_W_EVENT_LEARN", 0.10),
         "event_ingenuity": ("RANK_W_EVENT_INGENUITY", 0.12),
         "proven_online": ("RANK_W_PROVEN_ONLINE", 0.28),
-        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.12),
+        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.0),
     },
     "weekly": {
         "news_factor": ("RANK_W_NEWS_FACTOR", 0.05),
@@ -353,7 +353,7 @@ _ENV_RAW: dict[Sleeve, dict[str, tuple[str, float]]] = {
         "event_learn": ("RANK_W_EVENT_LEARN", 0.10),
         "event_ingenuity": ("RANK_W_EVENT_INGENUITY", 0.12),
         "proven_online": ("RANK_W_PROVEN_ONLINE", 0.28),
-        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.10),
+        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.0),
     },
     "longterm": {
         "news_long_horizon": ("RANK_W_NEWS_FACTOR", 0.05),
@@ -388,8 +388,8 @@ _ENV_RAW: dict[Sleeve, dict[str, tuple[str, float]]] = {
         "event_learn": ("RANK_W_EVENT_LEARN", 0.10),
         "event_ingenuity": ("RANK_W_EVENT_INGENUITY", 0.12),
         "proven_online": ("RANK_W_PROVEN_ONLINE", 0.28),
-        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.12),
-        "space_infra": ("RANK_W_SPACE_INFRA", 0.06),
+        "water_datacenter": ("RANK_W_WATER_DATACENTER", 0.0),
+        "space_infra": ("RANK_W_SPACE_INFRA", 0.0),
     },
 }
 
@@ -554,6 +554,14 @@ def apply_sleeve_env(sleeve: Sleeve | str | None = None, *, force: bool = False)
             pass
     os.environ["RANK_W_CRAMER_STRONG_BUY_SHARE"] = f"{min(0.10, cap + 0.03):.12g}"
     os.environ["RANK_W_CRAMER_STRONG_BUY_BUMP"] = f"{min(0.06, cap):.12g}"
+    # Zero table rows must not leak leftover theme knobs (water / FORCE / space).
+    for factor in ("water_datacenter", "space_infra", "pred_force"):
+        env_pair = raw_map.get(factor)
+        if not env_pair:
+            continue
+        if float(table.get(factor, 0.0) or 0.0) <= 0:
+            os.environ[env_pair[0]] = "0.0"
+            applied[env_pair[0]] = "0.0"
     os.environ.setdefault("CONFIDENCE_GATE_MODE", "dual")
     return applied
 

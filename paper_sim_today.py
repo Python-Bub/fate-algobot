@@ -497,7 +497,7 @@ def _score_symbol(
                 from intel.news_factor_engine import score_symbol_news_factors
                 from intel.transcript_factor_engine import score_symbol_transcripts
 
-                nf = score_symbol_news_factors(t)
+                nf = score_symbol_news_factors(t, as_of=sig_date or None)
                 tf = score_symbol_transcripts(t)
                 news_factor = float(nf.get("final_factor", 0.0))
                 transcript_factor = float(tf.get("final_factor", 0.0))

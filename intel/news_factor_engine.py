@@ -57,8 +57,10 @@ def _rec_bias(texts: list[str]) -> float:
     return (up - dn) / tot
 
 
-def score_symbol_news_factors(symbol: str) -> dict:
-    a, b, c = fetch_headline_groups_parallel(symbol, finnhub_limit=30, news_limit=30, cramer_limit=12)
+def score_symbol_news_factors(symbol: str, as_of: str | None = None) -> dict:
+    a, b, c = fetch_headline_groups_parallel(
+        symbol, finnhub_limit=30, news_limit=30, cramer_limit=12, as_of=as_of
+    )
     all_txt = list(a) + list(b) + list(c)
 
     sent, conv, contrad = _sent_stats(all_txt)

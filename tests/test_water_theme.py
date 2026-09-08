@@ -40,19 +40,25 @@ def test_classifier_loads_water_overrides():
     assert row["industry_id"] == "electric_gas_utilities"
 
 
-def test_chips_are_demand_not_water():
+def test_chips_are_demand_not_water(monkeypatch):
+    monkeypatch.setenv("FORTRESS_WATER_THEME", "true")
+    monkeypatch.setenv("RANK_W_WATER_DATACENTER", "0.12")
     b, meta = water_rank_boost("NVDA", p_up=0.70, sleeve="fortress")
     assert b == 0.0
     assert meta["reason"] == "demand_side_not_water"
 
 
-def test_model_down_kills_theme():
+def test_model_down_kills_theme(monkeypatch):
+    monkeypatch.setenv("FORTRESS_WATER_THEME", "true")
+    monkeypatch.setenv("RANK_W_WATER_DATACENTER", "0.12")
     b, meta = water_rank_boost("AWK", p_up=0.40, sleeve="fortress")
     assert b == 0.0
     assert meta["reason"] == "model_down"
 
 
-def test_tech_beats_utility_when_model_agrees():
+def test_tech_beats_utility_when_model_agrees(monkeypatch):
+    monkeypatch.setenv("FORTRESS_WATER_THEME", "true")
+    monkeypatch.setenv("RANK_W_WATER_DATACENTER", "0.12")
     awk, _ = water_rank_boost("AWK", p_up=0.62, sleeve="fortress")
     xyl, _ = water_rank_boost("XYL", p_up=0.62, sleeve="fortress")
     assert awk > 0 and xyl > awk
@@ -64,7 +70,9 @@ def test_hft_gets_zero_water():
     assert HFT_PCT.get("water_datacenter", 0.0) == 0.0
 
 
-def test_space_is_longterm_only():
+def test_space_is_longterm_only(monkeypatch):
+    monkeypatch.setenv("FORTRESS_SPACE_THEME", "true")
+    monkeypatch.setenv("RANK_W_SPACE_INFRA", "0.06")
     f, _ = space_rank_boost("RKLB", p_up=0.62, sleeve="fortress")
     lt, _ = space_rank_boost("RKLB", p_up=0.62, sleeve="longterm")
     tsla, _ = space_rank_boost("TSLA", p_up=0.70, sleeve="longterm")
@@ -74,9 +82,9 @@ def test_space_is_longterm_only():
 
 
 def test_water_table_mass():
-    assert FORTRESS_PCT["water_datacenter"] == 2.0
-    assert FORTRESS_PCT["pred_force"] == 2.0
-    assert LONGTERM_PCT["space_infra"] == 1.0
+    assert FORTRESS_PCT["water_datacenter"] == 0.0
+    assert FORTRESS_PCT["pred_force"] == 0.0
+    assert LONGTERM_PCT["space_infra"] == 0.0
     assert pct_sum("fortress") == 100.0
     assert pct_sum("weekly") == 100.0
     assert pct_sum("longterm") == 100.0

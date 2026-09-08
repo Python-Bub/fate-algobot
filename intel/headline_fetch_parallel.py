@@ -13,11 +13,23 @@ from sentiment_pipeline import fetch_cramer_mentions, fetch_finnhub_headlines, f
 
 
 def fetch_headline_groups_parallel(
-    symbol: str, finnhub_limit: int = 30, news_limit: int = 30, cramer_limit: int = 12
+    symbol: str,
+    finnhub_limit: int = 30,
+    news_limit: int = 30,
+    cramer_limit: int = 12,
+    *,
+    as_of: str | None = None,
 ) -> tuple[list[str], list[str], list[str]]:
-    """Return (finnhub, newsapi, cramer) headline texts with parallel HTTP where enabled."""
+    """Return (finnhub, newsapi, cramer) headline texts with parallel HTTP where enabled.
+
+    Hist ``as_of`` uses dated Finnhub only — NewsAPI/Cramer strings have no
+    reliable timestamps, so they are omitted to fail closed vs look-ahead.
+    """
+    from intel.point_in_time import parse_as_of
+
     sym = symbol.strip().upper()
-    cache_key = f"{sym}:{finnhub_limit}:{news_limit}:{cramer_limit}"
+    hist = parse_as_of(as_of) is not None
+    cache_key = f"{sym}:{finnhub_limit}:{news_limit}:{cramer_limit}:{as_of or 'live'}"
     try:
         from intel.api_budget import cache_get, cache_set
 
@@ -25,7 +37,7 @@ def fetch_headline_groups_parallel(
         if cached and isinstance(cached, list) and len(cached) == 3:
             a, b, c = list(cached[0]), list(cached[1]), list(cached[2])
             if a or b or c:
-                if not b:
+                if not hist and not b:
                     fill = _free_headline_fill(sym, max(news_limit, 12))
                     if fill:
                         b = list(dict.fromkeys(list(b) + fill))
@@ -33,12 +45,15 @@ def fetch_headline_groups_parallel(
     except Exception:
         pass
 
-    if os.getenv("USE_PARALLEL_NEWS_FETCH", "true").lower() not in ("1", "true", "yes"):
+    if hist:
+        a = fetch_finnhub_headlines(sym, limit=finnhub_limit, as_of=as_of)
+        b, c = [], []
+    elif os.getenv("USE_PARALLEL_NEWS_FETCH", "true").lower() not in ("1", "true", "yes"):
         a, b, c = _fetch_groups_sequential(sym, finnhub_limit, news_limit, cramer_limit)
     else:
         a, b, c = _fetch_groups_parallel(sym, finnhub_limit, news_limit, cramer_limit)
 
-    if not a and not b:
+    if not hist and not a and not b:
         fill = _free_headline_fill(sym, max(news_limit, 12))
         if fill:
             b = list(dict.fromkeys(list(b) + fill))

@@ -264,6 +264,13 @@ cmd_down() {
   echo "[GCP] deleted $INSTANCE"
 }
 
+cmd_push_paper() {
+  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  _sync_code
+  echo "[GCP] refresh-paper on $INSTANCE (trainers untouched)…"
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='cd ~/FATE_AlgoBot && PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true ./run_all.sh refresh-paper'
+}
+
 case "${1:-}" in
   setup)    cmd_setup ;;
   up)       cmd_up ;;
@@ -273,9 +280,10 @@ case "${1:-}" in
   sync)     cmd_sync ;;
   sync-env) cmd_sync_env ;;
   sync-models) cmd_sync_models ;;
+  push-paper) cmd_push_paper ;;
   down)     cmd_down "${2:-${GCP_INSTANCE:-}}" ;;
   *)
-    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|down NAME}" >&2
+    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|push-paper|down NAME}" >&2
     exit 1
     ;;
 esac

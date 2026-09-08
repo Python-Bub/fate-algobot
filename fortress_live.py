@@ -1253,8 +1253,13 @@ def run_fortress_pass(args) -> None:
     try:
         from pathlib import Path as _P
 
+        _use_watch = os.getenv("FORTRESS_USE_FORCE_WATCH", "false").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         _fw = _P("data/ops/force_buy_watch.json")
-        if _fw.is_file():
+        if _use_watch and _fw.is_file():
             import json as _json
 
             _doc = _json.loads(_fw.read_text(encoding="utf-8"))
@@ -3583,10 +3588,13 @@ def run_fortress_pass(args) -> None:
                         log.info("[FORTRESS] skip BUY %s — duplicate open buy order", t)
                         continue
                     try:
-                        from analytics.order_fingerprint import recently_cancelled
+                        from analytics.order_fingerprint import recently_cancelled, recently_submitted
 
                         if recently_cancelled(t, side="buy"):
                             log.info("[FORTRESS] skip BUY %s — same ticket was just cancelled", t)
+                            continue
+                        if recently_submitted(t, side="buy"):
+                            log.info("[FORTRESS] skip BUY %s — buy just submitted", t)
                             continue
                     except Exception:
                         pass

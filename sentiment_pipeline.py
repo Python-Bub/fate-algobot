@@ -151,19 +151,26 @@ def fetch_cramer_mentions(symbol: str, limit: int = 10) -> list[str]:
         return []
 
 
-def fetch_finnhub_headlines(symbol: str, limit: int = 20) -> list[str]:
+def fetch_finnhub_headlines(
+    symbol: str, limit: int = 20, *, as_of: str | None = None
+) -> list[str]:
     if _FINNHUB_DISABLED:
         return []
+    from intel.point_in_time import filter_items_as_of, news_window
+
+    start, end = news_window(as_of, lookback_days=7)
     sym = symbol.strip().upper()
     if os.getenv("FINNHUB_SENTIMENT_FIRST", "true").lower() in ("1", "true", "yes"):
         try:
             from intel.finnhub_batch import fetch_company_news_lite, fetch_sentiment
 
             fetch_sentiment(sym)
-            lite = fetch_company_news_lite(sym, limit=limit)
+            lite = fetch_company_news_lite(sym, limit=limit, as_of=as_of)
             if lite:
                 return lite
-            if os.getenv("FINNHUB_SKIP_COMPANY_NEWS_IF_SENTIMENT", "true").lower() in ("1", "true", "yes"):
+            if as_of is None and os.getenv(
+                "FINNHUB_SKIP_COMPANY_NEWS_IF_SENTIMENT", "true"
+            ).lower() in ("1", "true", "yes"):
                 from intel.finnhub_batch import sentiment_headline_skip
 
                 if sentiment_headline_skip(sym):
@@ -174,20 +181,23 @@ def fetch_finnhub_headlines(symbol: str, limit: int = 20) -> list[str]:
     if not key:
         return []
     try:
-        from datetime import date, timedelta
-
-        end = date.today()
-        start = end - timedelta(days=7)
         r = requests.get(
             FINNHUB,
-            params={"symbol": symbol, "from": start.isoformat(), "to": end.isoformat(), "token": key},
+            params={
+                "symbol": symbol,
+                "from": start.isoformat(),
+                "to": end.isoformat(),
+                "token": key,
+            },
             timeout=_SENT_HTTP_TIMEOUT,
         )
         if r.status_code in (401, 403, 429):
             _disable_finnhub(f"HTTP {r.status_code} on {symbol}")
             return []
         r.raise_for_status()
-        items = r.json()[:limit]
+        body = r.json()
+        items = body if isinstance(body, list) else []
+        items = filter_items_as_of(items, as_of)[:limit]
         return [(it.get("headline") or "") + " " + (it.get("summary") or "") for it in items]
     except Exception as e:
         log.warning("[SENT] Finnhub failed: %s", e)
