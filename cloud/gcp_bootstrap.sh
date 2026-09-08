@@ -172,6 +172,26 @@ _sync_models() {
     "$ROOT/models/" "${INSTANCE}:~/FATE_AlgoBot/models/"
 }
 
+# IAP/SSH often drops mid-copy; --partial lets the next attempt resume.
+_sync_models_until_done() {
+  local n=0
+  local rc=0
+  while true; do
+    n=$((n + 1))
+    echo "[GCP] models rsync attempt $n $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    set +e
+    _sync_models
+    rc=$?
+    set -e
+    if [ "$rc" -eq 0 ]; then
+      echo "[GCP] models rsync complete after $n attempt(s)"
+      return 0
+    fi
+    echo "[GCP] models rsync rc=$rc — retry in 20s (resume --partial)" >&2
+    sleep 20
+  done
+}
+
 cmd_setup() {
   echo "[GCP] account:  $(gcloud config get-value account 2>/dev/null)"
   echo "[GCP] project:  $(gcloud config get-value project 2>/dev/null)"
@@ -222,8 +242,7 @@ cmd_paper() {
   echo "  Stop:    ./cloud/gcp_bootstrap.sh down $INSTANCE"
   echo "============================================================"
   echo "[GCP] copying models/ (73 GB — can take hours on a home uplink; paper already running)…"
-  _sync_models || echo "[GCP] models rsync incomplete — re-run: GCP_INSTANCE=$INSTANCE $0 sync-models" >&2
-  echo "[GCP] models copy finished (or resumed later with sync-models)."
+  _sync_models_until_done
 }
 
 cmd_ssh() {
@@ -263,7 +282,7 @@ cmd_sync_env() {
 
 cmd_sync_models() {
   INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
-  _sync_models
+  _sync_models_until_done
 }
 
 cmd_down() {
