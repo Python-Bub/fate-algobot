@@ -89,7 +89,13 @@ def test_last_wins_news_off_hft_full_cash():
     assert "PAPER_SIM_TOP_K=16" in last
     assert "MICRO_SCALP_BP_USE_FRAC=0.30" in last
     assert "HFT_FILL_PERSIST=false" in last
-    assert "HFT_BLOCK_ADD_TO_BROKER_LONG=false" in last
+    assert "HFT_BLOCK_ADD_TO_BROKER_LONG=true" in last
+    assert "HFT_SIZE_FROM_CASH=true" in last
+    assert "HFT_MIN_CASH_TO_BUY=250" in last
+    assert "MICRO_SCALP_SKIP_IF_HELD=true" in last
+    assert "CRYPTO_HFT_SKIP_IF_HELD=true" in last
+    assert "FORTRESS_EXPOSURE_USE_BP=false" in last
+    assert "FORTRESS_BLOCK_NEG_CASH_BUYS=true" in last
     assert "HFT_SKIP_LATENCY_BUDGET=true" in last
     assert "HFT_LIMIT_TIF=ioc" in last
     assert "HFT_REST_POLL_MS=800" in last

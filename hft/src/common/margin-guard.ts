@@ -35,6 +35,11 @@ export function marginSnapshot(): AccountSnapshot | null {
   return cache;
 }
 
+export function __setMarginCacheForTest(snap: AccountSnapshot | null): void {
+  cache = snap;
+  lastFetchMs = snap ? Date.now() : 0;
+}
+
 export function canEnterBuy(notionalUsd: number): { ok: boolean; reason?: string } {
   if (process.env.HFT_MARGIN_GUARD === "false") return { ok: true };
   if (!cache) {
@@ -44,19 +49,36 @@ export function canEnterBuy(notionalUsd: number): { ok: boolean; reason?: string
     return { ok: true };
   }
 
+  const minCash = numEnv("HFT_MIN_CASH_TO_BUY", 250);
+  if (!(cache.cash >= minCash)) {
+    return { ok: false, reason: `cash ${cache.cash.toFixed(0)} < min ${minCash}` };
+  }
+
+  const maxGross = numEnv("HFT_MAX_GROSS_FRAC", numEnv("MAX_GROSS_LEVERAGE", 1.0));
+  if (cache.equity > 0 && cache.longMarketValue > cache.equity * maxGross + 1) {
+    return {
+      ok: false,
+      reason: `over-gross ${cache.longMarketValue.toFixed(0)} > equity ${cache.equity.toFixed(0)} * ${maxGross}`,
+    };
+  }
+
   const minBp = numEnv("HFT_MIN_BUYING_POWER_USD", 5000);
   const bpFrac = numEnv("HFT_BP_USE_FRAC", 0.35);
-  const reserve = numEnv("HFT_BP_RESERVE_USD", 10_000);
+  const sizeFromCash = process.env.HFT_SIZE_FROM_CASH !== "false";
+  const reserve = sizeFromCash
+    ? numEnv("HFT_CASH_RESERVE_USD", 500)
+    : numEnv("HFT_BP_RESERVE_USD", 10_000);
   const minEquityMm = numEnv("HFT_MIN_EQUITY_TO_MM_RATIO", 1.15);
 
-  const bpRoom = Math.max(0, cache.buyingPower * bpFrac - reserve);
+  const pool = sizeFromCash ? Math.max(0, cache.cash) : cache.buyingPower;
+  const bpRoom = Math.max(0, pool * bpFrac - reserve);
   if (notionalUsd > bpRoom) {
     return {
       ok: false,
       reason: `bp-room ${bpRoom.toFixed(0)} < notional ${notionalUsd.toFixed(0)}`,
     };
   }
-  if (cache.buyingPower < minBp) {
+  if (!sizeFromCash && cache.buyingPower < minBp) {
     return { ok: false, reason: `buying_power ${cache.buyingPower.toFixed(0)} < min ${minBp}` };
   }
   if (cache.maintenanceMargin > 0) {
@@ -87,10 +109,15 @@ export function resolveHftNotionalUsd(baseNotional: number): number {
   const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 2_500));
   const slots = Math.max(1, numEnv("HFT_MAX_CONCURRENT_SLOTS", 12));
   const bpFrac = numEnv("HFT_BP_USE_FRAC", 0.8);
-  const reserve = numEnv("HFT_BP_RESERVE_USD", 2000);
+  const sizeFromCash = process.env.HFT_SIZE_FROM_CASH !== "false";
+  const reserve = sizeFromCash
+    ? numEnv("HFT_CASH_RESERVE_USD", 500)
+    : numEnv("HFT_BP_RESERVE_USD", 2000);
 
-  if (cache && cache.buyingPower > 0) {
-    const deployable = Math.max(0, cache.buyingPower * bpFrac - reserve);
+  if (cache) {
+    const pool = sizeFromCash ? Math.max(0, cache.cash) : Math.max(0, cache.buyingPower);
+    const deployable = Math.max(0, pool * bpFrac - reserve);
+    if (!(deployable > 0)) return 0;
     const slot = deployable / slots;
     return Math.max(floor, Math.min(cap, slot));
   }
