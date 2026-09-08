@@ -564,45 +564,48 @@ launch_subsecond_alpaca_paper() {
         HFT_REST_TICKERS="${HFT_REST_TICKERS:-}" \
         HFT_LONG_ONLY="${HFT_LONG_ONLY:-true}" \
         HFT_OR_SIGNAL="${HFT_OR_SIGNAL:-false}" \
-        HFT_STRICT_DUAL_SIGNAL="${HFT_STRICT_DUAL_SIGNAL:-true}" \
+        HFT_STRICT_DUAL_SIGNAL="${HFT_STRICT_DUAL_SIGNAL:-false}" \
         HFT_WS_SILENCE_RECONNECT_MS="${HFT_WS_SILENCE_RECONNECT_MS:-120000}" \
         HFT_MIN_DUAL_STRENGTH="${HFT_MIN_DUAL_STRENGTH:-0.18}" \
         HFT_NEWS_GATE="${HFT_NEWS_GATE:-false}" \
         HFT_W_NEWS_PROB="${HFT_W_NEWS_PROB:-0}" \
-        HFT_ADOPT_WORKING_BUYS="${HFT_ADOPT_WORKING_BUYS:-true}" \
+        HFT_ADOPT_WORKING_BUYS="${HFT_ADOPT_WORKING_BUYS:-false}" \
+        HFT_FILL_PERSIST="${HFT_FILL_PERSIST:-false}" \
         HFT_MIN_OBI_STRENGTH="${HFT_MIN_OBI_STRENGTH:-0.06}" \
         HFT_ULTRA_MODE="${HFT_ULTRA_MODE:-false}" \
         HFT_JP_ULTRA="${HFT_JP_ULTRA:-false}" \
-        HFT_SKIP_LATENCY_BUDGET="${HFT_SKIP_LATENCY_BUDGET:-false}" \
+        HFT_SKIP_LATENCY_BUDGET="${HFT_SKIP_LATENCY_BUDGET:-true}" \
         HFT_EXEC_DELAY_MAX_FEE_BPS="${HFT_EXEC_DELAY_MAX_FEE_BPS:-1.5}" \
         HFT_FEE_BPS="${HFT_FEE_BPS:-0}" \
         OBI_BUDGET_LATENCY_MS="${OBI_BUDGET_LATENCY_MS:-40}" \
         HFT_USE_MARKET_ORDERS="${HFT_USE_MARKET_ORDERS:-false}" \
         HFT_EXTENDED_HOURS="${HFT_EXTENDED_HOURS:-true}" \
         HFT_LIMIT_SLIP_BPS="${HFT_LIMIT_SLIP_BPS:-15}" \
-        HFT_REST_POLL_MS="${HFT_REST_POLL_MS:-2500}" \
+        HFT_REST_POLL_MS="${HFT_REST_POLL_MS:-800}" \
         HFT_REST_POLL_QUIET_N="${HFT_REST_POLL_QUIET_N:-8}" \
-        HFT_REST_POLL_ALL_SYMS="${HFT_REST_POLL_ALL_SYMS:-true}" \
+        HFT_REST_POLL_ALL_SYMS="${HFT_REST_POLL_ALL_SYMS:-false}" \
         HFT_REST_POLL_SLICE="${HFT_REST_POLL_SLICE:-24}" \
         HFT_REST_QUOTE_CHUNK="${HFT_REST_QUOTE_CHUNK:-12}" \
         HFT_REST_429_BACKOFF_MS="${HFT_REST_429_BACKOFF_MS:-20000}" \
         HFT_ORDER_TIMEOUT_MS="${HFT_ORDER_TIMEOUT_MS:-8000}" \
         HFT_MAX_IN_FLIGHT_ORDERS="${HFT_MAX_IN_FLIGHT_ORDERS:-64}" \
-        HFT_PER_TICKER_COOLDOWN_MS="${HFT_PER_TICKER_COOLDOWN_MS:-8000}" \
-        HFT_ENTRY_MISS_COOLDOWN_MS="${HFT_ENTRY_MISS_COOLDOWN_MS:-8000}" \
+        HFT_PER_TICKER_COOLDOWN_MS="${HFT_PER_TICKER_COOLDOWN_MS:-800}" \
+        HFT_ENTRY_MISS_COOLDOWN_MS="${HFT_ENTRY_MISS_COOLDOWN_MS:-800}" \
         HFT_MAX_ORDERS_PER_MIN="${HFT_MAX_ORDERS_PER_MIN:-200}" \
-        HFT_MAX_ORDERS_PER_SEC="${HFT_MAX_ORDERS_PER_SEC:-5}" \
+        HFT_MAX_ORDERS_PER_SEC="${HFT_MAX_ORDERS_PER_SEC:-8}" \
         HFT_GLOBAL_MAX_ORDERS_PER_MIN="${HFT_GLOBAL_MAX_ORDERS_PER_MIN:-200}" \
         HFT_CANCEL_ENTRY_UNFILLED="${HFT_CANCEL_ENTRY_UNFILLED:-false}" \
-        HFT_LIMIT_TIF="${HFT_LIMIT_TIF:-day}" \
+        HFT_LIMIT_TIF="${HFT_LIMIT_TIF:-ioc}" \
         HFT_EXIT_TIF="${HFT_EXIT_TIF:-day}" \
         HFT_FLATTEN_DEBOUNCE_MS="${HFT_FLATTEN_DEBOUNCE_MS:-15000}" \
         HFT_FLATTEN_MAX_SPREAD_BPS="${HFT_FLATTEN_MAX_SPREAD_BPS:-40}" \
         HFT_EDGE_SPREAD_CAP_BPS="${HFT_EDGE_SPREAD_CAP_BPS:-12}" \
         HFT_ENTRY_FILL_MS="${HFT_ENTRY_FILL_MS:-2500}" \
-        HFT_ENTRY_WORKING_TTL_MS="${HFT_ENTRY_WORKING_TTL_MS:-180000}" \
+        HFT_ENTRY_WORKING_TTL_MS="${HFT_ENTRY_WORKING_TTL_MS:-0}" \
         HFT_REST_TICKERS_FILE="${HFT_REST_TICKERS_FILE:-$ROOT/data/ops/hft_rest_tickers.txt}" \
-        HFT_STALE_ORDER_MAX_AGE_MS="${HFT_STALE_ORDER_MAX_AGE_MS:-900000}" \
+        HFT_STALE_ORDER_SWEEP_MS="${HFT_STALE_ORDER_SWEEP_MS:-15000}" \
+        HFT_STALE_ORDER_MAX_AGE_MS="${HFT_STALE_ORDER_MAX_AGE_MS:-8000}" \
+        HFT_ALLOW_SYNTHETIC_NBBO="${HFT_ALLOW_SYNTHETIC_NBBO:-true}" \
         FATE_ROOT="$ROOT" \
         HFT_MIN_CONFIDENCE="${HFT_MIN_CONFIDENCE:-0.45}" \
         HFT_SKIP_SPREAD_CHECK="${HFT_SKIP_SPREAD_CHECK:-false}" \
@@ -610,8 +613,8 @@ launch_subsecond_alpaca_paper() {
         HFT_MAX_SPREAD_BPS="${HFT_MAX_SPREAD_BPS:-40}" \
         HFT_MAX_NOTIONAL_MULT="${HFT_MAX_NOTIONAL_MULT:-1.75}" \
         HFT_MAX_HOLD_MS="${HFT_MAX_HOLD_MS:-180000}" \
-        HFT_MIN_ORDER_NOTIONAL="${HFT_MIN_ORDER_NOTIONAL:-200}" \
-        HFT_MAX_ORDER_NOTIONAL="${HFT_MAX_ORDER_NOTIONAL:-2500}" \
+        HFT_MIN_ORDER_NOTIONAL="${HFT_MIN_ORDER_NOTIONAL:-80}" \
+        HFT_MAX_ORDER_NOTIONAL="${HFT_MAX_ORDER_NOTIONAL:-600}" \
         HFT_BP_USE_FRAC="${HFT_BP_USE_FRAC:-0.90}" \
         HFT_MAX_CONCURRENT_SLOTS="${HFT_MAX_CONCURRENT_SLOTS:-40}" \
         OBI_NOTIONAL_USD="${OBI_NOTIONAL_USD:-1500}" \
@@ -632,7 +635,7 @@ launch_subsecond_alpaca_paper() {
         HFT_SOFT_GREEN_EXIT="${HFT_SOFT_GREEN_EXIT:-true}" \
         HFT_MAX_HOLD_REQUIRE_GREEN="${HFT_MAX_HOLD_REQUIRE_GREEN:-false}" \
         HFT_MICROSTRUCTURE_PROB="${HFT_MICROSTRUCTURE_PROB:-true}" \
-        HFT_BLOCK_ADD_TO_BROKER_LONG="${HFT_BLOCK_ADD_TO_BROKER_LONG:-true}" \
+        HFT_BLOCK_ADD_TO_BROKER_LONG="${HFT_BLOCK_ADD_TO_BROKER_LONG:-false}" \
         HFT_ADOPT_BROKER_LEGS="${HFT_ADOPT_BROKER_LEGS:-false}" \
         HFT_FLATTEN_ORPHANS="${HFT_FLATTEN_ORPHANS:-false}" \
         HFT_MR_ENABLED="${HFT_MR_ENABLED:-true}" \
@@ -649,7 +652,7 @@ launch_subsecond_alpaca_paper() {
         HFT_MR_DEBOUNCE_MS="${HFT_MR_DEBOUNCE_MS:-8000}" \
         HFT_CANDLE_MS="${HFT_CANDLE_MS:-150}" \
         HFT_TRADE_SESSION="${HFT_TRADE_SESSION:-extended}" \
-        HFT_REST_POLL_ALWAYS="${HFT_REST_POLL_ALWAYS:-true}" \
+        HFT_REST_POLL_ALWAYS="${HFT_REST_POLL_ALWAYS:-false}" \
         HFT_REST_QUOTE_MAX_BPS="${HFT_REST_QUOTE_MAX_BPS:-30}" \
         HFT_REST_MAX_SPREAD_BPS="${HFT_REST_MAX_SPREAD_BPS:-40}" \
         TRADE_WEEKDAY_24X5="${TRADE_WEEKDAY_24X5:-true}" \
@@ -3680,7 +3683,13 @@ cmd_train_everything() {
 # start
 # ----------------------------------------------------------------------------
 ensure_hft_built() {
-  if [ ! -d hft/dist ]; then
+  local need=0
+  if [ ! -f hft/dist/obi-tape/index.js ]; then
+    need=1
+  elif [ -n "$(find hft/src -name '*.ts' -newer hft/dist/obi-tape/index.js 2>/dev/null | head -1)" ]; then
+    need=1
+  fi
+  if [ "$need" = 1 ]; then
     echo "[hft] building TS…"
     (cd hft && npm install --no-audit --no-fund >/dev/null && npm run build) || {
       echo "[hft] build FAILED" >&2; return 1; }
@@ -4284,6 +4293,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   hft-rotator)     cmd_launch_hft_rotator ;;
   swap-hft)        cmd_swap_hft "${2:-obi}" ;;
   stop-hft-engines) cmd_stop_hft_engines ;;
+  stop-hft-obi) cmd_stop_hft_obi ;;
   stop-hft|stop-hft-trading) cmd_stop_hft_trading ;;
   train-config)    TRAIN_CONFIG_TICKERS_ONLY=true cmd_train ;;
   train-intraday)  cmd_train_intraday "${2:-config}" ;;

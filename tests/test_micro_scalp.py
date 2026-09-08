@@ -135,3 +135,5 @@ def test_micro_scalp_confirms_fill_from_entry_order_not_broker_long():
     assert "order_filled_qty" in text
     assert "sellable_qty_for_head" in text
     assert "cancel_open_orders(sym)" not in text
+    assert 'MICRO_SCALP_SKIP_IF_HELD' in text
+    assert 'MICRO_SCALP_SKIP_OTHER_SLEEVES' in text

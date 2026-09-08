@@ -88,6 +88,17 @@ def test_last_wins_news_off_hft_full_cash():
     assert "HFT_MIN_DUAL_STRENGTH=0.18" in last
     assert "PAPER_SIM_TOP_K=16" in last
     assert "MICRO_SCALP_BP_USE_FRAC=0.30" in last
+    assert "HFT_FILL_PERSIST=false" in last
+    assert "HFT_BLOCK_ADD_TO_BROKER_LONG=false" in last
+    assert "HFT_SKIP_LATENCY_BUDGET=true" in last
+    assert "HFT_LIMIT_TIF=ioc" in last
+    assert "HFT_REST_POLL_MS=800" in last
+    assert "HFT_REST_POLL_ALWAYS=false" in last
+    assert "HFT_CANCEL_ENTRY_UNFILLED=false" in last
+    dummy = text.rsplit("stop dummy idle-cash dumps", 1)[-1]
+    assert "FORTRESS_RELAX_GATES_ON_FILL=false" in dummy
+    assert "FORTRESS_VEC_MIN_SCORE=0.02" in dummy
+    assert "FORTRESS_OVERNIGHT_CASH_DEPLOY=false" in dummy
 
 
 def test_hft_flatten_reprices_unfillable_exits():
@@ -96,4 +107,7 @@ def test_hft_flatten_reprices_unfillable_exits():
     assert "flatten-reprice" in risk
     sig = (ROOT / "hft/src/obi-tape/obi-tape-signals.ts").read_text(encoding="utf-8")
     assert "entry-working-ttl-cancel" in sig
+    idx = (ROOT / "hft/src/obi-tape/index.ts").read_text(encoding="utf-8")
+    assert "cancel-stale-hft-entries" in idx
+    assert "cancelHftEntries" in idx
 

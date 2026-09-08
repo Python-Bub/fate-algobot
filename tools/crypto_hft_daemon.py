@@ -132,6 +132,8 @@ def _place_limit(symbol: str, qty: float, side: str, px: float) -> dict[str, Any
         )
     except Exception as e:
         log.warning("[CRYPTO-HFT] %s %s failed: %s", side, symbol, e)
+        if "insufficient" in str(e).lower():
+            return {"_insufficient": True, "symbol": symbol}
         return None
 
 
@@ -181,25 +183,37 @@ def tick(state: dict[str, Any] | None = None) -> dict[str, Any]:
         fortress = skip_held(sym, live_qty=live, our_qty=our_qty, skip_if_held=skip_fort)
 
         if rec and our_qty > 1e-12:
+            if live <= 1e-12:
+                opens.pop(sym, None)
+                out["actions"].append({"sym": sym, "why": "phantom_flat"})
+                continue
             entry = float(rec.get("entry") or mid)
             tgt = target_px(entry, bps=tgt_bps)
             stp = stop_px(entry, bps=stp_bps)
             if mid >= tgt and _pace_ok(st):
-                sell_q = min(our_qty, live) if live > 0 else our_qty
+                sell_q = min(our_qty, live)
                 if sell_q > 1e-12:
                     od = _place_limit(sym, sell_q, "sell", max(ask * 0.999, tgt))
                     _note_order(st)
-                    out["actions"].append({"sym": sym, "why": "take_profit", "order": bool(od)})
-                    if od:
+                    if od and od.get("_insufficient"):
                         opens.pop(sym, None)
+                        out["actions"].append({"sym": sym, "why": "phantom_flat"})
+                    else:
+                        out["actions"].append({"sym": sym, "why": "take_profit", "order": bool(od)})
+                        if od:
+                            opens.pop(sym, None)
             elif mid <= stp and _pace_ok(st):
-                sell_q = min(our_qty, live) if live > 0 else our_qty
+                sell_q = min(our_qty, live)
                 if sell_q > 1e-12:
                     od = _place_limit(sym, sell_q, "sell", min(bid, stp))
                     _note_order(st)
-                    out["actions"].append({"sym": sym, "why": "wide_stop", "order": bool(od)})
-                    if od:
+                    if od and od.get("_insufficient"):
                         opens.pop(sym, None)
+                        out["actions"].append({"sym": sym, "why": "phantom_flat"})
+                    else:
+                        out["actions"].append({"sym": sym, "why": "wide_stop", "order": bool(od)})
+                        if od:
+                            opens.pop(sym, None)
             else:
                 out["actions"].append({"sym": sym, "why": "hold_open", "pnl_mid": mid / entry - 1.0})
             continue
@@ -231,8 +245,9 @@ def tick(state: dict[str, Any] | None = None) -> dict[str, Any]:
             continue
         od = _place_limit(sym, qty, "buy", lp)
         _note_order(st)
-        out["actions"].append({"sym": sym, "why": "enter", "order": bool(od), "qty": qty, "px": lp})
-        if od:
+        filled = bool(od) and not od.get("_insufficient")
+        out["actions"].append({"sym": sym, "why": "enter", "order": filled, "qty": qty, "px": lp})
+        if filled:
             fills_px = float(od.get("filled_avg_price") or lp)
             opens[sym] = {
                 "qty": qty,

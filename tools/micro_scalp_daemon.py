@@ -453,22 +453,34 @@ class MicroScalpEngine:
                 pass
             if not self._cooldown_ok(sym):
                 continue
-            try:
-                from alpaca_broker import get_position
+            skip_held = os.getenv("MICRO_SCALP_SKIP_IF_HELD", "true").lower() in (
+                "1",
+                "true",
+                "yes",
+            )
+            if skip_held:
+                try:
+                    from alpaca_broker import get_position
 
-                held = get_position(sym)
-                if held and abs(float(held.get("qty") or 0)) > 1e-8:
+                    held = get_position(sym)
+                    if held and abs(float(held.get("qty") or 0)) > 1e-8:
+                        continue
+                except Exception:
                     continue
-            except Exception:
-                continue
-            try:
-                from analytics.portfolio_slots import load_registry
+            skip_sleeves = os.getenv("MICRO_SCALP_SKIP_OTHER_SLEEVES", "true").lower() in (
+                "1",
+                "true",
+                "yes",
+            )
+            if skip_sleeves:
+                try:
+                    from analytics.portfolio_slots import load_registry
 
-                head = str(load_registry().get(sym) or "").lower()
-                if head in ("fortress", "weekly", "longterm"):
-                    continue
-            except Exception:
-                pass
+                    head = str(load_registry().get(sym) or "").lower()
+                    if head in ("fortress", "weekly", "longterm"):
+                        continue
+                except Exception:
+                    pass
             skip = self._skip_pressure(sym)
             if skip:
                 log.debug("[MICRO_SCALP] skip %s — %s", sym, skip)

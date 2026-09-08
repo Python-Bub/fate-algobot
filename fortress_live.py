@@ -1670,8 +1670,16 @@ def run_fortress_pass(args) -> None:
             start = (pd.Timestamp.utcnow() - pd.Timedelta(days=lookback)).strftime("%Y-%m-%d")
             tick_timeout = float(os.getenv("FORTRESS_TICK_TIMEOUT_SEC", "25") or 0)
             with lat.track("feature_build"):
+                t_feat = t
                 try:
-                    df = _call_with_timeout(build_features, tick_timeout, t, start, end)
+                    from crypto_universe import is_crypto_symbol, yahoo_symbol
+
+                    if is_crypto_symbol(t):
+                        t_feat = yahoo_symbol(t)
+                except Exception:
+                    t_feat = t
+                try:
+                    df = _call_with_timeout(build_features, tick_timeout, t_feat, start, end)
                 except TimeoutError:
                     log.warning("[FORTRESS] tick timeout %s after %.0fs — skip", t, tick_timeout)
                     continue
@@ -3201,7 +3209,11 @@ def run_fortress_pass(args) -> None:
                     leftover -= add
             allocated = sum(vec_notionals.values())
             idle_left = max(float(leftover), max(0.0, float(budget) - allocated))
-            if idle_left >= min_n and idle_cash_fill_active(ctx):
+            if scanned <= 0:
+                log.warning(
+                    "[FORTRESS] skip idle-cash fill — scan scored 0 ticks this pass"
+                )
+            elif idle_left >= min_n and idle_cash_fill_active(ctx):
                 leftover = idle_left
                 try:
                     from alpaca_broker import list_positions as _lp_idle
@@ -3226,70 +3238,28 @@ def run_fortress_pass(args) -> None:
                         already=vec_notionals,
                         banned=_ban,
                     )
+                    scored = {
+                        str(c.get("ticker") or "").upper()
+                        for c in ranked
+                        if float(c.get("score") or 0) > 0
+                    }
+                    kept_idle = 0.0
                     for t, n_add in extra.items():
-                        vec_notionals[t] = float(vec_notionals.get(t) or 0.0) + float(n_add)
-                        leftover -= float(n_add)
-                    if extra:
-                        have_rank = {str(c.get("ticker") or "").upper() for c in ranked}
-                        pos_map = {
-                            str(p.get("symbol", "")).replace("/", "-").upper(): p
-                            for p in pos_idle
-                        }
-                        for t_ex in extra:
-                            tu = str(t_ex).upper()
-                            if tu in have_rank:
-                                continue
-                            p = pos_map.get(tu) or pos_map.get(tu.replace("-", "")) or {}
-                            try:
-                                px_h = float(p.get("current_price") or 0)
-                            except (TypeError, ValueError):
-                                px_h = 0.0
-                            if px_h <= 0:
-                                try:
-                                    from alpaca_broker import get_quote_bid_ask as _q_idle
-
-                                    qh = _q_idle(tu)
-                                    if qh:
-                                        bid_h, ask_h = float(qh[0] or 0), float(qh[1] or 0)
-                                        px_h = (
-                                            (bid_h + ask_h) / 2.0
-                                            if bid_h > 0 and ask_h > 0
-                                            else (ask_h or bid_h)
-                                        )
-                                except Exception:
-                                    px_h = 0.0
-                            if px_h <= 0:
-                                log.warning("[FORTRESS] idle fill skip %s — no price", tu)
-                                vec_notionals.pop(tu, None)
-                                continue
-                            try:
-                                mv_h = abs(float(p.get("market_value") or 0))
-                            except (TypeError, ValueError):
-                                mv_h = 0.0
-                            ranked.append(
-                                {
-                                    "ticker": tu,
-                                    "p_up": 0.55,
-                                    "p_adj": 0.55,
-                                    "p_entry": 0.55,
-                                    "exec_c": 0.55,
-                                    "sent": 0.0,
-                                    "px": px_h,
-                                    "scale": 1.0,
-                                    "existing_mv": mv_h,
-                                    "existing_gain": (
-                                        float(p.get("unrealized_plpc") or 0) if p else None
-                                    )
-                                    or None,
-                                    "score": 0.0,
-                                    "force_priority": False,
-                                }
+                        tu = str(t).upper()
+                        if tu not in scored:
+                            log.info(
+                                "[FORTRESS] idle skip %s $%.0f — no scored edge this pass",
+                                tu,
+                                float(n_add),
                             )
-                            have_rank.add(tu)
+                            continue
+                        vec_notionals[tu] = float(vec_notionals.get(tu) or 0.0) + float(n_add)
+                        leftover -= float(n_add)
+                        kept_idle += float(n_add)
+                    if kept_idle > 0:
                         log.info(
-                            "[FORTRESS] idle-cash fill %d name(s) $%.0f (leftover now $%.0f)",
-                            len(extra),
-                            sum(extra.values()),
+                            "[FORTRESS] idle-cash fill scored names $%.0f (leftover now $%.0f)",
+                            kept_idle,
                             leftover,
                         )
                 except Exception as e:
@@ -3313,6 +3283,12 @@ def run_fortress_pass(args) -> None:
         except Exception as e:
             log.warning("[FORTRESS] vectorized weights failed — falling back to per-name sizing: %s", e)
             vec_notionals = {}
+
+    if scanned <= 0:
+        if ranked or vec_notionals:
+            log.warning("[FORTRESS] drop %d ranked / %d sized — scan scored 0 ticks", len(ranked), len(vec_notionals))
+        ranked = []
+        vec_notionals = {}
 
     try:
         from alpaca_broker import cancel_extra_working_buys
@@ -3343,6 +3319,15 @@ def run_fortress_pass(args) -> None:
                 t,
                 existing_mv,
             )
+            continue
+        try:
+            if float(cand.get("score") or 0) <= 0 and not cand.get("force_priority"):
+                log.info(
+                    "[FORTRESS] skip BUY %s — no rank score (refuse dummy p=0.55 cash dump)",
+                    t,
+                )
+                continue
+        except (TypeError, ValueError):
             continue
         try:
             _g_hold = cand.get("existing_gain")

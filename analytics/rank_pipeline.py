@@ -882,8 +882,8 @@ def vectorized_target_weights(
          book consumes ~100% of `total_capital` (the full allowed buying power).
 
     Returns a notional array (USD) aligned to `scores`. Names below `min_score`
-    get 0. This is intentionally long-only and fully invested by construction so
-    the deployment target (~$400k) is met every cycle without per-name drift.
+    get 0. If nobody clears the floor, the array is all zeros — leftover cash
+    stays cash. Do not force-invest dummy scores.
     """
     s = np.asarray(scores, dtype=float).ravel()
     n = s.size
@@ -892,7 +892,9 @@ def vectorized_target_weights(
 
     eligible = s > float(min_score)
     if not eligible.any():
-        eligible = np.ones(n, dtype=bool)  # never leave capital idle
+        # Cash can sit. Forcing 100% into zero-score names is how idle-fill
+        # dumped $12k into SOLUSD at dummy p=0.55 and went red.
+        return np.zeros(n, dtype=float)
 
     z = np.zeros(n, dtype=float)
     sd = float(s[eligible].std())

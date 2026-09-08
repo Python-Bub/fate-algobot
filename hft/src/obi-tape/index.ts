@@ -731,6 +731,17 @@ async function main(): Promise<void> {
     .then((n) => {
       if (n > 0) log("cancel-orphan-hft-exits", { canceled: n });
     })
+    .then(() => {
+      // IOC mode: leftover DAY bids from persist-era block pending.has forever.
+      const persistOff =
+        process.env.HFT_FILL_PERSIST === "false" || process.env.FILL_PERSIST === "false";
+      const wantIoc = (process.env.HFT_LIMIT_TIF || "").toLowerCase() === "ioc";
+      if (!persistOff && !wantIoc) return 0;
+      return broker.cancelHftEntries().then((n) => {
+        if (n > 0) log("cancel-stale-hft-entries", { canceled: n });
+        return n;
+      });
+    })
     .then(() => adoptWorkingBuys())
     .then(() => void reconcileOrphanLegs());
   const orphanTimer = setInterval(() => void reconcileOrphanLegs(), reconcileMs);

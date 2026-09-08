@@ -154,6 +154,15 @@ def test_skip_fortress_inventory_and_tiny_qty():
     assert spread_bps(100.0, 100.05) < 8.0
 
 
+def test_crypto_hft_does_not_resell_phantom_inventory():
+    from pathlib import Path
+
+    src = (Path(__file__).resolve().parents[1] / "tools" / "crypto_hft_daemon.py").read_text()
+    assert "else our_qty" not in src
+    assert "phantom_flat" in src
+    assert "_insufficient" in src
+
+
 def test_decide_entry_skips_fortress(monkeypatch):
     monkeypatch.setenv("CRYPTO_HFT_MAX_OPEN", "1")
     cs = CryptoScore("BTC-USD", 0.5, 0.75, 0.7, True, {})
