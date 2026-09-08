@@ -125,6 +125,7 @@ _prefer_running_instance() {
 
 _sync_code() {
   echo "[GCP] rsync project → VM (excludes venv, large caches)…"
+  set +e
   rsync -az --delete --partial "$(_rsync_prog)" \
     --exclude='venv/' \
     --exclude='hft/node_modules/' \
@@ -135,8 +136,23 @@ _sync_code() {
     --exclude='.pids/' \
     --exclude='.env' \
     --exclude='models/' \
+    --exclude='data/policy/' \
+    --exclude='data/cortex/' \
+    --exclude='data/intel/' \
+    --exclude='data/replay/' \
+    --exclude='analytics/generated_patterns/' \
     -e "$(_rsync_e)" \
     "$ROOT/" "${INSTANCE}:~/FATE_AlgoBot/"
+  local rc=$?
+  set -e
+  if [ "$rc" -eq 23 ]; then
+    echo "[GCP] rsync vanished-file warning (rc=23) — code copy is enough, continuing"
+    return 0
+  fi
+  if [ "$rc" -ne 0 ]; then
+    echo "[GCP] rsync failed rc=$rc" >&2
+    return "$rc"
+  fi
 }
 
 _sync_env() {
