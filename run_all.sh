@@ -883,7 +883,7 @@ launch_weekly_paper_daemon() {
     FORTRESS_ALLOW_OVERNIGHT="${FORTRESS_ALLOW_OVERNIGHT:-true}" \
     FLATTEN_AT_CLOSE="${FLATTEN_AT_CLOSE:-false}" \
     RANK_W_NEWS_FACTOR="${RANK_W_NEWS_FACTOR:-0.05}" USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 \
-    NEURAL_EPOCHS=2 NEURAL_SEQ_LEN=24 \
+    NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}" \
     "$ROOT/tools/daemon_loop.sh" "$pause" \
     "$PY" -u paper_sim_today.py \
     >"$logf" 2>&1 </dev/null &
@@ -918,7 +918,7 @@ launch_longterm_paper_daemon() {
     SWING_BUY_WINDOW_ENABLED="${SWING_BUY_WINDOW_ENABLED:-true}" \
     SWING_HOLD_DAYS_MIN="${SWING_HOLD_DAYS_MIN:-5}" \
     CRAMER_HOLD_DAYS=20 RANK_W_NEWS_FACTOR="${RANK_W_NEWS_FACTOR:-0.05}" RANK_W_CRAMER="${RANK_W_CRAMER:-0.05}" \
-    USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 NEURAL_EPOCHS=2 NEURAL_SEQ_LEN=24 \
+    USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}" \
     "$ROOT/tools/daemon_loop.sh" "$pause" \
     "$PY" -u paper_sim_today.py \
     >"$logf" 2>&1 </dev/null &
@@ -2045,6 +2045,9 @@ cmd_train_lstm() {
   echo "[train-lstm] per-ticker LSTM heads  scope=$scope  workers=$workers  → models/lstm/"
   launch_python train-lstm env USE_LSTM_HEAD=true TRAIN_FORCE_YAHOO=true \
                             LSTM_TRAIN_SCOPE="$scope" LSTM_WORKERS="$workers" \
+                            LSTM_HIDDEN="${LSTM_HIDDEN:-128}" LSTM_LAYERS="${LSTM_LAYERS:-3}" \
+                            LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-60}" LSTM_EPOCHS="${LSTM_EPOCHS:-20}" \
+                            TRAIN_DATA_START="${TRAIN_DATA_START:-2010-01-01}" \
                             "$PY" -u tools/train_lstm_heads.py
   echo "[train-lstm] pid $(read_pid train-lstm).  Tail:  tail -f logs/train-lstm_latest.log"
 }
@@ -2713,12 +2716,12 @@ cmd_week_finish() {
 }
 
 cmd_proper_finish() {
-  echo "[proper-finish] maximum quality — no FAST_MODE, no placeholder skips, full LSTM-all @ 20 epochs"
+  echo "[proper-finish] maximum quality — no FAST_MODE, no placeholder skips, full LSTM-all @ 24 epochs"
   echo "                timeline: intraday (~1h) → proper intraday rerun → LSTM active → proper daily junk"
   echo "                          → failed retry → top100 perfection → LSTM-all (~4–8 days)"
   export TRAIN_PROPER_FINISH=true
   export ENHANCE_FINISH_MODE=full
-  export ENHANCE_LSTM_EPOCHS="${ENHANCE_LSTM_EPOCHS:-20}"
+  export ENHANCE_LSTM_EPOCHS="${ENHANCE_LSTM_EPOCHS:-24}"
   export ENHANCE_LSTM_WORKERS="${ENHANCE_LSTM_WORKERS:-6}"
   export ENHANCE_DAILY_WORKERS="${ENHANCE_DAILY_WORKERS:-6}"
   export INTRADAY_GAP_SKIP_CACHED_PLACEHOLDER=false
@@ -3679,6 +3682,47 @@ cmd_train_everything() {
   echo "[train-everything] stop cleanly:    ./run_all.sh pause"
 }
 
+cmd_cloud_train() {
+  # Autonomous GCP trainer: stronger nets + full historical cook.
+  # Does NOT start fortress/HFT — paper VM is the only orderer.
+  echo "[cloud-train] historical + LSTM-all + hist-cook + enhancement (no paper/HFT)"
+  export SKIP_PAPER_AUTO_TRAIN=true
+  export NETWORK_FIRST="${NETWORK_FIRST:-true}"
+  export TRAIN_FORCE_YAHOO="${TRAIN_FORCE_YAHOO:-true}"
+  export TRAIN_DATA_START="${TRAIN_DATA_START:-2010-01-01}"
+  export STRONG_TRAIN_DATA_START="${STRONG_TRAIN_DATA_START:-2010-01-01}"
+  export USE_LSTM_HEAD=true
+  export BLEND_LSTM_INTO_META=true
+  export USE_NEURAL_ENSEMBLE=true
+  export LSTM_TRAIN_SCOPE="${LSTM_TRAIN_SCOPE:-all}"
+  export LSTM_HIDDEN="${LSTM_HIDDEN:-128}"
+  export LSTM_LAYERS="${LSTM_LAYERS:-3}"
+  export LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-60}"
+  export LSTM_EPOCHS="${LSTM_EPOCHS:-20}"
+  export LSTM_EARLY_STOP_PATIENCE="${LSTM_EARLY_STOP_PATIENCE:-5}"
+  export NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}"
+  export NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}"
+  export HIST_COOK_YEARS="${HIST_COOK_YEARS:-16}"
+  export HIST_COOK_MAX_SYMBOLS="${HIST_COOK_MAX_SYMBOLS:-400}"
+  export HIST_COOK_TRAIN_LSTM="${HIST_COOK_TRAIN_LSTM:-true}"
+  export TRAIN_PROPER_FINISH=true
+  export ENHANCE_FINISH_MODE=full
+  export ENHANCE_LSTM_EPOCHS="${ENHANCE_LSTM_EPOCHS:-24}"
+  export FAST_MODE=false
+  export FAST_UNIVERSE_TRAIN=false
+  export TRAIN_TOP50_ONLY=false
+  export TRAIN_TOP100_ONLY=false
+  export TRAIN_CONFIG_TICKERS_ONLY=false
+  cmd_train_everything
+  is_running train-lstm || cmd_train_lstm || true
+  cmd_launch_hist_cook || true
+  cmd_launch_gen_learn_train || true
+  cmd_launch_continuous_learn || true
+  cmd_launch_ule_watch || true
+  is_running enhancement-queue || cmd_launch_enhancement_queue full || true
+  echo "[cloud-train] launched. Orders stay on the paper VM — this box only trains."
+}
+
 # ----------------------------------------------------------------------------
 # start
 # ----------------------------------------------------------------------------
@@ -4299,6 +4343,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   train-intraday)  cmd_train_intraday "${2:-config}" ;;
   train-all)       cmd_train_all "${2:-all}" ;;
   train-everything|everything|full)  cmd_train_everything ;;
+  cloud-train|train-cloud|gcp-train) cmd_cloud_train ;;
   pause)           cmd_pause ;;
   pause-all|pause-everything|freeze) cmd_pause_all ;;
   going-away|away|sleep-safe) cmd_going_away ;;
@@ -4476,6 +4521,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
     echo "    train-intraday   minute + hourly heads via Alpaca IEX" >&2
     echo "    train-all        daily-and-up + intraday (full universe by default)" >&2
     echo "    train-everything 24-hour kickoff — every horizon, every ticker, backgrounded" >&2
+    echo "    cloud-train      GCP trainer: hist-cook + LSTM-all + enhancement (no paper/HFT)" >&2
     echo "    going-away       FORCE-flatten (marketable exits + retries) then pause-all before lid-close" >&2
     echo "    exec-delay-probe measure Alpaca RTT (WiFi/VPN) → data/ops/hft_exec_delay.json" >&2
     echo "    pause-all        sell all positions (if FLATTEN_ON_PAUSE_ALL) + stop everything" >&2

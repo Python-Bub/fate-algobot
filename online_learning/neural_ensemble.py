@@ -145,10 +145,12 @@ class NeuralTrainReport:
 
 
 class _LSTMHead(nn.Module):
-    def __init__(self, n_features: int, hidden: int = 64) -> None:
+    def __init__(self, n_features: int, hidden: int = 64, num_layers: int = 2) -> None:
         super().__init__()
-        self.lstm = nn.LSTM(n_features, hidden, num_layers=2, batch_first=True, dropout=0.2)
-        self.fc = nn.Sequential(nn.Linear(hidden, hidden // 2), nn.ReLU(), nn.Linear(hidden // 2, 1))
+        layers = max(1, int(num_layers))
+        drop = 0.2 if layers > 1 else 0.0
+        self.lstm = nn.LSTM(n_features, hidden, num_layers=layers, batch_first=True, dropout=drop)
+        self.fc = nn.Sequential(nn.Linear(hidden, max(16, hidden // 2)), nn.ReLU(), nn.Linear(max(16, hidden // 2), 1))
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
         out, _ = self.lstm(x)
@@ -156,11 +158,12 @@ class _LSTMHead(nn.Module):
 
 
 class _CNNHead(nn.Module):
-    def __init__(self, n_features: int) -> None:
+    def __init__(self, n_features: int, channels: int = 64) -> None:
         super().__init__()
-        self.c1 = nn.Conv1d(n_features, 64, kernel_size=3, padding=1)
-        self.c2 = nn.Conv1d(64, 64, kernel_size=3, padding=1)
-        self.fc = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Linear(32, 1))
+        ch = max(16, int(channels))
+        self.c1 = nn.Conv1d(n_features, ch, kernel_size=3, padding=1)
+        self.c2 = nn.Conv1d(ch, ch, kernel_size=3, padding=1)
+        self.fc = nn.Sequential(nn.Linear(ch, max(16, ch // 2)), nn.ReLU(), nn.Linear(max(16, ch // 2), 1))
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
         # [B,T,F] -> [B,F,T]
@@ -174,12 +177,14 @@ class _CNNHead(nn.Module):
 class _GALSTMHead(nn.Module):
     """Gated-attention LSTM (GA-LSTM)."""
 
-    def __init__(self, n_features: int, hidden: int = 64) -> None:
+    def __init__(self, n_features: int, hidden: int = 64, num_layers: int = 1) -> None:
         super().__init__()
-        self.lstm = nn.LSTM(n_features, hidden, num_layers=1, batch_first=True)
+        layers = max(1, int(num_layers))
+        drop = 0.2 if layers > 1 else 0.0
+        self.lstm = nn.LSTM(n_features, hidden, num_layers=layers, batch_first=True, dropout=drop)
         self.attn = nn.Linear(hidden, 1)
         self.gate = nn.Sequential(nn.Linear(hidden, hidden), nn.Sigmoid())
-        self.fc = nn.Sequential(nn.Linear(hidden, 32), nn.ReLU(), nn.Linear(32, 1))
+        self.fc = nn.Sequential(nn.Linear(hidden, max(16, hidden // 2)), nn.ReLU(), nn.Linear(max(16, hidden // 2), 1))
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
         out, _ = self.lstm(x)  # [B,T,H]
@@ -191,11 +196,15 @@ class _GALSTMHead(nn.Module):
 
 
 class _CNNBiLSTMHead(nn.Module):
-    def __init__(self, n_features: int, hidden: int = 48) -> None:
+    def __init__(self, n_features: int, hidden: int = 48, channels: int = 48, num_layers: int = 1) -> None:
         super().__init__()
-        self.conv = nn.Conv1d(n_features, 48, kernel_size=3, padding=1)
-        self.bilstm = nn.LSTM(48, hidden, num_layers=1, batch_first=True, bidirectional=True)
-        self.fc = nn.Sequential(nn.Linear(hidden * 2, 32), nn.ReLU(), nn.Linear(32, 1))
+        ch = max(16, int(channels))
+        hid = max(16, int(hidden))
+        layers = max(1, int(num_layers))
+        drop = 0.2 if layers > 1 else 0.0
+        self.conv = nn.Conv1d(n_features, ch, kernel_size=3, padding=1)
+        self.bilstm = nn.LSTM(ch, hid, num_layers=layers, batch_first=True, bidirectional=True, dropout=drop)
+        self.fc = nn.Sequential(nn.Linear(hid * 2, max(16, hid)), nn.ReLU(), nn.Linear(max(16, hid), 1))
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
         z = F.relu(self.conv(x.transpose(1, 2))).transpose(1, 2)  # [B,T,48]
@@ -204,14 +213,15 @@ class _CNNBiLSTMHead(nn.Module):
 
 
 class _DQN(nn.Module):
-    def __init__(self, n_features: int) -> None:
+    def __init__(self, n_features: int, width: int = 64) -> None:
         super().__init__()
+        w = max(16, int(width))
         self.net = nn.Sequential(
-            nn.Linear(n_features, 64),
+            nn.Linear(n_features, w),
             nn.ReLU(),
-            nn.Linear(64, 64),
+            nn.Linear(w, w),
             nn.ReLU(),
-            nn.Linear(64, 3),
+            nn.Linear(w, 3),
         )
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
@@ -219,24 +229,91 @@ class _DQN(nn.Module):
 
 
 class _TransformerHead(nn.Module):
-    """Tiny temporal encoder — extra vote, does not replace LSTM/CNN checkpoints."""
+    """Temporal encoder — extra vote, does not replace LSTM/CNN checkpoints."""
 
-    def __init__(self, n_features: int, d_model: int = 32, nhead: int = 4, nlayers: int = 2) -> None:
+    def __init__(
+        self,
+        n_features: int,
+        d_model: int = 32,
+        nhead: int = 4,
+        nlayers: int = 2,
+        ff: int = 64,
+    ) -> None:
         super().__init__()
+        d_model = max(16, int(d_model))
+        nhead = max(1, int(nhead))
+        if d_model % nhead != 0:
+            nhead = 4 if d_model % 4 == 0 else 1
+        ff = max(d_model, int(ff))
         self.proj = nn.Linear(n_features, d_model)
         layer = nn.TransformerEncoderLayer(
             d_model=d_model,
             nhead=nhead,
-            dim_feedforward=64,
+            dim_feedforward=ff,
             dropout=0.1,
             batch_first=True,
         )
-        self.enc = nn.TransformerEncoder(layer, num_layers=nlayers)
-        self.fc = nn.Sequential(nn.Linear(d_model, 16), nn.ReLU(), nn.Linear(16, 1))
+        self.enc = nn.TransformerEncoder(layer, num_layers=max(1, int(nlayers)))
+        self.fc = nn.Sequential(nn.Linear(d_model, max(16, d_model // 2)), nn.ReLU(), nn.Linear(max(16, d_model // 2), 1))
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
         z = self.enc(self.proj(x))
         return self.fc(z[:, -1, :]).squeeze(-1)
+
+
+def _train_arch() -> dict:
+    """Capacity for *new* checkpoints. Missing keys on disk stay at legacy sizes."""
+    return {
+        "lstm_hidden": _i("NEURAL_LSTM_HIDDEN", 128),
+        "lstm_layers": _i("NEURAL_LSTM_LAYERS", 3),
+        "cnn_channels": _i("NEURAL_CNN_CHANNELS", 96),
+        "ga_hidden": _i("NEURAL_GA_HIDDEN", 128),
+        "ga_layers": _i("NEURAL_GA_LAYERS", 2),
+        "bilstm_hidden": _i("NEURAL_BILSTM_HIDDEN", 64),
+        "bilstm_channels": _i("NEURAL_BILSTM_CHANNELS", 64),
+        "bilstm_layers": _i("NEURAL_BILSTM_LAYERS", 2),
+        "tf_d_model": _i("NEURAL_TF_D_MODEL", 64),
+        "tf_nhead": _i("NEURAL_TF_NHEAD", 4),
+        "tf_nlayers": _i("NEURAL_TF_NLAYERS", 3),
+        "tf_ff": _i("NEURAL_TF_FF", 128),
+        "dqn_width": _i("NEURAL_DQN_WIDTH", 128),
+    }
+
+
+def _make_head(key: str, n_feat: int, arch: dict | None = None) -> "nn.Module":
+    a = arch or {}
+    if key == "lstm":
+        return _LSTMHead(
+            n_feat,
+            hidden=int(a.get("lstm_hidden", 64)),
+            num_layers=int(a.get("lstm_layers", 2)),
+        )
+    if key == "cnn":
+        return _CNNHead(n_feat, channels=int(a.get("cnn_channels", 64)))
+    if key == "ga_lstm":
+        return _GALSTMHead(
+            n_feat,
+            hidden=int(a.get("ga_hidden", 64)),
+            num_layers=int(a.get("ga_layers", 1)),
+        )
+    if key == "cnn_bilstm":
+        return _CNNBiLSTMHead(
+            n_feat,
+            hidden=int(a.get("bilstm_hidden", 48)),
+            channels=int(a.get("bilstm_channels", 48)),
+            num_layers=int(a.get("bilstm_layers", 1)),
+        )
+    if key == "transformer":
+        return _TransformerHead(
+            n_feat,
+            d_model=int(a.get("tf_d_model", 32)),
+            nhead=int(a.get("tf_nhead", 4)),
+            nlayers=int(a.get("tf_nlayers", 2)),
+            ff=int(a.get("tf_ff", 64)),
+        )
+    if key == "dqn":
+        return _DQN(n_feat, width=int(a.get("dqn_width", 64)))
+    raise KeyError(key)
 
 
 # Share replay + checkpoints across class-share tickers (Alpaca vs Yahoo naming).
@@ -437,7 +514,7 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
     if not use_neural_ensemble():
         return NeuralTrainReport(ticker=ticker, applied=False, reason="disabled_or_torch_missing", n_samples=0)
 
-    seq_len = _i("NEURAL_SEQ_LEN", 24)
+    seq_len = _i("NEURAL_SEQ_LEN", 48)
     min_n = _i("NEURAL_MIN_SAMPLES", 80)
     rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_MAX_SAMPLES", 6000))
     X, y, dqn_s, dqn_a = _build_windows(rows, seq_len=seq_len)
@@ -455,11 +532,12 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
             )
 
     paths = {k: _checkpoint_path(save_as, k) for k in ALL_MODEL_KEYS}
-    dev = torch.device("cpu")
+    dev = torch.device("cuda" if torch.cuda.is_available() and _b("NEURAL_CUDA", True) else "cpu")
     n_feat = X.shape[-1]
-    epochs = _i("NEURAL_EPOCHS", 2)
+    epochs = _i("NEURAL_EPOCHS", 12)
     bs = _i("NEURAL_BATCH", 128)
     lr = _f("NEURAL_LR", 1e-3)
+    arch = _train_arch()
 
     def _fit_binary(model: nn.Module, key: str) -> float:
         model.to(dev)
@@ -480,13 +558,16 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
                 nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                 opt.step()
                 last_loss = float(loss.item())
-        torch.save({"state_dict": model.state_dict(), "seq_len": seq_len, "n_feat": n_feat}, paths[key])
+        torch.save(
+            {"state_dict": {k: v.detach().cpu() for k, v in model.state_dict().items()}, "seq_len": seq_len, "n_feat": n_feat, "arch": arch},
+            paths[key],
+        )
         return last_loss
 
-    lstm = _LSTMHead(n_feat)
-    cnn = _CNNHead(n_feat)
-    ga = _GALSTMHead(n_feat)
-    cb = _CNNBiLSTMHead(n_feat)
+    lstm = _make_head("lstm", n_feat, arch)
+    cnn = _make_head("cnn", n_feat, arch)
+    ga = _make_head("ga_lstm", n_feat, arch)
+    cb = _make_head("cnn_bilstm", n_feat, arch)
 
     rep = NeuralTrainReport(ticker=ticker, applied=True, reason="updated" if save_as == ticker else "updated_global", n_samples=int(len(X)))
     rep.lstm_loss = _fit_binary(lstm, "lstm")
@@ -494,14 +575,14 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
     rep.ga_lstm_loss = _fit_binary(ga, "ga_lstm")
     rep.cnn_bilstm_loss = _fit_binary(cb, "cnn_bilstm")
     try:
-        tr = _TransformerHead(n_feat)
+        tr = _make_head("transformer", n_feat, arch)
         rep.transformer_loss = _fit_binary(tr, "transformer")
     except Exception as e:
         log.debug("[NEURAL] transformer skip: %s", e)
 
     # DQN fit (supervised Bellman-ish target from replay).
     if len(dqn_s) > 10:
-        dqn = _DQN(n_feat).to(dev)
+        dqn = _make_head("dqn", n_feat, arch).to(dev)
         opt = torch.optim.AdamW(dqn.parameters(), lr=lr, weight_decay=1e-4)
         dqn_s_t = torch.from_numpy(dqn_s).to(dev)
         dqn_a_t = torch.from_numpy(dqn_a).to(dev)
@@ -524,26 +605,35 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
                 opt.step()
                 last = float(loss.item())
         rep.dqn_loss = last
-        torch.save({"state_dict": dqn.state_dict(), "n_feat": n_feat}, paths["dqn"])
+        torch.save(
+            {"state_dict": {k: v.detach().cpu() for k, v in dqn.state_dict().items()}, "n_feat": n_feat, "arch": arch},
+            paths["dqn"],
+        )
 
     return rep
 
 
-def _load_model(path: Path, model: nn.Module) -> nn.Module | None:
+def _load_model(path: Path, model: nn.Module | None = None, *, key: str | None = None) -> nn.Module | None:
     if not path.is_file():
         return None
     cache_on = os.getenv("NEURAL_MODEL_CACHE", "true").lower() in ("1", "true", "yes")
-    key = str(path)
+    cache_key = str(path)
     try:
         mtime = path.stat().st_mtime
     except OSError:
         mtime = 0.0
     if cache_on:
-        hit = _TORCH_MODEL_CACHE.get(key)
+        hit = _TORCH_MODEL_CACHE.get(cache_key)
         if hit is not None and hit[0] == mtime:
             return hit[1]
     try:
         b = torch.load(path, map_location="cpu")
+        n_feat = int(b.get("n_feat") or 0) or len(FEATURE_COLS)
+        arch = b.get("arch") if isinstance(b.get("arch"), dict) else {}
+        if model is None:
+            if not key:
+                return None
+            model = _make_head(key, n_feat, arch)
         model.load_state_dict(b["state_dict"])
         model.eval()
     except Exception:
@@ -552,7 +642,7 @@ def _load_model(path: Path, model: nn.Module) -> nn.Module | None:
         max_sz = int(os.getenv("NEURAL_MODEL_CACHE_SIZE", "128"))
         if len(_TORCH_MODEL_CACHE) >= max_sz > 0:
             _TORCH_MODEL_CACHE.pop(next(iter(_TORCH_MODEL_CACHE)))
-        _TORCH_MODEL_CACHE[key] = (mtime, model)
+        _TORCH_MODEL_CACHE[cache_key] = (mtime, model)
     return model
 
 
@@ -566,7 +656,7 @@ def _prepare_inference_tensors(
     checkpoints still produce a p_up instead of silently returning None.
     """
     rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_PRED_MAX_SAMPLES", 2000))
-    seq_len = _i("NEURAL_SEQ_LEN", 24)
+    seq_len = _i("NEURAL_SEQ_LEN", 48)
     n_feat = len(FEATURE_COLS)
     cur = _state_vec(current_state)
     if not rows:
@@ -596,14 +686,14 @@ def _infer_all_models(
     xv = torch.from_numpy(vec).to(dev)
 
     with torch.no_grad():
-        for key, factory in (
+        for key, _factory in (
             ("lstm", _LSTMHead),
             ("cnn", _CNNHead),
             ("ga_lstm", _GALSTMHead),
             ("cnn_bilstm", _CNNBiLSTMHead),
             ("transformer", _TransformerHead),
         ):
-            m = _load_model(paths[key], factory(n_feat))
+            m = _load_model(paths[key], key=key)
             if m is None:
                 models_out[key] = {"loaded": False}
                 continue
@@ -611,7 +701,7 @@ def _infer_all_models(
             preds.append(p)
             models_out[key] = {"loaded": True, "p_up": round(p, 4)}
 
-        m = _load_model(paths["dqn"], _DQN(n_feat))
+        m = _load_model(paths["dqn"], key="dqn")
         if m is None:
             models_out["dqn"] = {"loaded": False}
         else:
@@ -697,7 +787,7 @@ def model_win_rates_for_ticker(
         return {}
 
     rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_MAX_SAMPLES", 6000))
-    seq_len = _i("NEURAL_SEQ_LEN", 24)
+    seq_len = _i("NEURAL_SEQ_LEN", 48)
     X, y, dqn_s, _ = _build_windows(rows, seq_len=seq_len)
     min_eval = _i("NEURAL_WINRATE_MIN_EVAL", 12)
     if len(X) < min_eval + 5:
@@ -718,14 +808,8 @@ def model_win_rates_for_ticker(
     out: dict[str, dict] = {}
 
     with torch.no_grad():
-        for key, factory in (
-            ("lstm", _LSTMHead),
-            ("cnn", _CNNHead),
-            ("ga_lstm", _GALSTMHead),
-            ("cnn_bilstm", _CNNBiLSTMHead),
-            ("transformer", _TransformerHead),
-        ):
-            m = _load_model(paths[key], factory(n_feat))
+        for key in ("lstm", "cnn", "ga_lstm", "cnn_bilstm", "transformer"):
+            m = _load_model(paths[key], key=key)
             if m is None:
                 continue
             p = torch.sigmoid(m(torch.from_numpy(Xe).to(dev))).cpu().numpy()
@@ -738,7 +822,7 @@ def model_win_rates_for_ticker(
                 "correct": correct,
             }
 
-        m = _load_model(paths["dqn"], _DQN(n_feat))
+        m = _load_model(paths["dqn"], key="dqn")
         if m is not None:
             q = m(torch.from_numpy(dqn_e).to(dev))
             p_long = torch.softmax(q, dim=-1)[:, ACTION_TO_IDX["LONG"]].cpu().numpy()
