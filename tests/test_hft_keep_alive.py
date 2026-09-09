@@ -145,6 +145,8 @@ def test_last_wins_aggressive_ioc_and_dtbp():
     assert "HFT_BP_RESERVE_USD=500" in last
     assert "MAX_GROSS_LEVERAGE=1.0" in last
     assert "FORTRESS_LITE_INTEL=false" in last
+    assert "OBI_TICKER_WHITELIST=AMD,PLTR,CRWD" in last
+    assert "HFT_SIZE_FROM_CASH=false" in last
 
 
 def test_rsync_excludes_mac_autopilot_pause():
