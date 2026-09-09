@@ -51,7 +51,7 @@ def _banned() -> set[str]:
     return {s.strip().upper() for s in raw.split(",") if s.strip()}
 
 
-def write_file(*, cap: int = 80) -> Path:
+def write_file(*, cap: int = 120) -> Path:
     held = _held()
     banned = _banned()
     seen: set[str] = set()
@@ -80,7 +80,7 @@ def write_file(*, cap: int = 80) -> Path:
 
 
 def main() -> int:
-    path = write_file(cap=int(os.getenv("HFT_REST_TICKER_CAP", "80")))
+    path = write_file(cap=int(os.getenv("HFT_REST_TICKER_CAP", "120")))
     n = len(path.read_text(encoding="utf-8").split(","))
     print(f"[hft-universe] {n} rest tickers → {path}")
     return 0

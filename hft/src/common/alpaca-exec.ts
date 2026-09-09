@@ -83,6 +83,7 @@ export interface AccountSnapshot {
   longMarketValue: number;
   maintenanceMargin: number;
   regtBuyingPower: number;
+  daytradingBuyingPower: number;
 }
 
 export class AlpacaExecutor {
@@ -828,6 +829,7 @@ export class AlpacaExecutor {
         longMarketValue: 0,
         maintenanceMargin: 0,
         regtBuyingPower: 1_000_000,
+        daytradingBuyingPower: 1_000_000,
       };
     }
     try {
@@ -840,13 +842,17 @@ export class AlpacaExecutor {
         const n = Number(v);
         return Number.isFinite(n) ? n : 0;
       };
+      const overnight = f("buying_power");
+      const dtbp = f("daytrading_buying_power");
+      const useDtbp = process.env.HFT_USE_DTBP !== "false";
       return {
-        buyingPower: f("buying_power") || f("daytrading_buying_power"),
+        buyingPower: useDtbp ? dtbp || overnight : overnight || dtbp,
         equity: f("equity"),
         cash: f("cash"),
         longMarketValue: f("long_market_value"),
         maintenanceMargin: f("maintenance_margin"),
         regtBuyingPower: f("regt_buying_power"),
+        daytradingBuyingPower: dtbp,
       };
     } catch {
       return null;

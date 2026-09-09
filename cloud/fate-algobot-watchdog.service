@@ -1,11 +1,12 @@
 [Unit]
-Description=FATE AlgoBot 24/7 paper (Alpaca paper)
-After=network-online.target
+Description=FATE AlgoBot stack watchdog (keeps HFT + all timeframes alive)
+After=network-online.target fate-algobot-paper.service
 Wants=network-online.target
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
+Restart=always
+RestartSec=8
 User=demirgenc
 Group=demirgenc
 WorkingDirectory=/home/demirgenc/FATE_AlgoBot
@@ -15,8 +16,7 @@ Environment=SKIP_PAPER_AUTO_TRAIN=true
 Environment=NETWORK_FIRST=true
 Environment=FATE_ORDER_ROLE=gcp-paper
 Environment=KEEP_STACK_ALWAYS_ONLINE=true
-TimeoutStartSec=180
-ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./run_all.sh paper >> logs/gcp_paper.log 2>&1'
+ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./venv/bin/python -u tools/stack_watchdog.py >> logs/gcp_watchdog.log 2>&1'
 
 [Install]
 WantedBy=multi-user.target

@@ -71,6 +71,24 @@ elif [ -n "${POLYGON_API_KEY:-}" ] && [ "${USE_POLYGON_FIRST:-false}" = "true" ]
   export PRICE_FETCH_BLOCK=true
 fi
 
+# Laptop must not dual-order Alpaca paper. GCP paper VM is the only orderer.
+# Hostname wins over a Mac-synced .env (observe must not disable the paper box).
+apply_fate_order_role() {
+  local hn
+  hn="$(hostname 2>/dev/null || true)"
+  case "$hn" in
+    *algobot-paper*) export FATE_ORDER_ROLE=gcp-paper; return 0 ;;
+    *algobot-trainer*) export FATE_ORDER_ROLE=train; return 0 ;;
+  esac
+  if [ "${FATE_ALLOW_LOCAL_ORDERS:-}" = "true" ] || [ "${FATE_ALLOW_LOCAL_ORDERS:-}" = "1" ]; then
+    if [ -n "${FATE_ORDER_ROLE:-}" ]; then
+      return 0
+    fi
+  fi
+  export FATE_ORDER_ROLE=observe
+}
+apply_fate_order_role
+
 # GNU stat -f is --file-system (not mtime). Prefer -c %Y; BSD macOS uses -f %m.
 _file_mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
 
@@ -122,24 +140,25 @@ is_running() {
     return 1
   fi
   local p; p="$(read_pid "$1")"
+  # Node-true: a sleeping daemon_loop wrapper is NOT a live OBI/earnings engine.
+  if [ "$1" = "subsecond-obi" ]; then
+    if found=$(hft_obi_pid) && [ -n "$found" ]; then
+      save_pid "$1" "$found"; return 0
+    fi
+    return 1
+  fi
+  if [ "$1" = "subsecond-earnings" ]; then
+    if found=$(hft_earn_pid) && [ -n "$found" ]; then
+      save_pid "$1" "$found"; return 0
+    fi
+    return 1
+  fi
   if [ -n "$p" ] && alive "$p"; then
     return 0
   fi
   # HFT stores node pid; legacy launches may leave a bash wrapper pid.
   # When pgrep finds a live process, heal the empty/stale .pids file.
   local found=""
-  if [ "$1" = "subsecond-obi" ] && found=$(hft_obi_pid) && [ -n "$found" ]; then
-    save_pid "$1" "$found"; return 0
-  fi
-  if [ "$1" = "subsecond-obi" ] && found=$(pgrep -f "daemon_loop.sh 5 .*obi-tape" 2>/dev/null | head -1) && [ -n "$found" ]; then
-    save_pid "$1" "$found"; return 0
-  fi
-  if [ "$1" = "subsecond-earnings" ] && found=$(hft_earn_pid) && [ -n "$found" ]; then
-    save_pid "$1" "$found"; return 0
-  fi
-  if [ "$1" = "subsecond-earnings" ] && found=$(pgrep -f "daemon_loop.sh .*earnings/index.js" 2>/dev/null | head -1) && [ -n "$found" ]; then
-    save_pid "$1" "$found"; return 0
-  fi
   if [ "$1" = "intraday" ] && found=$(pgrep -f "fortress_live.py" 2>/dev/null | head -1) && [ -n "$found" ]; then
     save_pid "$1" "$found"; return 0
   fi
@@ -240,6 +259,15 @@ is_running() {
     save_pid "$1" "$found"; return 0
   fi
   if [ "$1" = "hft-news-watch" ] && found=$(pgrep -f "hft_news_watch.py" 2>/dev/null | head -1) && [ -n "$found" ]; then
+    save_pid "$1" "$found"; return 0
+  fi
+  if [ "$1" = "valuation-news-watch" ] && found=$(pgrep -f "valuation_news_watch.py" 2>/dev/null | head -1) && [ -n "$found" ]; then
+    save_pid "$1" "$found"; return 0
+  fi
+  if [ "$1" = "event-calendar-watch" ] && found=$(pgrep -f "event_calendar_watch.py" 2>/dev/null | head -1) && [ -n "$found" ]; then
+    save_pid "$1" "$found"; return 0
+  fi
+  if [ "$1" = "exec-delay" ] && found=$(pgrep -f "exec_delay" 2>/dev/null | head -1) && [ -n "$found" ]; then
     save_pid "$1" "$found"; return 0
   fi
   if [ "$1" = "paper-awake" ] && found=$(pgrep -f "fate-paper-awake" 2>/dev/null | head -1) && [ -n "$found" ]; then
@@ -496,6 +524,7 @@ launch_node() {
 
 # Sub-second HFT (OBI + tape + micro mean-reversion) → Alpaca paper, real orders.
 launch_subsecond_alpaca_paper() {
+  apply_fate_order_role
   ensure_hft_built || return 1
   # Already-up check BEFORE the 12-sample RTT probe — watchdog/rotator used to
   # stall ~10s on every ensure even when OBI was healthy.
@@ -544,7 +573,7 @@ launch_subsecond_alpaca_paper() {
   fi
   "$PY" -u "$ROOT/tools/write_hft_liquid_universe.py" 2>/dev/null || true
   # Alpaca IEX websocket: trades+quotes count toward symbol cap (~30 channels → ≤15 tickers).
-  local obi_tickers="${OBI_TICKER_WHITELIST:-NVDA,AMD,TSLA,MSFT,NFLX,AMZN,AAPL,META,SBUX,BX}"
+  local obi_tickers="${OBI_TICKER_WHITELIST:-AMD,PLTR,CRWD,COIN,UBER,HOOD,ARM,SMCI,NET,DDOG,SHOP,PANW,SNOW,INTU,NOW,APP,SOFI,MARA,ROKU,SNAP}"
   echo "[subsecond] HFT OBI — normal mode (passive entry, edge≥spread, long-only)"
   local logf="$LOGDIR/subsecond-obi_$(date +%Y%m%d_%H%M%S).log"
   ln -sf "$logf" "$LOGDIR/subsecond-obi_latest.log"
@@ -556,11 +585,12 @@ launch_subsecond_alpaca_paper() {
     "$ROOT/tools/daemon_loop.sh" 5 -- \
     env \
         FATE_SLEEVE=hft \
+        FATE_ORDER_ROLE="${FATE_ORDER_ROLE:-observe}" \
         HFT_DRY_RUN="${HFT_DRY_RUN:-false}" \
         HFT_GLOBAL_KILL="${HFT_GLOBAL_KILL:-false}" \
         ALPACA_BASE_URL="https://paper-api.alpaca.markets" \
         ALPACA_DATA_STREAM="${ALPACA_DATA_STREAM:-wss://stream.data.alpaca.markets/v2/iex}" \
-        OBI_TICKER_WHITELIST="${OBI_TICKER_WHITELIST:-NVDA,AMD,TSLA,MSFT,NFLX,AMZN,AAPL,META,SBUX,BX}" \
+        OBI_TICKER_WHITELIST="${OBI_TICKER_WHITELIST:-AMD,PLTR,CRWD,COIN,UBER,HOOD,ARM,SMCI,NET,DDOG,SHOP,PANW,SNOW,INTU,NOW,APP,SOFI,MARA,ROKU,SNAP}" \
         HFT_REST_TICKERS="${HFT_REST_TICKERS:-}" \
         HFT_LONG_ONLY="${HFT_LONG_ONLY:-true}" \
         HFT_OR_SIGNAL="${HFT_OR_SIGNAL:-false}" \
@@ -586,11 +616,12 @@ launch_subsecond_alpaca_paper() {
         HFT_REST_POLL_ALL_SYMS="${HFT_REST_POLL_ALL_SYMS:-false}" \
         HFT_REST_POLL_SLICE="${HFT_REST_POLL_SLICE:-24}" \
         HFT_REST_QUOTE_CHUNK="${HFT_REST_QUOTE_CHUNK:-12}" \
+        HFT_REST_POLL_ALWAYS="${HFT_REST_POLL_ALWAYS:-true}" \
         HFT_REST_429_BACKOFF_MS="${HFT_REST_429_BACKOFF_MS:-20000}" \
         HFT_ORDER_TIMEOUT_MS="${HFT_ORDER_TIMEOUT_MS:-8000}" \
         HFT_MAX_IN_FLIGHT_ORDERS="${HFT_MAX_IN_FLIGHT_ORDERS:-64}" \
-        HFT_PER_TICKER_COOLDOWN_MS="${HFT_PER_TICKER_COOLDOWN_MS:-800}" \
-        HFT_ENTRY_MISS_COOLDOWN_MS="${HFT_ENTRY_MISS_COOLDOWN_MS:-800}" \
+        HFT_PER_TICKER_COOLDOWN_MS="${HFT_PER_TICKER_COOLDOWN_MS:-250}" \
+        HFT_ENTRY_MISS_COOLDOWN_MS="${HFT_ENTRY_MISS_COOLDOWN_MS:-250}" \
         HFT_MAX_ORDERS_PER_MIN="${HFT_MAX_ORDERS_PER_MIN:-200}" \
         HFT_MAX_ORDERS_PER_SEC="${HFT_MAX_ORDERS_PER_SEC:-8}" \
         HFT_GLOBAL_MAX_ORDERS_PER_MIN="${HFT_GLOBAL_MAX_ORDERS_PER_MIN:-200}" \
@@ -615,7 +646,10 @@ launch_subsecond_alpaca_paper() {
         HFT_MAX_HOLD_MS="${HFT_MAX_HOLD_MS:-180000}" \
         HFT_MIN_ORDER_NOTIONAL="${HFT_MIN_ORDER_NOTIONAL:-80}" \
         HFT_MAX_ORDER_NOTIONAL="${HFT_MAX_ORDER_NOTIONAL:-600}" \
-        HFT_BP_USE_FRAC="${HFT_BP_USE_FRAC:-0.90}" \
+        HFT_BP_USE_FRAC="${HFT_BP_USE_FRAC:-0.85}" \
+        HFT_BP_RESERVE_USD="${HFT_BP_RESERVE_USD:-500}" \
+        HFT_MIN_BUYING_POWER_USD="${HFT_MIN_BUYING_POWER_USD:-2000}" \
+        HFT_USE_DTBP="${HFT_USE_DTBP:-true}" \
         HFT_MAX_CONCURRENT_SLOTS="${HFT_MAX_CONCURRENT_SLOTS:-40}" \
         OBI_NOTIONAL_USD="${OBI_NOTIONAL_USD:-1500}" \
         OBI_TRIGGER_LONG="${OBI_TRIGGER_LONG:-0.40}" \
@@ -626,7 +660,8 @@ launch_subsecond_alpaca_paper() {
         HFT_EXIT_ON_GREEN="${HFT_EXIT_ON_GREEN:-true}" \
         HFT_REQUIRE_EXIT_PROFIT="${HFT_REQUIRE_EXIT_PROFIT:-true}" \
         HFT_REQUIRE_PROFIT_CUSHION="${HFT_REQUIRE_PROFIT_CUSHION:-true}" \
-        HFT_AGGRESSIVE_ENTRY="${HFT_AGGRESSIVE_ENTRY:-false}" \
+        HFT_AGGRESSIVE_ENTRY="${HFT_AGGRESSIVE_ENTRY:-true}" \
+        HFT_BUY_LOW="${HFT_BUY_LOW:-false}" \
         HFT_OBI_MIN_HOLD_MS="${HFT_OBI_MIN_HOLD_MS:-4000}" \
         HFT_MIN_EXIT_PROFIT_BPS="${HFT_MIN_EXIT_PROFIT_BPS:-5}" \
         HFT_GREEN_EXIT_MIN_TICKS="${HFT_GREEN_EXIT_MIN_TICKS:-1}" \
@@ -635,7 +670,7 @@ launch_subsecond_alpaca_paper() {
         HFT_SOFT_GREEN_EXIT="${HFT_SOFT_GREEN_EXIT:-true}" \
         HFT_MAX_HOLD_REQUIRE_GREEN="${HFT_MAX_HOLD_REQUIRE_GREEN:-false}" \
         HFT_MICROSTRUCTURE_PROB="${HFT_MICROSTRUCTURE_PROB:-true}" \
-        HFT_BLOCK_ADD_TO_BROKER_LONG="${HFT_BLOCK_ADD_TO_BROKER_LONG:-false}" \
+        HFT_BLOCK_ADD_TO_BROKER_LONG="${HFT_BLOCK_ADD_TO_BROKER_LONG:-true}" \
         HFT_ADOPT_BROKER_LEGS="${HFT_ADOPT_BROKER_LEGS:-false}" \
         HFT_FLATTEN_ORPHANS="${HFT_FLATTEN_ORPHANS:-false}" \
         HFT_MR_ENABLED="${HFT_MR_ENABLED:-true}" \
@@ -652,7 +687,7 @@ launch_subsecond_alpaca_paper() {
         HFT_MR_DEBOUNCE_MS="${HFT_MR_DEBOUNCE_MS:-8000}" \
         HFT_CANDLE_MS="${HFT_CANDLE_MS:-150}" \
         HFT_TRADE_SESSION="${HFT_TRADE_SESSION:-extended}" \
-        HFT_REST_POLL_ALWAYS="${HFT_REST_POLL_ALWAYS:-false}" \
+        HFT_REST_POLL_ALWAYS="${HFT_REST_POLL_ALWAYS:-true}" \
         HFT_REST_QUOTE_MAX_BPS="${HFT_REST_QUOTE_MAX_BPS:-30}" \
         HFT_REST_MAX_SPREAD_BPS="${HFT_REST_MAX_SPREAD_BPS:-40}" \
         TRADE_WEEKDAY_24X5="${TRADE_WEEKDAY_24X5:-true}" \
@@ -722,16 +757,16 @@ launch_fortress_alpaca_paper() {
     TRADE_START_ET="${TRADE_START_ET:-}" \
     TRADE_END_ET="${TRADE_END_ET:-}" \
     MONDAY_PLAYBOOK_PATH="${MONDAY_PLAYBOOK_PATH:-data/monday_playbook.json}" \
-    USE_FOUNDATION_FORECAST="${USE_FOUNDATION_FORECAST:-false}" \
+    FORTRESS_LITE_INTEL="${FORTRESS_LITE_INTEL:-false}" \
+    HEAVY_NEWS_INTEL="${HEAVY_NEWS_INTEL:-true}" \
+    USE_NEWS_AI_AGENT="${USE_NEWS_AI_AGENT:-true}" \
+    USE_FOUNDATION_FORECAST="${USE_FOUNDATION_FORECAST:-true}" \
     FORTRESS_LONG_ONLY=true \
     FORTRESS_ALLOW_SHORT_ENTRIES=false \
     FORTRESS_PREDICT_HORIZON=1d \
     MAX_LIVE_SYMBOLS="${MAX_LIVE_SYMBOLS:-22}" \
     LIVE_SLEEP_SEC="${LIVE_SLEEP_SEC:-0.02}" \
     FORTRESS_ACCURACY_MODE="${FORTRESS_ACCURACY_MODE:-false}" \
-    FORTRESS_LITE_INTEL="${FORTRESS_LITE_INTEL:-true}" \
-    HEAVY_NEWS_INTEL=false \
-    USE_NEWS_AI_AGENT=false \
     HEARTBEAT_MAX_LATENCY_MS="${HEARTBEAT_MAX_LATENCY_MS:-2500}" \
     MIN_MODEL_CONFIDENCE="${FORTRESS_MIN_CONF:-${MIN_MODEL_CONFIDENCE:-0.55}}" \
     MIN_EXECUTION_CONFIDENCE="${MIN_EXECUTION_CONFIDENCE:-0.55}" \
@@ -1752,7 +1787,9 @@ cmd_refresh_paper() {
 }
 
 cmd_start_paper() {
+  apply_fate_order_role
   echo "[paper] Sub-second HFT primary (long-only). Fortress optional (slow) — set PAPER_USE_FORTRESS=true in .env."
+  echo "        Order host role=${FATE_ORDER_ROLE} (only gcp-paper posts to Alpaca)."
   echo "        Daemons use nohup — safe to close this Terminal window. Stay logged in; plug in AC for lid-closed runs."
   echo "        Hardware sleep stops everything — use install-paper-launchd after reboot, or a VPS for true 24/7."
   if training_checkpoints_complete; then
@@ -1778,6 +1815,7 @@ cmd_start_paper() {
   launch_execution_monitor_daemon
   launch_day_trade_daemon
   launch_micro_scalp_daemon
+  launch_crypto_hft_daemon 2>/dev/null || cmd_ensure_crypto_hft 2>/dev/null || true
   launch_gainz_v2_daemon
   launch_gainz_escape_watch
   launch_cramer_cnbc_poll
@@ -1795,13 +1833,16 @@ cmd_start_paper() {
   cmd_ensure_self_improve
   cmd_launch_ule_watch 2>/dev/null || true
   cmd_ensure_continuous_learn 2>/dev/null || true
+  cmd_launch_valuation_news_watch 2>/dev/null || true
+  cmd_launch_event_calendar_watch 2>/dev/null || true
+  cmd_launch_hft_rotator 2>/dev/null || true
   launch_stack_watchdog_daemon
   if [ "${INDUSTRY_AI_ON_START:-true}" = "true" ] || [ "${INDUSTRY_AI_ON_START:-true}" = "1" ]; then
     cmd_launch_industry_ai_watch || true
   fi
   echo ""
   echo "[paper] Running:"
-  echo "  • subsecond-obi — normal HFT (passive entry, green exits, no micro-stop dump)"
+  echo "  • subsecond-obi — IOC take-the-offer HFT (non-held names; green exits)"
   echo "  • micro-scalp  — noise-harvest sidecar (entry+tick edge; MICRO_SCALP_ENABLED)"
   echo "  • crypto-hft   — experimental BTC/ETH paper clips (CRYPTO_HFT_EXPERIMENTAL; not IEX)"
   echo "  • continuous-learn — fills → ULE/neural tweaks every ${CONTINUOUS_LEARN_SEC:-45}s"
@@ -2929,6 +2970,7 @@ cmd_self_maint() {
 }
 
 cmd_forever() {
+  apply_fate_order_role
   "$PY" -u "$ROOT/tools/check_core_integrity.py" || {
     echo "[forever] ABORT — critical files empty/missing (restore before trading)" >&2
     return 1

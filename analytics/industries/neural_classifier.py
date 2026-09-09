@@ -98,10 +98,25 @@ def _collect_training_samples() -> tuple[list[str], list[dict[str, float]]]:
         if iid and iid != "unclassified" and conf >= 0.55:
             _add(sym, {iid: 1.0})
 
+    try:
+        from analytics.industries.peer_ticker_map import TICKER_INDUSTRY
+
+        cap = int(os.getenv("INDUSTRY_NEURAL_TICKER_CAP", "2500"))
+        n = 0
+        for sym, iid in TICKER_INDUSTRY.items():
+            if not iid or iid == "unclassified":
+                continue
+            _add(str(sym), {iid: 1.0})
+            n += 1
+            if n >= cap:
+                break
+    except Exception:
+        pass
+
     return texts, blends
 
 
-def train_neural_classifier(*, min_samples: int = 40) -> dict[str, Any]:
+def train_neural_classifier(*, min_samples: int | None = None) -> dict[str, Any]:
     """Train MLP blend regressor on TF-IDF features."""
     if not _enabled():
         return {"ok": False, "reason": "disabled"}
@@ -111,10 +126,11 @@ def train_neural_classifier(*, min_samples: int = 40) -> dict[str, Any]:
 
     ids = _industry_ids()
     texts, blends = _collect_training_samples()
-    if len(texts) < min_samples:
-        return {"ok": False, "reason": f"too_few_samples:{len(texts)}", "need": min_samples}
+    need = int(min_samples if min_samples is not None else os.getenv("INDUSTRY_NEURAL_MIN_SAMPLES", "12"))
+    if len(texts) < need:
+        return {"ok": False, "reason": f"too_few_samples:{len(texts)}", "need": need}
 
-    vec = TfidfVectorizer(max_features=6000, ngram_range=(1, 2), min_df=1)
+    vec = TfidfVectorizer(max_features=12000, ngram_range=(1, 2), min_df=1)
     X = vec.fit_transform(texts).toarray()
     Y = np.zeros((len(blends), len(ids)), dtype=np.float64)
     id_idx = {iid: j for j, iid in enumerate(ids)}
@@ -124,13 +140,14 @@ def train_neural_classifier(*, min_samples: int = 40) -> dict[str, Any]:
                 Y[i, id_idx[iid]] = w
 
     mlp = MLPRegressor(
-        hidden_layer_sizes=(256, 128, 64),
+        hidden_layer_sizes=(512, 256, 128),
         activation="relu",
-        max_iter=int(os.getenv("INDUSTRY_NEURAL_EPOCHS", "400")),
+        max_iter=int(os.getenv("INDUSTRY_NEURAL_EPOCHS", "800")),
         early_stopping=True,
         validation_fraction=0.12,
         random_state=42,
-        learning_rate_init=float(os.getenv("INDUSTRY_NEURAL_LR", "0.001")),
+        learning_rate_init=float(os.getenv("INDUSTRY_NEURAL_LR", "0.0008")),
+        alpha=float(os.getenv("INDUSTRY_NEURAL_L2", "0.0001")),
     )
     mlp.fit(X, Y)
 

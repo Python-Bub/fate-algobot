@@ -18,6 +18,13 @@ import requests
 from utils import log
 
 from symbol_aliases import price_feed_symbol
+
+
+def _require_order_host() -> None:
+    from order_role import orders_allowed_here
+
+    if not orders_allowed_here():
+        raise RuntimeError("order blocked (FATE_ORDER_ROLE — only GCP paper VM posts)")
 from crypto_universe import is_crypto_symbol, alpaca_symbol
 
 # Set False after HTTP 401/403 on data API (trading keys often lack Market Data subscription).
@@ -1836,6 +1843,7 @@ def submit_market_order(
     """
     from analytics.market_session import log_session_block, orders_allowed
 
+    _require_order_host()
     side_l = side.lower()
     order_side = "sell" if side_l == "sell" else "buy"
     sess_side = _session_order_side(symbol, order_side)
@@ -1968,6 +1976,7 @@ def submit_limit_order(
 ) -> dict:
     from analytics.market_session import log_session_block, orders_allowed
 
+    _require_order_host()
     side_l = side.lower()
     order_side = "sell" if side_l == "sell" else "buy"
     sess_side = _session_order_side(symbol, order_side)

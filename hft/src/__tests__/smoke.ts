@@ -48,6 +48,7 @@ import {
   spreadOkForSession,
   sellLimitUnfillable,
   completeNbbo,
+  wantAggressiveEntry,
 } from "../obi-tape/order-pricing.js";
 import { assessQuoteHealth } from "../obi-tape/quote-health.js";
 import { AlpacaExecutor } from "../common/alpaca-exec.js";
@@ -812,6 +813,27 @@ ok("aggressive IOC take crosses the ask when buy-low is off", () => {
   else process.env.HFT_BUY_LOW = prevBuy;
   if (prevAgg === undefined) delete process.env.HFT_AGGRESSIVE_ENTRY;
   else process.env.HFT_AGGRESSIVE_ENTRY = prevAgg;
+});
+
+ok("IOC TIF takes the ask even when HFT_BUY_LOW is true", () => {
+  const prevBuy = process.env.HFT_BUY_LOW;
+  const prevAgg = process.env.HFT_AGGRESSIVE_ENTRY;
+  const prevTif = process.env.HFT_LIMIT_TIF;
+  process.env.HFT_BUY_LOW = "true";
+  delete process.env.HFT_AGGRESSIVE_ENTRY;
+  process.env.HFT_LIMIT_TIF = "ioc";
+  assert.equal(wantAggressiveEntry(), true);
+  const b = new L2Book("KO");
+  b.applySnapshot([[70.00, 400]], [[70.02, 200]], Date.now());
+  const px = entryLimitPx("buy", b);
+  assert.ok(px != null);
+  assert.ok(px! >= 70.02);
+  if (prevBuy === undefined) delete process.env.HFT_BUY_LOW;
+  else process.env.HFT_BUY_LOW = prevBuy;
+  if (prevAgg === undefined) delete process.env.HFT_AGGRESSIVE_ENTRY;
+  else process.env.HFT_AGGRESSIVE_ENTRY = prevAgg;
+  if (prevTif === undefined) delete process.env.HFT_LIMIT_TIF;
+  else process.env.HFT_LIMIT_TIF = prevTif;
 });
 
 ok("fuseObiMicro does not need a tape burst", () => {

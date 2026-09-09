@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -48,6 +49,11 @@ def _thermal_cool() -> bool:
 
 
 def _autopilot_paused() -> bool:
+    # GCP paper must keep trading even if a Mac pause file was rsynced.
+    role = (os.getenv("FATE_ORDER_ROLE") or "").strip().lower()
+    hn = (os.getenv("HOSTNAME") or socket.gethostname() or "").lower()
+    if role in ("gcp-paper", "order", "paper-vm") or "algobot-paper" in hn:
+        return False
     if not AUTOPILOT_STATE.is_file():
         return False
     try:
@@ -316,7 +322,34 @@ def _pgrep(pattern: str) -> bool:
         return False
 
 
+def _node_script_alive(script: str) -> bool:
+    """True only if a Node process (not bash daemon_loop) has `script` in argv."""
+    try:
+        r = subprocess.run(
+            ["ps", "-ax", "-o", "comm=,args="],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception:
+        return False
+    needle = script.lower()
+    for line in r.stdout.splitlines():
+        s = line.strip()
+        if not s:
+            continue
+        comm = s.split(None, 1)[0].lower()
+        if comm.startswith("node") and needle in s.lower():
+            return True
+    return False
+
+
 def _daemon_alive(name: str) -> bool:
+    if name == "subsecond-obi":
+        return _node_script_alive("obi-tape/index.js")
+    if name == "subsecond-earnings":
+        return _node_script_alive("earnings/index.js")
     pid = _read_pid(name)
     if pid and _pid_alive(pid):
         return True
@@ -344,6 +377,9 @@ def _daemon_alive(name: str) -> bool:
         "execution-monitor": r"monitor_execution\.py",
         "weekly": r"daemon_loop\.sh 3600.*paper_sim_today",
         "longterm": r"daemon_loop\.sh 7200.*paper_sim_today",
+        "valuation-news-watch": r"valuation_news_watch\.py",
+        "event-calendar-watch": r"event_calendar_watch\.py",
+        "exec-delay": r"exec_delay",
         # Narrow patterns — avoid OR-globs that false-match unrelated lstm/train jobs.
         "train-lstm": r"tools/train_lstm|batch_train_lstm|train_lstm_meta",
         "retrain-weak-loop": r"retrain_weak_models\.py|finish_weak_top100|retrain_top100_strong",
@@ -511,6 +547,9 @@ def ensure_stack(*, bootstrap: bool = False) -> None:
         ("subsecond-earnings", ["./run_all.sh", "ensure-earnings"]),
         ("hft-rotator", ["./run_all.sh", "hft-rotator"]),
         ("weekly", ["./run_all.sh", "ensure-weekly"]),
+        ("valuation-news-watch", ["./run_all.sh", "valuation-news-watch"]),
+        ("event-calendar-watch", ["./run_all.sh", "event-calendar-watch"]),
+        ("exec-delay", ["./run_all.sh", "exec-delay-daemon"]),
     ]
     if os.getenv("PAPER_USE_LONGTERM", "false").lower() in ("1", "true", "yes"):
         checks.append(("longterm", ["./run_all.sh", "ensure-longterm"]))
@@ -561,7 +600,12 @@ def ensure_stack(*, bootstrap: bool = False) -> None:
             "intraday",
             "subsecond-obi",
             "subsecond-earnings",
+            "hft-rotator",
+            "weekly",
+            "longterm",
             "paper-hygiene",
+            "valuation-news-watch",
+            "event-calendar-watch",
         }
         checks = [c for c in checks if c[0] in keep]
         _log("thermal_cool", f"skip trainers; keep {sorted(keep)}")

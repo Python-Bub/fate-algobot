@@ -26,7 +26,7 @@ def get_industry_profile(
     row = classify_ticker(
         sym,
         use_cache=use_cache,
-        use_yfinance=False,
+        use_yfinance=True,
         news_headlines=news_headlines,
     )
     if (row.get("industry_id") == "unclassified" or not row.get("industry_id")) and os.getenv(
@@ -50,7 +50,7 @@ def get_industry_profile(
         try:
             from analytics.industries.neural_classifier import classify_symbol_neural
 
-            neural = classify_symbol_neural(sym, persist=False)
+            neural = classify_symbol_neural(sym, persist=True)
             if neural.get("industries"):
                 row = dict(row)
                 row["industries"] = neural["industries"]

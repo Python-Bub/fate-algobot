@@ -5,6 +5,7 @@
  */
 import { config as loadDotenv } from "dotenv";
 import { existsSync, readFileSync } from "node:fs";
+import { hostname as osHostname } from "node:os";
 import { resolve } from "node:path";
 import { hftConfidenceFloorDelta } from "./overlay-runtime.js";
 
@@ -43,6 +44,21 @@ function bool(name: string, fallback: boolean): boolean {
   const v = process.env[name];
   if (v == null || v === "") return fallback;
   return ["1", "true", "yes", "y", "on"].includes(v.toLowerCase());
+}
+
+/** Laptop/trainer must not POST the same Alpaca paper account as the GCP paper VM. */
+function _orderRoleDryRun(): boolean {
+  const hn = (process.env.HOSTNAME || process.env.HOST || osHostname() || "").toLowerCase();
+  if (hn.includes("algobot-paper")) return false;
+  if (hn.includes("algobot-trainer")) return true;
+  const allowLocal = ["1", "true", "yes"].includes(
+    (process.env.FATE_ALLOW_LOCAL_ORDERS || "").toLowerCase(),
+  );
+  if (allowLocal) {
+    const role = (process.env.FATE_ORDER_ROLE || "").trim().toLowerCase();
+    if (role === "gcp-paper" || role === "order" || role === "paper-vm") return false;
+  }
+  return true;
 }
 function csv(name: string, fallback: string[]): string[] {
   const v = process.env[name];
@@ -120,7 +136,7 @@ export const CFG = {
     newsStream: str("BENZINGA_NEWS_STREAM", "wss://api.benzinga.com/api/v1/news/stream"),
   },
   // --- safety ---
-  dryRun: bool("HFT_DRY_RUN", true),
+  dryRun: bool("HFT_DRY_RUN", true) || _orderRoleDryRun(),
   globalKill: bool("HFT_GLOBAL_KILL", false),
   maxOrdersPerMin: num("HFT_MAX_ORDERS_PER_MIN", 200),
   cooldownMs: num("HFT_PER_TICKER_COOLDOWN_MS", 8_000),

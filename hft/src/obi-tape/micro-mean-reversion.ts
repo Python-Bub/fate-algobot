@@ -41,6 +41,7 @@ import {
   sellLimitUnfillable,
   spreadBps,
   bookSpreadOk,
+  wantAggressiveEntry,
 } from "./order-pricing.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
 import { isEarnedSymbol, mrTimingFor } from "./profit-cushion-gate.js";
@@ -628,8 +629,7 @@ export class MicroMeanReversion {
       }
       // Passive maker entry rests at the bid → must use DAY TIF (an IOC at the
       // bid cancels instantly). Aggressive (taker) entries cross the spread IOC.
-      const aggressive = process.env.HFT_AGGRESSIVE_ENTRY === "true";
-      // Passive bid rest must stay DAY (IOC at the bid cancels immediately).
+      const aggressive = wantAggressiveEntry();
       const entryTif = (aggressive ? hftLimitTif() : "day") as TimeInForce;
       this.broker.registerNbbo(t, book.bestBid, book.bestAsk);
       const resp: OrderResponse = await this.broker.place({

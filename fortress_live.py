@@ -1835,7 +1835,7 @@ def run_fortress_pass(args) -> None:
             # Heavier online adaptation from neural replay models.
             # When ULE is on, do NOT linear-blend here — ULE LEA-fuses neural as its own channel.
             _neural_p_for_ule = None
-            if not _fortress_lite_intel() and os.getenv("USE_NEURAL_ENSEMBLE", "true").lower() in ("1", "true", "yes"):
+            if os.getenv("USE_NEURAL_ENSEMBLE", "true").lower() in ("1", "true", "yes"):
                 try:
                     from online_learning.neural_ensemble import neural_ensemble_details
 

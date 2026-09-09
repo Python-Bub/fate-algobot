@@ -79,6 +79,16 @@ def test_last_wins_strong_neural():
     assert "HIST_COOK_TRAIN_LSTM=true" in last
 
 
+def test_industry_neural_uses_ticker_map_and_deeper_mlp():
+    src = (ROOT / "analytics/industries/neural_classifier.py").read_text(encoding="utf-8")
+    assert "TICKER_INDUSTRY" in src
+    assert "hidden_layer_sizes=(512, 256, 128)" in src
+    assert 'INDUSTRY_NEURAL_MIN_SAMPLES", "12"' in src
+    integ = (ROOT / "analytics/industries/integration.py").read_text(encoding="utf-8")
+    assert "use_yfinance=True" in integ
+    assert "persist=True" in integ
+
+
 def test_lstm_roundtrip_saves_best_and_arch(tmp_path, monkeypatch):
     import numpy as np
     import pandas as pd
