@@ -152,6 +152,9 @@ def test_rsync_excludes_mac_autopilot_pause():
     assert "--exclude='data/autopilot_state.json'" in text
     assert "stop-hft-obi" in text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
     assert "ensure-subsecond" in text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
+    paper = text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
+    assert "GCP_PAPER_INSTANCE:-fate-algobot-paper" in paper
+    assert "GCP_INSTANCE:-fate-algobot-paper" not in paper
 
 
 def test_paper_startup_reensures_hft_even_if_fortress_up():

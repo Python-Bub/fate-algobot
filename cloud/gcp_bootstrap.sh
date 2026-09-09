@@ -270,12 +270,12 @@ cmd_sync() {
 }
 
 cmd_sync_env() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_env
 }
 
 cmd_sync_models() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_models
 }
 
@@ -294,7 +294,7 @@ cmd_down() {
 }
 
 cmd_push_paper() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_code
   echo "[GCP] refresh-paper + rebuild HFT on $INSTANCE (no sync-env; trainers untouched)…"
   # Do not put 'obi-tape' in this --command string (pkill -f would match ssh).
@@ -302,7 +302,7 @@ cmd_push_paper() {
 }
 
 cmd_push_train() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-trainer}"
+  INSTANCE="${GCP_TRAIN_INSTANCE:-fate-algobot-trainer}"
   if ! gcloud compute instances describe "$INSTANCE" --zone="$ZONE" &>/dev/null; then
     echo "[GCP] $INSTANCE not found. Create it with: $0 up" >&2
     exit 1
