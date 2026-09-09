@@ -3,7 +3,8 @@
 #
 #   ./cloud/gcp_bootstrap.sh setup     # project + billing + Compute API check
 #   ./cloud/gcp_bootstrap.sh paper     # create 24/7 paper VM (needs .env)
-#   ./cloud/gcp_bootstrap.sh up        # create trainer VM, start train-everything
+#   ./cloud/gcp_bootstrap.sh up        # create trainer VM, start cloud-train (hist + LSTM-all)
+#   ./cloud/gcp_bootstrap.sh push-train  # rsync code to existing trainer and resume cloud-train
 #   ./cloud/gcp_bootstrap.sh ssh       # SSH
 #   ./cloud/gcp_bootstrap.sh status    # VM + ./run_all.sh progress
 #   ./cloud/gcp_bootstrap.sh sync      # pull models + checkpoints to this Mac
@@ -185,17 +186,25 @@ cmd_setup() {
 }
 
 cmd_up() {
+  INSTANCE="${GCP_INSTANCE:-fate-algobot-trainer}"
+  DISK_GB="${GCP_DISK_GB:-400}"
+  if [ "${GCP_TRAIN_ALWAYS_ON:-false}" = "true" ] || [ "${GCP_TRAIN_ALWAYS_ON:-false}" = "1" ]; then
+    PROVISIONING="STANDARD"
+    echo "[GCP] GCP_TRAIN_ALWAYS_ON — STANDARD (not Spot) so hist/LSTM keep running"
+  fi
   _create_vm
   _sync_code
-  echo "[GCP] remote install + start tmux training…"
+  _sync_env || echo "[GCP] no local .env — Yahoo train still works; later: $0 sync-env" >&2
+  echo "[GCP] remote install + start autonomous cloud-train…"
   gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command="chmod +x ~/FATE_AlgoBot/${REMOTE_SETUP} && bash ~/FATE_AlgoBot/${REMOTE_SETUP}"
   echo
   echo "============================================================"
-  echo "  VM is up. Training runs in tmux session: train"
+  echo "  Trainer VM is up. cloud-train (hist + LSTM-all) in tmux: train"
   echo "  SSH:        ./cloud/gcp_bootstrap.sh ssh"
   echo "  Then:       tmux attach -t train"
   echo "  Status:     ./cloud/gcp_bootstrap.sh status"
   echo "  Pull models: ./cloud/gcp_bootstrap.sh sync"
+  echo "  Resume:     ./cloud/gcp_bootstrap.sh push-train"
   echo "  Destroy VM: ./cloud/gcp_bootstrap.sh down $INSTANCE"
   echo "============================================================"
 }
@@ -253,6 +262,9 @@ cmd_sync() {
   rsync -avz \
     -e "$(_rsync_e)" \
     "${INSTANCE}:~/FATE_AlgoBot/data/intraday_train_checkpoint.json" "$ROOT/data/" 2>/dev/null || true
+  rsync -avz \
+    -e "$(_rsync_e)" \
+    "${INSTANCE}:~/FATE_AlgoBot/data/lstm_train_checkpoint.json" "$ROOT/data/" 2>/dev/null || true
   echo "[GCP] local daily models: $(ls "$ROOT/models/"*_model.pkl 2>/dev/null | wc -l | tr -d ' ')"
 }
 
@@ -287,6 +299,18 @@ cmd_push_paper() {
   gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='cd ~/FATE_AlgoBot && PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true ./run_all.sh refresh-paper'
 }
 
+cmd_push_train() {
+  INSTANCE="${GCP_INSTANCE:-fate-algobot-trainer}"
+  if ! gcloud compute instances describe "$INSTANCE" --zone="$ZONE" &>/dev/null; then
+    echo "[GCP] $INSTANCE not found. Create it with: $0 up" >&2
+    exit 1
+  fi
+  _sync_code
+  _sync_env || true
+  echo "[GCP] resume cloud-train on $INSTANCE (no paper/HFT)…"
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='cd ~/FATE_AlgoBot && ./run_all.sh cloud-train'
+}
+
 case "${1:-}" in
   setup)    cmd_setup ;;
   up)       cmd_up ;;
@@ -297,9 +321,10 @@ case "${1:-}" in
   sync-env) cmd_sync_env ;;
   sync-models) cmd_sync_models ;;
   push-paper) cmd_push_paper ;;
+  push-train|ensure-train) cmd_push_train ;;
   down)     cmd_down "${2:-${GCP_INSTANCE:-}}" ;;
   *)
-    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|push-paper|down NAME}" >&2
+    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|push-paper|push-train|down NAME}" >&2
     exit 1
     ;;
 esac

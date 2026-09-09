@@ -1,0 +1,22 @@
+[Unit]
+Description=FATE AlgoBot autonomous cloud trainer (historical + LSTM-all)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=demirgenc
+Group=demirgenc
+WorkingDirectory=/home/demirgenc/FATE_AlgoBot
+Environment=SKIP_PAPER_AUTO_TRAIN=true
+Environment=NETWORK_FIRST=true
+Environment=TRAIN_FORCE_YAHOO=true
+Environment=TRAIN_DATA_START=2010-01-01
+Environment=USE_LSTM_HEAD=true
+Environment=LSTM_TRAIN_SCOPE=all
+TimeoutStartSec=180
+ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./run_all.sh cloud-train >> logs/gcp_train.log 2>&1'
+
+[Install]
+WantedBy=multi-user.target

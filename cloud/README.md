@@ -68,10 +68,16 @@ Then:
 
 | Command | Action |
 |---------|--------|
+| `./cloud/gcp_bootstrap.sh up` | Create Spot trainer (400 GB disk) and start **cloud-train** |
+| `./cloud/gcp_bootstrap.sh push-train` | Rsync code to an existing trainer and resume hist + LSTM-all |
 | `./cloud/gcp_bootstrap.sh status` | VM state + `./run_all.sh progress` on VM |
 | `./cloud/gcp_bootstrap.sh ssh` | Shell on VM (`tmux attach -t train` to see training) |
 | `./cloud/gcp_bootstrap.sh sync` | Pull `models/` + checkpoints to your Mac |
-| `./cloud/gcp_bootstrap.sh down` | Delete VM (stop charges) |
+| `./cloud/gcp_bootstrap.sh down NAME` | Delete VM (stop charges) |
+
+`cloud-train` runs daily + intraday + **LSTM-all** + **hist-cook** (16y, 400 names + LSTM heads) + enhancement-queue + ULE/continuous-learn. It does **not** start fortress/HFT — only the paper VM places orders.
+
+Spot STOP auto-resumes via `cloud/fate-algobot-train.service`. For a box that never preempts: `GCP_TRAIN_ALWAYS_ON=true ./cloud/gcp_bootstrap.sh up` (STANDARD, more \$).
 
 ## 4) Optional: archive to Cloud Storage (not RAM)
 
@@ -118,6 +124,7 @@ compute). See the in-editor plan canvas.
 |----------|---------|---------|
 | `GCP_ZONE` | `us-central1-a` | Zone |
 | `GCP_MACHINE` | `n2-highmem-8` (train) / `n2-standard-4` (`paper`) | Machine type |
-| `GCP_DISK_GB` | `200` | Boot disk size (paper needs room for models) |
-| `GCP_INSTANCE` | `fate-algobot-trainer` / `fate-algobot-paper` | Set when SSHing to paper |
-| `TRAIN_WORKERS` / `INTRADAY_WORKERS` | 8 / 4 | Set inside `gcp_remote_setup.sh` on VM |
+| `GCP_DISK_GB` | `400` (train) / `200` (`paper`) | Boot disk size (LSTM-all needs room) |
+| `GCP_INSTANCE` | `fate-algobot-trainer` / `fate-algobot-paper` | Set when SSHing to paper or trainer |
+| `GCP_TRAIN_ALWAYS_ON` | `false` | `true` → STANDARD trainer (no Spot preempt) |
+| `TRAIN_WORKERS` / `INTRADAY_WORKERS` / `LSTM_WORKERS` | 8 / 4 / 6 | Set inside `gcp_remote_setup.sh` on VM |
