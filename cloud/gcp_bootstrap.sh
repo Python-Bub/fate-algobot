@@ -296,9 +296,9 @@ cmd_down() {
 cmd_push_paper() {
   INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_code
-  echo "[GCP] refresh-paper + rebuild HFT on $INSTANCE (no sync-env; trainers untouched)…"
+  echo "[GCP] rebuild HFT + restart fortress/HFT on $INSTANCE (no sync-env, no hygiene hang)…"
   # Do not put 'obi-tape' in this --command string (pkill -f would match ssh).
-  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export FATE_ORDER_ROLE=gcp-paper KEEP_STACK_ALWAYS_ONLINE=true PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true NETWORK_FIRST=true && (cd hft && npm run build) && ./run_all.sh refresh-paper; ./run_all.sh stop-hft-obi || true; ./run_all.sh ensure-subsecond; ./run_all.sh ensure-earnings || true; ./run_all.sh watchdog || true; bash cloud/install_paper_systemd.sh || true"'
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export FATE_ORDER_ROLE=gcp-paper KEEP_STACK_ALWAYS_ONLINE=true PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true NETWORK_FIRST=true && (cd hft && npm run build) && ./run_all.sh reload-intraday; ./run_all.sh stop-hft-obi || true; ./run_all.sh ensure-subsecond; ./run_all.sh ensure-earnings || true; ./run_all.sh watchdog || true; bash cloud/install_paper_systemd.sh || true"'
 }
 
 cmd_push_train() {

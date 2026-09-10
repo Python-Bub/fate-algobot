@@ -152,15 +152,22 @@ def size_position(
     qty = max(1, min(qty, cap))
     # Dollar cap: 1% stop on $72k equity used to size 389 WMT (~$45k). Risk-$ ≠ notional.
     hard_max = _f("HARD_MAX_ORDER_NOTIONAL", 0.0)
-    if hard_max <= 0:
-        hard_max = _f("DAY_TRADE_MAX_NOTIONAL", 2500.0)
-    else:
-        hard_max = min(hard_max, _f("DAY_TRADE_MAX_NOTIONAL", hard_max))
-    max_frac = min(
-        _f("MAX_SINGLE_ASSET_FRAC", 0.10),
-        _f("FORTRESS_MAX_SINGLE_FRAC", 0.10),
-    )
-    notional_cap = min(hard_max, max(0.0, equity * max_frac)) if hard_max > 0 else equity * max_frac
+    dt_max = _f("DAY_TRADE_MAX_NOTIONAL", 0.0)
+    try:
+        from analytics.buying_power import clip_ceiling_usd, load_plan
+
+        snap = load_plan() or {}
+        calc_clip = float(snap.get("day_trade_clip") or 0) or clip_ceiling_usd(equity)
+    except Exception:
+        calc_clip = equity * min(
+            _f("MAX_SINGLE_ASSET_FRAC", 0.10),
+            _f("FORTRESS_MAX_SINGLE_FRAC", 0.10),
+        )
+    if hard_max > 0 and dt_max > 0:
+        hard_max = min(hard_max, dt_max)
+    elif hard_max <= 0:
+        hard_max = dt_max
+    notional_cap = min(hard_max, calc_clip) if hard_max > 0 else calc_clip
     if notional_cap > 0 and entry_px > notional_cap * 1.02:
         return RiskDecision(False, "name-too-expensive-for-cap")
     if notional_cap > 0:

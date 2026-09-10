@@ -76,15 +76,26 @@ class GuardedPolicyAgent:
         deployed = float(metrics.get("deployed_frac", 1.0))
         target_deploy = float(os.getenv("FORTRESS_TARGET_DEPLOY_FRAC", "0.88"))
         cur_buy = float(get_runtime_param("BUY_THRESHOLD", float(os.getenv("BUY_THRESHOLD", "0.58"))))
-        max_notional = float(
-            os.getenv(
-                "POLICY_MAX_NOTIONAL",
-                os.getenv("HARD_MAX_ORDER_NOTIONAL", os.getenv("MAX_ORDER_NOTIONAL", "10000")),
+        try:
+            max_notional = float(
+                os.getenv(
+                    "POLICY_MAX_NOTIONAL",
+                    os.getenv("HARD_MAX_ORDER_NOTIONAL", os.getenv("MAX_ORDER_NOTIONAL", "0")),
+                )
+                or 0
             )
-        )
+        except (TypeError, ValueError):
+            max_notional = 0.0
         hard_cap = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
         if hard_cap > 0:
-            max_notional = min(max_notional, hard_cap)
+            max_notional = min(max_notional, hard_cap) if max_notional > 0 else hard_cap
+        if max_notional <= 0:
+            try:
+                from analytics.buying_power import clip_ceiling_usd
+
+                max_notional = clip_ceiling_usd(float(metrics.get("equity") or 0) or 100_000.0)
+            except Exception:
+                max_notional = 10_000.0
         cur_notional = float(get_runtime_param("ORDER_NOTIONAL", float(os.getenv("ORDER_NOTIONAL", "500"))))
         change = {}
         try:

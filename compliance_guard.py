@@ -78,7 +78,7 @@ def pretrade_check(
     # 2) Hard max order notional (fast local backstop — before any network checks)
     hard_max = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
     if hard_max <= 0:
-        hard_max = float(os.getenv("MAX_ORDER_NOTIONAL", "0") or 0)
+        hard_max = 0.0
     if hard_max > 0 and float(notional) > hard_max + 1e-6:
         return ComplianceDecision(
             ok=False,

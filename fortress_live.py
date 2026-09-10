@@ -3118,16 +3118,22 @@ def run_fortress_pass(args) -> None:
                 room = max(0.0, room_cap - held_mv)
                 if held_mv > 0 and not (allow_addon or allow_dca or fill_idle):
                     room = 0.0
+                try:
+                    gain = c.get("existing_gain")
+                    from analytics.buying_power import hold_is_green
+
+                    if held_mv > 0 and not hold_is_green(None if gain is None else float(gain)):
+                        continue
+                except (TypeError, ValueError):
+                    pass
                 if room < min_n:
                     continue
                 eligible_idx.append(i)
                 rooms.append(room)
                 scores.append(float(c.get("score") or 0.0))
-            # max_weight as fraction of *this* budget, hard-capped by equity single-name $.
-            # BUGFIX: never `max()` with FORTRESS_MAX_SINGLE_FRAC — that treated 10% of
-            # 4× margin budget as a legal clip (~$40k) and leftover-swept WMT/TJX.
+            # max_weight = fraction of leftover budget so one name can take the
+            # equity single-cap, not 10% of leftover (that left cash idle).
             max_w = min(1.0, max_single_usd / max(budget, 1.0)) if budget > 0 else 1.0
-            max_w = min(max_w, float(os.getenv("FORTRESS_MAX_SINGLE_FRAC", "0.10")))
             temp = float(os.getenv("FORTRESS_WEIGHT_TEMPERATURE", "1.0"))
             raw = (
                 vectorized_target_weights(
@@ -3142,7 +3148,9 @@ def run_fortress_pass(args) -> None:
             )
             go_live_cap = float(os.getenv("FORTRESS_GO_LIVE_MAX_NOTIONAL", "0") or 0)
             hard_max = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
-            if hard_max <= 0:
+            if hard_max <= 0 and go_live_cap <= 0:
+                hard_max = 0.0  # calculator / equity single-cap is the clamp
+            elif hard_max <= 0:
                 hard_max = float(os.getenv("MAX_ORDER_NOTIONAL", "0") or 0)
             leftover = 0.0
             for j, idx in enumerate(eligible_idx):
@@ -3243,10 +3251,20 @@ def run_fortress_pass(args) -> None:
                         for c in ranked
                         if float(c.get("score") or 0) > 0
                     }
+                    held = set()
+                    for p in pos_idle:
+                        try:
+                            if float(p.get("qty") or 0) <= 0:
+                                continue
+                        except (TypeError, ValueError):
+                            continue
+                        held.add(str(p.get("symbol") or "").replace("/", "-").upper())
                     kept_idle = 0.0
                     for t, n_add in extra.items():
                         tu = str(t).upper()
-                        if tu not in scored:
+                        # Winners already in the book may take idle cash even if this
+                        # pass did not re-score them. Skip only *new* zero-score dumps.
+                        if tu not in scored and tu not in held:
                             log.info(
                                 "[FORTRESS] idle skip %s $%.0f — no scored edge this pass",
                                 tu,
@@ -3330,18 +3348,24 @@ def run_fortress_pass(args) -> None:
         except (TypeError, ValueError):
             continue
         try:
+            from analytics.buying_power import hold_is_green as _hold_green
+
             _g_hold = cand.get("existing_gain")
-            if existing_mv > 0 and _g_hold is not None and float(_g_hold) < -1e-9:
-                log.info("[FORTRESS] skip BUY %s — loser held (cut, do not add)", t)
+            if existing_mv > 0 and not _hold_green(None if _g_hold is None else float(_g_hold)):
+                log.info("[FORTRESS] skip BUY %s — not green (cut, do not add)", t)
                 continue
         except (TypeError, ValueError):
             pass
         if use_real and broker == "alpaca":
             portfolio_ctx = sync_risk_manager_from_alpaca(rm)
-        max_pos = int(float(os.getenv("FORTRESS_MAX_POSITIONS", "500")))
-        # 0 or negative = unlimited (hundreds of small math-sized names)
-        if max_pos <= 0:
-            max_pos = 10_000
+        max_pos = int(float(os.getenv("FORTRESS_MAX_POSITIONS", "0") or 0))
+        if max_pos <= 0 or max_pos > 80:
+            try:
+                from analytics.buying_power import sizing_slots
+
+                max_pos = max(40, sizing_slots())
+            except Exception:
+                max_pos = 40
         pos_n = int((portfolio_ctx or {}).get("position_count") or 0)
         if existing_mv <= 0 and pos_n >= max_pos:
             log.info("[FORTRESS] skip BUY %s — at max positions (%d/%d)", t, pos_n, max_pos)
@@ -3427,7 +3451,7 @@ def run_fortress_pass(args) -> None:
             pass
         hard_max_exec = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
         if hard_max_exec <= 0:
-            hard_max_exec = float(os.getenv("MAX_ORDER_NOTIONAL", "0") or 0)
+            hard_max_exec = 0.0  # last-wins 0 = single-name equity cap only
         held_mv = existing_mv
         notional = min(notional, max(0.0, max_single_usd - held_mv))
         if hard_max_exec > 0:

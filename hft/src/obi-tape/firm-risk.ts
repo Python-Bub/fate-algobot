@@ -42,7 +42,9 @@ export function combinedHaircut(
 
 export function clipNotional(baseUsd: number, haircut: number): number {
   const floor = Number(process.env.HFT_MIN_ORDER_NOTIONAL ?? 80);
-  const cap = Number(process.env.HFT_MAX_ORDER_NOTIONAL ?? 350);
+  const raw = process.env.HFT_MAX_ORDER_NOTIONAL;
+  const capNum = raw === undefined || raw === "" ? 350 : Number(raw);
+  const cap = Number.isFinite(capNum) && capNum > 0 ? capNum : Number.POSITIVE_INFINITY;
   const x = Math.max(0, baseUsd) * Math.max(0, Math.min(1, haircut));
   // Never round a haircut-thin clip UP to the floor — that re-levered lag.
   if (!(x >= floor) || !Number.isFinite(x)) return 0;

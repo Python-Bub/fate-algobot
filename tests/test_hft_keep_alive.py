@@ -149,10 +149,26 @@ def test_last_wins_aggressive_ioc_and_dtbp():
     assert "HFT_SIZE_FROM_CASH=false" in last
 
 
+def test_last_wins_buying_power_calculator_no_crumbs():
+    text = (ROOT / "data/deploy_scale.env").read_text(encoding="utf-8")
+    last = text.rsplit("buying-power calculator", 1)[-1]
+    assert "HARD_MAX_ORDER_NOTIONAL=0" in last
+    assert "FORTRESS_GO_LIVE_MAX_NOTIONAL=0" in last
+    assert "ORDER_NOTIONAL=0" in last
+    assert "FORTRESS_MAX_POSITIONS=40" in last
+    assert "FORTRESS_ALLOW_DCA=false" in last
+    assert "FORTRESS_WINNERS_ONLY=true" in last
+    assert "HFT_MAX_ORDER_NOTIONAL=0" in last
+    assert "HFT_BP_RESERVE_USD=200" in last
+    assert "HFT_BLOCK_ADD_TO_BROKER_LONG=true" in last
+    assert "MAX_GROSS_LEVERAGE=1.0" in last
+
+
 def test_rsync_excludes_mac_autopilot_pause():
     text = (ROOT / "cloud/gcp_bootstrap.sh").read_text(encoding="utf-8")
     assert "--exclude='data/autopilot_state.json'" in text
     assert "stop-hft-obi" in text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
+    assert "reload-intraday" in text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
     assert "ensure-subsecond" in text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
     paper = text.split("cmd_push_paper()")[1].split("cmd_push_train()")[0]
     assert "GCP_PAPER_INSTANCE:-fate-algobot-paper" in paper

@@ -53,6 +53,15 @@ if [ -f "$ROOT/.env" ]; then
   set +a
   set -u
 fi
+# deploy_scale.env last-wins over stale .env ($2500 caps, 500-slot book, leftover cash).
+if [ -f "$ROOT/data/deploy_scale.env" ]; then
+  set +u
+  set -a
+  # shellcheck disable=SC1091
+  . "$ROOT/data/deploy_scale.env"
+  set +a
+  set -u
+fi
 
 # Yahoo-first price routing (reliable, no API cap). Set USE_POLYGON_FIRST=true for Polygon.
 if [ "${USE_YAHOO_FIRST:-true}" = "true" ] || [ "${USE_YAHOO_ONLY:-false}" = "true" ]; then
@@ -362,7 +371,9 @@ cmd_status() {
     printf "  %-22s %s\n" "Dry-run mode" "$(grep ^HFT_DRY_RUN .env | cut -d= -f2)"
   fi
   echo
-  echo "---- Running processes ----"
+  echo "---- Buying power ----"
+  "$PY" -u "$ROOT/tools/buying_power_status.py" --quiet 2>/dev/null || echo "  (calculator unavailable)"
+  echo
   for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator hft-news-watch retrain-weak-loop stack-autotune self-improve cortex-singularity free-agent operator-doc stack-watchdog paper-awake paper-hygiene day-trade micro-scalp crypto-hft disk-cleanup execution-monitor exec-delay bottom-fisher-watch valuation-news-watch event-calendar-watch event-learn-train hist-cook gen-learn-train sheldon-hunt algo-pipeline pattern-anomaly-watch ule-watch continuous-learn universe-lifecycle-watch industry-ai-watch; do
     if is_running "$name"; then
       printf "  %-22s RUNNING (pid %s)\n" "$name" "$(resolve_pid "$name")"
@@ -644,13 +655,13 @@ launch_subsecond_alpaca_paper() {
         HFT_MAX_SPREAD_BPS="${HFT_MAX_SPREAD_BPS:-40}" \
         HFT_MAX_NOTIONAL_MULT="${HFT_MAX_NOTIONAL_MULT:-1.75}" \
         HFT_MAX_HOLD_MS="${HFT_MAX_HOLD_MS:-180000}" \
-        HFT_MIN_ORDER_NOTIONAL="${HFT_MIN_ORDER_NOTIONAL:-80}" \
-        HFT_MAX_ORDER_NOTIONAL="${HFT_MAX_ORDER_NOTIONAL:-600}" \
+        HFT_MIN_ORDER_NOTIONAL="${HFT_MIN_ORDER_NOTIONAL:-200}" \
+        HFT_MAX_ORDER_NOTIONAL="${HFT_MAX_ORDER_NOTIONAL:-0}" \
         HFT_BP_USE_FRAC="${HFT_BP_USE_FRAC:-0.85}" \
-        HFT_BP_RESERVE_USD="${HFT_BP_RESERVE_USD:-500}" \
+        HFT_BP_RESERVE_USD="${HFT_BP_RESERVE_USD:-200}" \
         HFT_MIN_BUYING_POWER_USD="${HFT_MIN_BUYING_POWER_USD:-2000}" \
         HFT_USE_DTBP="${HFT_USE_DTBP:-true}" \
-        HFT_MAX_CONCURRENT_SLOTS="${HFT_MAX_CONCURRENT_SLOTS:-40}" \
+        HFT_MAX_CONCURRENT_SLOTS="${HFT_MAX_CONCURRENT_SLOTS:-16}" \
         OBI_NOTIONAL_USD="${OBI_NOTIONAL_USD:-1500}" \
         OBI_TRIGGER_LONG="${OBI_TRIGGER_LONG:-0.40}" \
         OBI_TRIGGER_SHORT="${OBI_TRIGGER_SHORT:--0.40}" \
@@ -764,7 +775,7 @@ launch_fortress_alpaca_paper() {
     FORTRESS_LONG_ONLY=true \
     FORTRESS_ALLOW_SHORT_ENTRIES=false \
     FORTRESS_PREDICT_HORIZON=1d \
-    MAX_LIVE_SYMBOLS="${MAX_LIVE_SYMBOLS:-22}" \
+    MAX_LIVE_SYMBOLS="${MAX_LIVE_SYMBOLS:-40}" \
     LIVE_SLEEP_SEC="${LIVE_SLEEP_SEC:-0.02}" \
     FORTRESS_ACCURACY_MODE="${FORTRESS_ACCURACY_MODE:-false}" \
     HEARTBEAT_MAX_LATENCY_MS="${HEARTBEAT_MAX_LATENCY_MS:-2500}" \
@@ -782,20 +793,20 @@ launch_fortress_alpaca_paper() {
     FORTRESS_RELAX_VOL_FOR_MEGA="${FORTRESS_RELAX_VOL_FOR_MEGA:-true}" \
     FORTRESS_SELL_MAX_P="${FORTRESS_SELL_MAX_P:-0.50}" \
     SENTIMENT_BLOCK_LONG="${SENTIMENT_BLOCK_LONG:-false}" \
-    ORDER_NOTIONAL="${ORDER_NOTIONAL:-4500}" \
-    MIN_ORDER_NOTIONAL="${MIN_ORDER_NOTIONAL:-500}" \
-    HARD_MAX_ORDER_NOTIONAL="${HARD_MAX_ORDER_NOTIONAL:-2500}" \
-    MAX_ORDER_NOTIONAL="${MAX_ORDER_NOTIONAL:-2500}" \
-    POLICY_MAX_NOTIONAL="${POLICY_MAX_NOTIONAL:-2500}" \
+    ORDER_NOTIONAL="${ORDER_NOTIONAL:-0}" \
+    MIN_ORDER_NOTIONAL="${MIN_ORDER_NOTIONAL:-200}" \
+    HARD_MAX_ORDER_NOTIONAL="${HARD_MAX_ORDER_NOTIONAL:-0}" \
+    MAX_ORDER_NOTIONAL="${MAX_ORDER_NOTIONAL:-0}" \
+    POLICY_MAX_NOTIONAL="${POLICY_MAX_NOTIONAL:-0}" \
     PRED_FORCE_BUY="${PRED_FORCE_BUY:-false}" \
     EARNINGS_STICK_FORCE_BUY="${EARNINGS_STICK_FORCE_BUY:-false}" \
     MAX_SINGLE_POSITION_FRAC="${MAX_SINGLE_POSITION_FRAC:-0.10}" \
-    FORTRESS_GO_LIVE_MAX_NOTIONAL="${FORTRESS_GO_LIVE_MAX_NOTIONAL:-2500}" \
+    FORTRESS_GO_LIVE_MAX_NOTIONAL="${FORTRESS_GO_LIVE_MAX_NOTIONAL:-0}" \
     FORTRESS_UNDERDEPLOY_BOOST="${FORTRESS_UNDERDEPLOY_BOOST:-10.0}" \
     FORTRESS_UNDERDEPLOY_BOOST_CAP="${FORTRESS_UNDERDEPLOY_BOOST_CAP:-3.0}" \
     HORIZON_INDEPENDENT="${HORIZON_INDEPENDENT:-true}" \
     HORIZON_TOP_K="${HORIZON_TOP_K:-3}" \
-    FORTRESS_TOP_BUYS_PER_PASS="${FORTRESS_TOP_BUYS_PER_PASS:-16}" \
+    FORTRESS_TOP_BUYS_PER_PASS="${FORTRESS_TOP_BUYS_PER_PASS:-24}" \
     USE_BUYING_POWER="${USE_BUYING_POWER:-true}" \
     FORTRESS_EXPOSURE_USE_BP="${FORTRESS_EXPOSURE_USE_BP:-false}" \
     MAX_GROSS_LEVERAGE="${MAX_GROSS_LEVERAGE:-1.0}" \
@@ -805,7 +816,7 @@ launch_fortress_alpaca_paper() {
     FORTRESS_SINGLE_CAP_USE_EQUITY="${FORTRESS_SINGLE_CAP_USE_EQUITY:-true}" \
     MAX_TOTAL_EXPOSURE_FRAC="${MAX_TOTAL_EXPOSURE_FRAC:-1.0}" \
     CONFIDENCE_GATE_MODE="${CONFIDENCE_GATE_MODE:-exec_only}" \
-    FORTRESS_MAX_POSITIONS="${FORTRESS_MAX_POSITIONS:-500}" \
+    FORTRESS_MAX_POSITIONS="${FORTRESS_MAX_POSITIONS:-40}" \
     FORTRESS_BP_USE_FRAC="${FORTRESS_BP_USE_FRAC:-1.0}" \
     FORTRESS_MAX_SINGLE_FRAC="${FORTRESS_MAX_SINGLE_FRAC:-0.10}" \
     FORTRESS_MEGA_MAX_FRAC="${FORTRESS_MEGA_MAX_FRAC:-0.18}" \
@@ -836,7 +847,7 @@ launch_fortress_alpaca_paper() {
     HEAVY_NEWS_INTEL=false \
     DISABLE_SENTIMENT="${DISABLE_SENTIMENT:-false}" \
     USE_FOUNDATION_FORECAST=false \
-    FORTRESS_GO_LIVE_MAX_NOTIONAL="${FORTRESS_GO_LIVE_MAX_NOTIONAL:-2500}" \
+    FORTRESS_GO_LIVE_MAX_NOTIONAL="${FORTRESS_GO_LIVE_MAX_NOTIONAL:-0}" \
     MAX_SINGLE_POSITION_FRAC="${MAX_SINGLE_POSITION_FRAC:-0.10}" \
     FORTRESS_MIN_HOLD_MINUTES="${FORTRESS_MIN_HOLD_MINUTES:-55}" \
     FORTRESS_ALLOW_OVERNIGHT="${FORTRESS_ALLOW_OVERNIGHT:-true}" \
@@ -1487,6 +1498,16 @@ cmd_ensure_intraday() {
   if is_running intraday; then
     return 0
   fi
+  launch_fortress_alpaca_paper
+}
+
+cmd_reload_intraday() {
+  # Kill-by-pid (not pkill -f) so a gcloud --command string cannot match itself.
+  if [ "${PAPER_USE_FORTRESS:-false}" != "true" ] && [ "${PAPER_USE_FORTRESS:-false}" != "1" ]; then
+    echo "[reload-intraday] PAPER_USE_FORTRESS is off"
+    return 0
+  fi
+  _reload_paper_daemon intraday
   launch_fortress_alpaca_paper
 }
 
@@ -4040,10 +4061,13 @@ cmd_logs() {
 cmd_go_autonomous() {
   echo "[go-autonomous] FINAL: tighten gates + clean + smoke + full unattended stack"
   set -a; source "$ROOT/.env" 2>/dev/null; set +a
+  if [ -f "$ROOT/data/deploy_scale.env" ]; then
+    set -a; source "$ROOT/data/deploy_scale.env"; set +a
+  fi
   export POLICY_BUY_THRESHOLD_CAP="${POLICY_BUY_THRESHOLD_CAP:-0.65}"
   export POLICY_HUMAN_LOCK="${POLICY_HUMAN_LOCK:-true}"
   export MAX_SINGLE_ASSET_FRAC="${MAX_SINGLE_ASSET_FRAC:-0.12}"
-  export ORDER_NOTIONAL="${ORDER_NOTIONAL:-4500}"
+  export ORDER_NOTIONAL="${ORDER_NOTIONAL:-0}"
   export AUTONOMOUS_MODE=true
   export BUY_THRESHOLD="${BUY_THRESHOLD:-0.58}"
   export MIN_EXECUTION_CONFIDENCE="${MIN_EXECUTION_CONFIDENCE:-0.58}"
@@ -4270,6 +4294,10 @@ cmd_finish_trading_ready() {
 # ----------------------------------------------------------------------------
 case "${1:-status}" in
   status)          cmd_status ;;
+  buying-power|bp|buying_power)
+    shift
+    "$PY" -u "$ROOT/tools/buying_power_status.py" "$@"
+    ;;
   keys)            cmd_keys ;;
   train)           cmd_train ;;
   train-fresh)     cmd_train_fresh ;;
@@ -4483,6 +4511,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   train-talk-guide|talk-guide|train-investing-guide) shift; cmd_train_talk_guide "$@" ;;
   ensure-disk-cleanup) cmd_ensure_disk_cleanup ;;
   ensure-intraday) cmd_ensure_intraday ;;
+  reload-intraday) cmd_reload_intraday ;;
   ensure-weekly) cmd_ensure_weekly ;;
   ensure-longterm) cmd_ensure_longterm ;;
   ensure-subsecond) cmd_ensure_subsecond ;;

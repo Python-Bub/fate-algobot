@@ -1573,7 +1573,12 @@ def close_position_alpaca(
 
 
 def get_account() -> dict | None:
-    """Returns Alpaca account JSON (cash, buying_power, equity, ...)."""
+    """GET /v2/account — cash, equity, buying_power (Alpaca live JSON).
+
+    Fields we size from: cash, equity, last_equity, buying_power,
+    regt_buying_power, non_marginable_buying_power, long_market_value.
+    PDT aliases (daytrading_buying_power) were removed 2026-07-06.
+    """
     global _ACCT_CACHE
     k, _ = _keys()
     if not k:
@@ -2188,7 +2193,7 @@ def place_notional_alpaca(
     if side == "buy":
         hard_max = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
         if hard_max <= 0:
-            hard_max = float(os.getenv("MAX_ORDER_NOTIONAL", "0") or 0)
+            hard_max = 0.0
         if hard_max > 0 and dollars > hard_max:
             log.warning(
                 "[ALPACA] clamp BUY %s $%.0f → $%.0f (HARD_MAX_ORDER_NOTIONAL)",

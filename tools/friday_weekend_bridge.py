@@ -31,6 +31,10 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 
 load_dotenv()
+_ROOT = Path(__file__).resolve().parents[1]
+_scale = _ROOT / "data" / "deploy_scale.env"
+if _scale.is_file():
+    load_dotenv(_scale, override=True)
 
 
 def _lock_paper_sim_universe_for_bridge() -> None:
@@ -126,18 +130,19 @@ def main() -> int:
     if not dry:
         acc = get_account()
         if acc:
-            bp = float(acc.get("buying_power") or 0.0)
-            if bp > 0:
-                frac = float(os.getenv("FRIDAY_BRIDGE_BP_ORDER_FRAC", "0.18"))
-                cap = max(25.0, bp * frac)
-                if notional > cap:
-                    log.warning(
-                        "[FRIDAY_BRIDGE] capping per-order notional $%.0f → $%.0f (buying_power $%.0f)",
-                        notional,
-                        cap,
-                        bp,
-                    )
-                    notional = cap
+            try:
+                from analytics.buying_power import clip_ceiling_usd, plan_from_account
+
+                plan = plan_from_account(acc, persist=False)
+                eq = float(acc.get("equity") or equity or 0) or 100_000.0
+                cap = float(plan.overnight_clip or 0) or clip_ceiling_usd(eq)
+            except Exception:
+                eq = float(acc.get("equity") or equity or 0) or 100_000.0
+                cap = max(400.0, eq * 0.10 * 0.995)
+            if notional <= 0:
+                notional = cap
+            elif cap > 0:
+                notional = min(notional, cap)
 
     from paper_sim_today import run_paper_simulation_today
 

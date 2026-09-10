@@ -523,6 +523,12 @@ def _maybe_kill_hung_fortress() -> None:
 
 def ensure_stack(*, bootstrap: bool = False) -> None:
     _reload_env()
+    try:
+        from analytics.buying_power import refresh_and_persist
+
+        refresh_and_persist()
+    except Exception:
+        pass
     _maybe_auto_unpause()
     # Trading engines FIRST — never block restarts behind Cramer/autorun (was 5–120min stalls
     # that looked like "random STOPPED" while watchdog was "RUNNING").

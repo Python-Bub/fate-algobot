@@ -747,6 +747,11 @@ ok("lag haircut sits out and never rounds a thin clip up to the floor", () => {
   assert.equal(clipNotional(180, 0.5), 90);
   assert.equal(clipNotional(180, 0.1), 0);
   assert.equal(clipNotional(6_400, 1), 350);
+  const prevCapZero = process.env.HFT_MAX_ORDER_NOTIONAL;
+  process.env.HFT_MAX_ORDER_NOTIONAL = "0";
+  assert.equal(clipNotional(6_400, 1), 6_400);
+  if (prevCapZero === undefined) delete process.env.HFT_MAX_ORDER_NOTIONAL;
+  else process.env.HFT_MAX_ORDER_NOTIONAL = prevCapZero;
   const sit = sizeHftClip({
     baseUsd: 6_400,
     quoteAgeMs: 2_000,
