@@ -18,6 +18,7 @@ import {
   waitForGreenExit,
 } from "./order-pricing.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
+import { KillSwitch } from "../common/kill-switch.js";
 import { type Position } from "./obi-tape-signals.js";
 
 const log = stdoutTag("[OBI/RISK]");
@@ -37,6 +38,7 @@ export class ObiTapeRiskManager {
     private readonly broker: AlpacaExecutor,
     private readonly positions: Map<string, Position>,
     private readonly circuit: CircuitBreaker = new CircuitBreaker(),
+    private readonly kill: KillSwitch | null = null,
   ) {}
 
   private async flatten(book: L2Book, pos: Position, reason: "tp" | "sl" | "hold"): Promise<void> {
@@ -50,11 +52,17 @@ export class ObiTapeRiskManager {
     if (now - last < backoff) return;
 
     const flatSide = pos.side === "buy" ? "sell" : "buy";
-    // Only a hard stop may cross the bid. Max-hold + TP rest sell-high at/near ask.
-    const forcedLoss = reason === "sl";
+    const underwater =
+      pos.side === "buy"
+        ? book.bestBid > 0 && pos.entryPx > 0 && book.bestBid + 1e-12 < pos.entryPx
+        : book.bestAsk > 0 && pos.entryPx > 0 && book.bestAsk > pos.entryPx + 1e-12;
+    // Hard stop always crosses. Max-hold crosses only when last-wins recycle is on
+    // (HFT_MAX_HOLD_FORCE_EXIT) — otherwise red HFT bags lock the 15 WS slots.
+    const forceHoldExit = process.env.HFT_MAX_HOLD_FORCE_EXIT === "true";
+    const forcedLoss = reason === "sl" || (reason === "hold" && forceHoldExit && underwater);
     const px = exitLimitPx(flatSide, book, pos.entryPx, forcedLoss);
     if (!(px > 0)) return;
-    if (reason !== "sl" && pos.entryPx > 0 && px + 1e-12 < pos.entryPx) {
+    if (!forcedLoss && pos.entryPx > 0 && px + 1e-12 < pos.entryPx) {
       return;
     }
 
@@ -106,6 +114,8 @@ export class ObiTapeRiskManager {
         reason,
       });
     }
+
+    if (this.kill && !this.kill.reserveOrderSlot(now)) return;
 
     this.flattening.add(t);
     this.lastFlattenAttemptMs.set(t, now);

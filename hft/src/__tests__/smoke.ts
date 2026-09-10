@@ -138,6 +138,16 @@ ok("KillSwitch rolling 60s does not reset at calendar minute", () => {
   assert.equal(k.reserveOrderSlot(119_001), true);
 });
 
+ok("KillSwitch spaces burst submits to max-per-sec", () => {
+  process.env.HFT_GLOBAL_MAX_ORDERS_PER_MIN = "0";
+  process.env.HFT_MAX_ORDERS_PER_SEC = "4";
+  const k = new KillSwitch(["AAPL"], 0, 200);
+  assert.equal(k.reserveOrderSlot(1000), true);
+  assert.equal(k.reserveOrderSlot(1000), false); // same ms burst
+  assert.equal(k.reserveOrderSlot(1249), false); // < 250ms gap
+  assert.equal(k.reserveOrderSlot(1250), true);
+});
+
 ok("KillSwitch allows 200 submits inside a rolling minute", () => {
   process.env.HFT_GLOBAL_MAX_ORDERS_PER_MIN = "0";
   process.env.HFT_MAX_ORDERS_PER_SEC = "0";

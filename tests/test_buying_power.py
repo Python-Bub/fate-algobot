@@ -202,6 +202,15 @@ def test_last_wins_buying_power_calculator():
     assert "ALPACA_OPTIONS_ENABLED=false" in last
 
 
+def test_last_wins_200_tpm():
+    from pathlib import Path
+
+    last = (Path(__file__).resolve().parents[1] / "data" / "deploy_scale.env").read_text()
+    last = last.rsplit("200/min leftover BP", 1)[-1]
+    assert "HFT_MAX_ORDERS_PER_MIN=200" in last
+    assert "HFT_MAX_ORDER_NOTIONAL=800" in last
+
+
 def test_run_all_sources_deploy_scale_after_dotenv():
     from pathlib import Path
 

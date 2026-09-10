@@ -141,7 +141,9 @@ async function main(): Promise<void> {
   await broker.warmPositions();
   log("positions-warm", { n: broker.cachedPositionCount(), ready: broker.positionsReady() });
   const held = new Set(broker.heldSymbols());
-  const pool = [...CFG.obi.tickers, ...CFG.obi.restTickers];
+  // Rest file is unheld liquid names — put them on IEX WS first. Whitelist
+  // mega-caps are often fortress longs and would skip-all under BLOCK_ADD.
+  const pool = [...CFG.obi.restTickers, ...CFG.obi.tickers];
   const wsTickers = useAlpacaStream
     ? pickWsTickers(pool, held, iexWsMax)
     : pickWsTickers(pool, new Set(), Math.max(pool.length, 1));
@@ -160,7 +162,7 @@ async function main(): Promise<void> {
   const kill = new KillSwitch(pollTickers, CFG.cooldownMs, CFG.maxOrdersPerMin);
   const circuit = new CircuitBreaker();
   const signals = new ObiTapeSignals(broker, kill, circuit);
-  const risk = new ObiTapeRiskManager(broker, signals.openPositions, circuit);
+  const risk = new ObiTapeRiskManager(broker, signals.openPositions, circuit, kill);
   const mr = new MicroMeanReversion(broker, kill, (sym) => books.get(sym.toUpperCase()), circuit);
   const restMrLastMs = new Map<string, number>();
   const restMrMinGapMs = Number(process.env.HFT_MR_REST_MIN_GAP_MS ?? 1500);
@@ -212,7 +214,7 @@ async function main(): Promise<void> {
     if (st.book.syntheticNbbo) skips.synthetic++;
     let fired = false;
     if (obiEntriesEnabled) {
-      fired = signals.maybeFire(st.book, st.tape, t0);
+      fired = signals.maybeFire(st.book, st.tape, t0, wsSet.has(sym.toUpperCase()));
       if (fired) skips.fire++;
     }
     if (!fired && process.env.HFT_MR_ENABLED !== "false") {
@@ -711,8 +713,10 @@ async function main(): Promise<void> {
       const last = orphanLastAttempt.get(sym) ?? 0;
       if (now - last < orphanCooldownMs) continue;
       orphanLastAttempt.set(sym, now);
-      // Prefer adopt+manage over force close when we have an entry.
-      if (leg.avgEntry && leg.avgEntry > 0) {
+      // Recycle leftover BP: last-wins force-exit closes HFT-sized orphans
+      // instead of adopt-filling all 15 IEX slots (that pinned FIRE at ~15/min).
+      const forceClose = process.env.HFT_MAX_HOLD_FORCE_EXIT === "true";
+      if (!forceClose && leg.avgEntry && leg.avgEntry > 0) {
         signals.adoptBrokerLong(sym, Math.abs(leg.qty), leg.avgEntry);
         log("orphan-adopt", { ticker: sym, qty: leg.qty, entry: leg.avgEntry });
         continue;
@@ -808,7 +812,8 @@ async function main(): Promise<void> {
   }
   const eodTimer = setInterval(() => void maybeEodFlattenHft(), 30_000);
   eodTimer.unref();
-  const posTimer = setInterval(() => void broker.keepPositionsWarm(), 2_000);
+  const posMs = Math.max(5_000, Number(process.env.HFT_POSITION_REFRESH_MS ?? 15_000));
+  const posTimer = setInterval(() => void broker.keepPositionsWarm(), posMs);
   posTimer.unref();
 
   log("ready", {

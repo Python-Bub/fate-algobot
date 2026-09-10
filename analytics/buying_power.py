@@ -284,9 +284,8 @@ def plan_from_account(
     hft_floor = _f("HFT_MIN_ORDER_NOTIONAL", 200.0)
     hft_cap = _f("HFT_MAX_ORDER_NOTIONAL", 0.0)
     if hft_cap <= 0:
-        # 0 = no crumb cap. Same-day clip is DTBP / slots, still bounded by the
-        # equity single-name cap so HFT cannot park 4× overnight.
-        hft_cap = single
+        # Pace-first leftover BP: 200/min recycles; do not park 10% equity per clip.
+        hft_cap = min(single, max(hft_floor * 4.0, day_pool / max(hft_slots, 20)))
     hft_clip = max(hft_floor, min(hft_cap, hft_day_budget / hft_slots)) if hft_day_budget >= hft_floor else 0.0
 
     dt_frac = _f("DAY_TRADE_BP_USE_FRAC", 0.25)

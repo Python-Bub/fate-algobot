@@ -164,6 +164,29 @@ def test_last_wins_buying_power_calculator_no_crumbs():
     assert "MAX_GROSS_LEVERAGE=1.0" in last
 
 
+def test_last_wins_200_tpm_leftover_bp():
+    text = (ROOT / "data/deploy_scale.env").read_text(encoding="utf-8")
+    last = text.rsplit("200/min leftover BP", 1)[-1]
+    assert "HFT_MAX_ORDERS_PER_MIN=200" in last
+    assert "HFT_GLOBAL_MAX_ORDERS_PER_MIN=200" in last
+    assert "HFT_MAX_ORDER_NOTIONAL=800" in last
+    assert "HFT_REST_POLL_MS=2500" in last
+    assert "HFT_POSITION_REFRESH_MS=15000" in last
+    assert "HFT_LIMIT_TIF=ioc" in last
+    assert "HFT_BLOCK_ADD_TO_BROKER_LONG=true" in last
+    assert "OBI_TRIGGER_LONG=0.05" in last
+    assert "HFT_MIN_CONFIDENCE=0.08" in last
+    assert "HFT_REQUIRE_PROFIT_CUSHION=false" in last
+    assert "HFT_EV_GATE=false" in last
+    assert "HFT_OBI_EDGE_COST_GATE=false" in last
+    assert "HFT_OR_SIGNAL=true" in last
+    assert "HFT_PACE_FILL=true" in last
+    assert "HFT_MAX_ORDERS_PER_SEC=4" in last
+    assert "HFT_MAX_HOLD_MS=3500" in last
+    assert "HFT_MAX_HOLD_FORCE_EXIT=true" in last
+    assert "HFT_FLATTEN_ORPHANS=true" in last
+
+
 def test_rsync_excludes_mac_autopilot_pause():
     text = (ROOT / "cloud/gcp_bootstrap.sh").read_text(encoding="utf-8")
     assert "--exclude='data/autopilot_state.json'" in text

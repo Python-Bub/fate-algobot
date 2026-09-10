@@ -187,7 +187,10 @@ export const CFG = {
  *   in between            → linear
  */
 export function effectiveConfidenceFloor(): number {
-  return Math.max(0.35, Math.min(0.95, CFG.confidence.floor + hftConfidenceFloorDelta()));
+  // Honor last-wins floors below 0.35. The old clamp made OBI_TRIGGER_LONG=0.10
+  // dead: abs(OBI)≈0.10 never cleared confidenceNotionalMult, so FIRE stuck ~2/min.
+  const raw = CFG.confidence.floor + hftConfidenceFloorDelta();
+  return Math.max(0.05, Math.min(0.95, raw));
 }
 
 export function confidenceNotionalMult(confidence: number): number {

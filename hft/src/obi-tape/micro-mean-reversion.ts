@@ -755,9 +755,16 @@ export class MicroMeanReversion {
     const maxHoldMs = Number(process.env.HFT_MR_MAX_HOLD_MS ?? 30_000);
     const heldMs = Date.now() - pos.openedMs;
     const timedOut = maxHoldMs > 0 && heldMs >= maxHoldMs;
-    // forcedLoss pricing only on true stop / FORCE_FLATTEN — never on max-hold timeout.
+    const underwater =
+      pos.side === "buy"
+        ? book.bestBid > 0 && pos.entryPx > 0 && book.bestBid + 1e-12 < pos.entryPx
+        : book.bestAsk > 0 && pos.entryPx > 0 && book.bestAsk > pos.entryPx + 1e-12;
+    // Default: max-hold sells high. Last-wins HFT_MAX_HOLD_FORCE_EXIT recycles
+    // leftover BP instead of sitting red in all 15 IEX slots.
     const forced =
-      forceExit || process.env.HFT_FORCE_FLATTEN === "true";
+      forceExit ||
+      process.env.HFT_FORCE_FLATTEN === "true" ||
+      (timedOut && underwater && process.env.HFT_MAX_HOLD_FORCE_EXIT === "true");
 
     // Green TP, or max-hold sell-high, or hard forced exit.
     if (!forced && !timedOut && !isInGreen(pos.side, pos.entryPx, book)) {
