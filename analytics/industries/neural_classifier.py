@@ -130,7 +130,11 @@ def train_neural_classifier(*, min_samples: int | None = None) -> dict[str, Any]
     if len(texts) < need:
         return {"ok": False, "reason": f"too_few_samples:{len(texts)}", "need": need}
 
-    vec = TfidfVectorizer(max_features=12000, ngram_range=(1, 2), min_df=1)
+    vec = TfidfVectorizer(
+        max_features=int(os.getenv("INDUSTRY_NEURAL_TFIDF_FEATURES", "20000")),
+        ngram_range=(1, 2),
+        min_df=1,
+    )
     X = vec.fit_transform(texts).toarray()
     Y = np.zeros((len(blends), len(ids)), dtype=np.float64)
     id_idx = {iid: j for j, iid in enumerate(ids)}
@@ -139,10 +143,17 @@ def train_neural_classifier(*, min_samples: int | None = None) -> dict[str, Any]
             if iid in id_idx:
                 Y[i, id_idx[iid]] = w
 
+    hidden = tuple(
+        int(x)
+        for x in (os.getenv("INDUSTRY_NEURAL_HIDDEN", "1024,512,256,128") or "1024,512,256,128")
+        .replace(" ", "")
+        .split(",")
+        if x
+    ) or (1024, 512, 256, 128)
     mlp = MLPRegressor(
-        hidden_layer_sizes=(512, 256, 128),
+        hidden_layer_sizes=hidden,
         activation="relu",
-        max_iter=int(os.getenv("INDUSTRY_NEURAL_EPOCHS", "800")),
+        max_iter=int(os.getenv("INDUSTRY_NEURAL_EPOCHS", "1200")),
         early_stopping=True,
         validation_fraction=0.12,
         random_state=42,

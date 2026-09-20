@@ -9,12 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_lstm_defaults_are_stronger_and_legacy_arch_still_loads():
     src = (ROOT / "analytics/lstm_head.py").read_text(encoding="utf-8")
-    assert 'LSTM_HIDDEN", "128"' in src
-    assert 'LSTM_LAYERS", "3"' in src
-    assert 'LSTM_SEQ_LEN", "60"' in src
-    assert 'LSTM_EPOCHS", "20"' in src
+    assert 'LSTM_HIDDEN", "256"' in src
+    assert 'LSTM_LAYERS", "4"' in src
+    assert 'LSTM_SEQ_LEN", "80"' in src
+    assert 'LSTM_EPOCHS", "24"' in src
     assert "LSTM_EARLY_STOP_PATIENCE" in src
     assert "best_state" in src
+    assert "lstm_head_needs_upgrade" in src
     assert 'bundle.get("hidden") or 64' in src
     assert 'bundle.get("num_layers") or 2' in src
 
@@ -27,11 +28,13 @@ def test_daily_train_default_history_is_2010():
 
 def test_neural_ensemble_trains_more_and_stores_arch():
     src = (ROOT / "online_learning/neural_ensemble.py").read_text(encoding="utf-8")
-    assert 'NEURAL_EPOCHS", 12' in src
-    assert 'NEURAL_SEQ_LEN", 48' in src
+    assert 'NEURAL_EPOCHS", 24' in src
+    assert 'NEURAL_SEQ_LEN", 64' in src
     assert "def _train_arch" in src
-    assert 'NEURAL_LSTM_HIDDEN", 128' in src
+    assert 'NEURAL_LSTM_HIDDEN", 256' in src
     assert "def _make_head" in src
+    assert "foundation_p" in src
+    assert "finbert_tone" in src
 
 
 def test_hist_cook_expands_years_and_trains_lstm():
@@ -77,12 +80,58 @@ def test_last_wins_strong_neural():
     assert "NEURAL_EPOCHS=12" in last
     assert "HIST_COOK_YEARS=16" in last
     assert "HIST_COOK_TRAIN_LSTM=true" in last
+    leftover = text.rsplit("leftover BP quality", 1)[-1]
+    assert "USE_FINBERT=true" in leftover
+    cook = text.rsplit("cook more online nets", 1)[-1]
+    assert "amazon/chronos-bolt-base" in cook
+    assert "yiyanghkust/finbert-tone" in cook
+    assert "FREE_AGENT_NEURAL_TICKERS=500" in cook
+    assert "HIST_COOK_MAX_SYMBOLS=800" in cook
+    assert "HFT_PACE_FILL=false" in cook
+    bigger = text.rsplit("larger nets + blend every head", 1)[-1]
+    assert "LSTM_HIDDEN=256" in bigger
+    assert "LSTM_LAYERS=4" in bigger
+    assert "NEURAL_LSTM_HIDDEN=256" in bigger
+    assert "FREE_AGENT_NEURAL_TICKERS=800" in bigger
+    assert "HIST_COOK_MAX_SYMBOLS=1200" in bigger
+    assert "FINBERT_TONE_MODEL=yiyanghkust/finbert-tone" in bigger
+    assert "FOUNDATION_CHRONOS_INFER_EXTRA=amazon/chronos-bolt-small" in bigger
+    assert "INDUSTRY_NEURAL_HIDDEN=1024,512,256,128" in bigger
+    assert "LSTM_UPGRADE_SMALLER=true" in bigger
+    assert "HFT_PACE_FILL=false" in bigger
+    monday = text.rsplit("Monday full-quality cook", 1)[-1]
+    assert "TRAIN_PROPER_FINISH=true" in monday
+    assert "ENHANCE_FINISH_MODE=full" in monday
+    assert "FAST_MODE=false" in monday
+    assert "MIN_HEAD_TOP20=0.52" in monday
+    assert "RETRAIN_MIN_TOP20=0.62" in monday
+    assert "INTRADAY_LOOKBACK_DAYS=365" in monday
+    assert "HFT_PACE_FILL=false" in monday
+    pref = (ROOT / "tools/prefetch_online_nets.py").read_text(encoding="utf-8")
+    assert "amazon/chronos-bolt-mini" in pref
+    assert "amazon/chronos-bolt-base" in pref
+    assert "ProsusAI/finbert" in pref
+    assert "yiyanghkust/finbert-tone" in pref
+    assert "FOUNDATION_HF_EXTRA" in pref
+    run = (ROOT / "run_all.sh").read_text(encoding="utf-8")
+    assert "cmd_prefetch_online_nets" in run
+    assert "prefetch-online-nets" in run
+    orphans = run.split("cmd_kill_orphans()")[1].split("cmd_train()")[0]
+    assert "pipeline daily" in orphans
+    assert "pipeline intraday" in orphans
+    assert "continue 2" in orphans
+    lstm_batch = (ROOT / "tools/train_lstm_heads.py").read_text(encoding="utf-8")
+    assert "lstm_head_needs_upgrade" in lstm_batch
+    found = (ROOT / "analytics/foundation_forecast.py").read_text(encoding="utf-8")
+    assert "_chronos_infer_ids" in found
+    sent = (ROOT / "sentiment_pipeline.py").read_text(encoding="utf-8")
+    assert "FINBERT_TONE_MODEL" in sent
 
 
 def test_industry_neural_uses_ticker_map_and_deeper_mlp():
     src = (ROOT / "analytics/industries/neural_classifier.py").read_text(encoding="utf-8")
     assert "TICKER_INDUSTRY" in src
-    assert "hidden_layer_sizes=(512, 256, 128)" in src
+    assert 'INDUSTRY_NEURAL_HIDDEN", "1024,512,256,128"' in src
     assert 'INDUSTRY_NEURAL_MIN_SAMPLES", "12"' in src
     integ = (ROOT / "analytics/industries/integration.py").read_text(encoding="utf-8")
     assert "use_yfinance=True" in integ

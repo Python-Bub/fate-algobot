@@ -98,6 +98,20 @@ apply_fate_order_role() {
 }
 apply_fate_order_role
 
+is_paper_orderer() {
+  apply_fate_order_role
+  [ "${FATE_ORDER_ROLE:-}" = "gcp-paper" ]
+}
+
+refuse_trainer_on_paper() {
+  # Paper 16GB orderer: trainers/sims belong on fate-algobot-trainer.
+  if is_paper_orderer; then
+    echo "[paper] skip ${1:-trainer} — cooks belong on fate-algobot-trainer"
+    return 0
+  fi
+  return 1
+}
+
 # GNU stat -f is --file-system (not mtime). Prefer -c %Y; BSD macOS uses -f %m.
 _file_mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
 
@@ -673,6 +687,11 @@ launch_subsecond_alpaca_paper() {
         HFT_REQUIRE_EXIT_PROFIT="${HFT_REQUIRE_EXIT_PROFIT:-true}" \
         HFT_REQUIRE_PROFIT_CUSHION="${HFT_REQUIRE_PROFIT_CUSHION:-true}" \
         HFT_EV_GATE="${HFT_EV_GATE:-true}" \
+        HFT_EV_MIN_P="${HFT_EV_MIN_P:-0.58}" \
+        HFT_MIN_EV_BPS="${HFT_MIN_EV_BPS:-1.2}" \
+        HFT_CB_MAX_LOSS_USD="${HFT_CB_MAX_LOSS_USD:-40}" \
+        HFT_CB_DAY_LOSS_USD="${HFT_CB_DAY_LOSS_USD:-80}" \
+        HFT_CIRCUIT_BREAKER="${HFT_CIRCUIT_BREAKER:-true}" \
         HFT_MAX_HOLD_FORCE_EXIT="${HFT_MAX_HOLD_FORCE_EXIT:-false}" \
         HFT_MICRO_PRICE_GATE="${HFT_MICRO_PRICE_GATE:-true}" \
         HFT_PACE_FILL="${HFT_PACE_FILL:-false}" \
@@ -899,6 +918,7 @@ launch_fortress_alpaca_paper() {
 }
 
 launch_weekly_paper_daemon() {
+  if refuse_trainer_on_paper weekly; then return 0; fi
   if [ -f "$ROOT/data/deploy_scale.env" ]; then
     set -a
     # shellcheck disable=SC1091
@@ -934,7 +954,7 @@ launch_weekly_paper_daemon() {
     FORTRESS_ALLOW_OVERNIGHT="${FORTRESS_ALLOW_OVERNIGHT:-true}" \
     FLATTEN_AT_CLOSE="${FLATTEN_AT_CLOSE:-false}" \
     RANK_W_NEWS_FACTOR="${RANK_W_NEWS_FACTOR:-0.05}" USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 \
-    NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}" \
+    NEURAL_EPOCHS="${NEURAL_EPOCHS:-24}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-64}" \
     "$ROOT/tools/daemon_loop.sh" "$pause" \
     "$PY" -u paper_sim_today.py \
     >"$logf" 2>&1 </dev/null &
@@ -944,6 +964,7 @@ launch_weekly_paper_daemon() {
 }
 
 launch_longterm_paper_daemon() {
+  if refuse_trainer_on_paper longterm; then return 0; fi
   local pause="${LONGTERM_LOOP_PAUSE_SEC:-7200}"
   if is_running longterm; then
     echo "[longterm] daemon already running (pid $(read_pid longterm))"
@@ -969,7 +990,7 @@ launch_longterm_paper_daemon() {
     SWING_BUY_WINDOW_ENABLED="${SWING_BUY_WINDOW_ENABLED:-true}" \
     SWING_HOLD_DAYS_MIN="${SWING_HOLD_DAYS_MIN:-5}" \
     CRAMER_HOLD_DAYS=20 RANK_W_NEWS_FACTOR="${RANK_W_NEWS_FACTOR:-0.05}" RANK_W_CRAMER="${RANK_W_CRAMER:-0.05}" \
-    USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}" \
+    USE_NEURAL_ENSEMBLE=true NEURAL_BLEND_WEIGHT=0.35 NEURAL_EPOCHS="${NEURAL_EPOCHS:-24}" NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-64}" \
     "$ROOT/tools/daemon_loop.sh" "$pause" \
     "$PY" -u paper_sim_today.py \
     >"$logf" 2>&1 </dev/null &
@@ -1151,6 +1172,7 @@ launch_disk_cleanup_daemon() {
 }
 
 launch_self_improve_daemon() {
+  if refuse_trainer_on_paper self-improve; then return 0; fi
   local pause="${SELF_IMPROVE_POLL_SEC:-180}"
   if is_running self-improve; then
     return 0
@@ -1165,6 +1187,7 @@ launch_self_improve_daemon() {
 }
 
 launch_cortex_singularity_daemon() {
+  if refuse_trainer_on_paper cortex-singularity; then return 0; fi
   local pause="${CORTEX_POLL_SEC:-120}"
   if is_running cortex-singularity; then
     return 0
@@ -1179,6 +1202,7 @@ launch_cortex_singularity_daemon() {
 }
 
 launch_free_agent_daemon() {
+  if refuse_trainer_on_paper free-agent; then return 0; fi
   local pause="${FREE_AGENT_POLL_SEC:-45}"
   if is_running free-agent; then
     return 0
@@ -1217,6 +1241,7 @@ cmd_self_improve_once() {
 }
 
 launch_stack_autotune_daemon() {
+  if refuse_trainer_on_paper stack-autotune; then return 0; fi
   local pause="${AUTOTUNE_POLL_SEC:-300}"
   if is_running stack-autotune; then
     return 0
@@ -1269,6 +1294,52 @@ cmd_ensure_paper_hygiene() {
   launch_paper_hygiene_daemon
 }
 
+cmd_reload_paper_hygiene() {
+  # Kill-by-pidfile so a remote SSH command never pkill -f matches itself.
+  _reload_paper_daemon paper-hygiene
+  launch_paper_hygiene_daemon
+}
+
+cmd_reload_stack_watchdog() {
+  _reload_paper_daemon stack-watchdog
+  launch_stack_watchdog_daemon
+}
+
+cmd_paper_spare_ram() {
+  # Paper VM is the only Alpaca orderer. Trainer-class cooks belong on
+  # fate-algobot-trainer. 16GB + LSTM/ULE/retrain OOMs fortress (exit 137).
+  apply_fate_order_role 2>/dev/null || true
+  local role="${FATE_ORDER_ROLE:-}"
+  local hn
+  hn="$(hostname 2>/dev/null || true)"
+  if [ "$role" != "gcp-paper" ] && [ "$role" != "order" ] && [ "$role" != "paper-vm" ] \
+     && [[ "$hn" != *algobot-paper* ]]; then
+    echo "[paper-spare-ram] refuse — not the paper orderer (role=$role host=$hn)" >&2
+    return 1
+  fi
+  echo "[paper-spare-ram] stopping trainer-class daemons so fortress/HFT have RAM"
+  local name
+  for name in train train-intraday train-lstm enhancement-queue hist-cook gen-learn-train \
+              event-learn-train continuous-learn ule-watch retrain-weak-loop industry-ai-watch \
+              finish-today sheldon-hunt algo-pipeline universe-lifecycle-watch weekly longterm \
+              self-improve cortex-singularity free-agent pattern-anomaly-watch stack-autotune; do
+    _reload_paper_daemon "$name"
+  done
+  local pat p
+  for pat in "tools/family_forecast.py" "tools/retrain_top100_strong.py" "tools/ule_cycle.py" \
+             "tools/train_lstm_heads.py" "tools/continuous_learn.py" "tools/enhancement_queue.py" \
+             "tools/industry_ai_watch.py" "tools/hist_cook" "parallel_train.py" \
+             "paper_sim_today.py" "tools/self_maintenance.py" "self_improve_loop.py" \
+             "cortex_singularity_loop.py" "free_agent_loop.py" "tools/stack_autotune.py"; do
+    while read -r p; do
+      [ -n "$p" ] || continue
+      echo "[paper-spare-ram] TERM leftover pid $p"
+      kill -TERM "$p" 2>/dev/null || true
+    done < <(pgrep -f "$pat" 2>/dev/null || true)
+  done
+  echo "[paper-spare-ram] done — cooks stay on fate-algobot-trainer"
+}
+
 cmd_ensure_day_trade() {
   launch_day_trade_daemon
 }
@@ -1292,12 +1363,12 @@ launch_micro_scalp_daemon() {
   # spawn_daemon: survive agent-shell / process-group teardown (plain nohup dies).
   local pid
   pid="$("$PY" "$ROOT/tools/spawn_daemon.py" "$logf" \
-    env MICRO_SCALP_ENABLED=true MICRO_SCALP_NOTIONAL="${MICRO_SCALP_NOTIONAL:-12000}" \
-        MICRO_SCALP_MAX_OPEN="${MICRO_SCALP_MAX_OPEN:-12}" MICRO_SCALP_BATCH="${MICRO_SCALP_BATCH:-8}" \
+    env MICRO_SCALP_ENABLED=true MICRO_SCALP_NOTIONAL="${MICRO_SCALP_NOTIONAL:-800}" \
+        MICRO_SCALP_MAX_OPEN="${MICRO_SCALP_MAX_OPEN:-4}" MICRO_SCALP_BATCH="${MICRO_SCALP_BATCH:-2}" \
     "$PY" -u "$ROOT/tools/micro_scalp_daemon.py" 2>/dev/null | tail -1)"
   if [ -z "$pid" ] || ! alive "$pid" 2>/dev/null; then
-    nohup env MICRO_SCALP_ENABLED=true MICRO_SCALP_NOTIONAL="${MICRO_SCALP_NOTIONAL:-12000}" \
-      MICRO_SCALP_MAX_OPEN="${MICRO_SCALP_MAX_OPEN:-12}" MICRO_SCALP_BATCH="${MICRO_SCALP_BATCH:-8}" \
+    nohup env MICRO_SCALP_ENABLED=true MICRO_SCALP_NOTIONAL="${MICRO_SCALP_NOTIONAL:-800}" \
+      MICRO_SCALP_MAX_OPEN="${MICRO_SCALP_MAX_OPEN:-4}" MICRO_SCALP_BATCH="${MICRO_SCALP_BATCH:-2}" \
       "$PY" -u "$ROOT/tools/micro_scalp_daemon.py" \
       >"$logf" 2>&1 </dev/null &
     pid=$!
@@ -1589,6 +1660,7 @@ cmd_ensure_earnings() {
 }
 
 cmd_ensure_training() {
+  if refuse_trainer_on_paper ensure-training; then return 0; fi
   if [ "${AUTOPILOT_AUTO_TRAIN:-true}" != "true" ] && [ "${AUTOPILOT_AUTO_TRAIN:-true}" != "1" ]; then
     return 0
   fi
@@ -1597,6 +1669,7 @@ cmd_ensure_training() {
 }
 
 cmd_ensure_overnight_train() {
+  if refuse_trainer_on_paper overnight-train; then return 0; fi
   # 24/7: keep every horizon training. Never shrink universe. Never kill a live trainer.
   echo "[forever] trainers — leave live jobs; start missing-only if a pipeline is down"
   if is_running train; then
@@ -1857,15 +1930,19 @@ cmd_start_paper() {
   start_paper_keep_awake
   launch_stack_autotune_daemon
   cmd_ensure_self_improve
-  cmd_launch_ule_watch 2>/dev/null || true
-  cmd_ensure_continuous_learn 2>/dev/null || true
+  if [ "${FATE_ORDER_ROLE}" = "gcp-paper" ]; then
+    echo "[paper] orderer — ULE/continuous/industry/LSTM cooks stay on fate-algobot-trainer"
+  else
+    cmd_launch_ule_watch 2>/dev/null || true
+    cmd_ensure_continuous_learn 2>/dev/null || true
+    if [ "${INDUSTRY_AI_ON_START:-true}" = "true" ] || [ "${INDUSTRY_AI_ON_START:-true}" = "1" ]; then
+      cmd_launch_industry_ai_watch || true
+    fi
+  fi
   cmd_launch_valuation_news_watch 2>/dev/null || true
   cmd_launch_event_calendar_watch 2>/dev/null || true
   cmd_launch_hft_rotator 2>/dev/null || true
   launch_stack_watchdog_daemon
-  if [ "${INDUSTRY_AI_ON_START:-true}" = "true" ] || [ "${INDUSTRY_AI_ON_START:-true}" = "1" ]; then
-    cmd_launch_industry_ai_watch || true
-  fi
   echo ""
   echo "[paper] Running:"
   echo "  • subsecond-obi — IOC take-the-offer HFT (non-held names; green exits)"
@@ -1896,20 +1973,32 @@ cmd_prune_stale_pids() {
 
 cmd_kill_orphans() {
   # Anyone left over from a previous run that the pidfile lost track of.
+  # Never SIGKILL workers of a live daily/intraday trainer — starting
+  # train-intraday used to massacre parallel_train children of `train`.
   cmd_prune_stale_pids
-  local tracked="" p
+  local tracked="" p ppid i cur
   for name in train train-intraday; do
     p="$(read_pid "$name")"
     if [ -n "$p" ] && alive "$p"; then
       tracked="$tracked $p"
     fi
   done
+  p="$(pgrep -f "parallel_train.py --pipeline daily" 2>/dev/null | head -1 || true)"
+  [ -n "$p" ] && tracked="$tracked $p"
+  p="$(pgrep -f "parallel_train.py --pipeline intraday" 2>/dev/null | head -1 || true)"
+  [ -n "$p" ] && tracked="$tracked $p"
   local n=0
   while IFS= read -r p; do
     [ -z "$p" ] && continue
-    case " $tracked " in
-      *" $p "*) continue ;;
-    esac
+    cur="$p"
+    i=0
+    while [ -n "$cur" ] && [ "$cur" != "0" ] && [ "$cur" != "1" ] && [ "$i" -lt 16 ]; do
+      case " $tracked " in
+        *" $cur "*) continue 2 ;;
+      esac
+      cur="$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')"
+      i=$((i + 1))
+    done
     n=$((n + 1))
     kill -KILL "$p" 2>/dev/null || true
   done < <(pgrep -f "parallel_train.py")
@@ -1935,6 +2024,7 @@ cmd_kill_orphans() {
 }
 
 cmd_train() {
+  if refuse_trainer_on_paper train; then return 0; fi
   cmd_kill_orphans
   if is_running train; then
     echo "training already running (pid $(read_pid train))"
@@ -1972,6 +2062,7 @@ cmd_train_fresh() {
 }
 
 cmd_train_missing() {
+  if refuse_trainer_on_paper train-missing; then return 0; fi
   cmd_kill_orphans
   if is_running train; then
     echo "train already running (pid $(read_pid train))"
@@ -1987,6 +2078,7 @@ cmd_train_missing() {
 }
 
 cmd_train_missing_fast() {
+  if refuse_trainer_on_paper train-missing-fast; then return 0; fi
   cmd_kill_orphans
   if is_running train; then
     echo "train already running (pid $(read_pid train))"
@@ -2006,6 +2098,7 @@ cmd_train_missing_fast() {
 }
 
 cmd_train_missing_proper() {
+  if refuse_trainer_on_paper train-missing-proper; then return 0; fi
   cmd_kill_orphans
   if is_running train; then
     echo "train already running (pid $(read_pid train))"
@@ -2030,6 +2123,7 @@ cmd_train_missing_proper() {
 }
 
 cmd_train_intraday_gap() {
+  if refuse_trainer_on_paper train-intraday-gap; then return 0; fi
   cmd_kill_orphans
   if is_running train-intraday; then
     echo "train-intraday already running (pid $(read_pid train-intraday))"
@@ -2047,6 +2141,7 @@ cmd_train_intraday_gap() {
 }
 
 cmd_train_intraday_proper() {
+  if refuse_trainer_on_paper train-intraday-proper; then return 0; fi
   cmd_kill_orphans
   if is_running train-intraday; then
     echo "train-intraday already running (pid $(read_pid train-intraday))"
@@ -2103,6 +2198,7 @@ cmd_train_balance() {
 }
 
 cmd_train_lstm() {
+  if refuse_trainer_on_paper train-lstm; then return 0; fi
   if is_running train-lstm; then
     echo "train-lstm already running (pid $(read_pid train-lstm))"
     return 0
@@ -2112,8 +2208,8 @@ cmd_train_lstm() {
   echo "[train-lstm] per-ticker LSTM heads  scope=$scope  workers=$workers  → models/lstm/"
   launch_python train-lstm env USE_LSTM_HEAD=true TRAIN_FORCE_YAHOO=true \
                             LSTM_TRAIN_SCOPE="$scope" LSTM_WORKERS="$workers" \
-                            LSTM_HIDDEN="${LSTM_HIDDEN:-128}" LSTM_LAYERS="${LSTM_LAYERS:-3}" \
-                            LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-60}" LSTM_EPOCHS="${LSTM_EPOCHS:-20}" \
+                            LSTM_HIDDEN="${LSTM_HIDDEN:-256}" LSTM_LAYERS="${LSTM_LAYERS:-4}" \
+                            LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-80}" LSTM_EPOCHS="${LSTM_EPOCHS:-24}" \
                             TRAIN_DATA_START="${TRAIN_DATA_START:-2010-01-01}" \
                             "$PY" -u tools/train_lstm_heads.py
   echo "[train-lstm] pid $(read_pid train-lstm).  Tail:  tail -f logs/train-lstm_latest.log"
@@ -2228,6 +2324,7 @@ cmd_industry_ai_train() {
 }
 
 cmd_launch_industry_ai_watch() {
+  if refuse_trainer_on_paper industry-ai-watch; then return 0; fi
   if is_running industry-ai-watch; then
     echo "industry-ai-watch already running (pid $(read_pid industry-ai-watch))"
     return 0
@@ -2275,6 +2372,7 @@ cmd_universe_plan() {
 }
 
 cmd_launch_universe_lifecycle_watch() {
+  if refuse_trainer_on_paper universe-lifecycle-watch; then return 0; fi
   if is_running universe-lifecycle-watch; then
     echo "universe-lifecycle-watch already running (pid $(read_pid universe-lifecycle-watch))"
     return 0
@@ -2288,12 +2386,14 @@ cmd_launch_universe_lifecycle_watch() {
 }
 
 cmd_train_untrained() {
+  if refuse_trainer_on_paper train-untrained; then return 0; fi
   echo "[train-untrained] top100 intraday + LSTM gaps, then full LSTM backlog"
   start_paper_keep_awake 2>/dev/null || true
   "$PY" -u "$ROOT/tools/train_untrained.py" --launch
 }
 
 cmd_train_top100() {
+  if refuse_trainer_on_paper train-top100; then return 0; fi
   echo "[train-top100] perfection pass: rebuild daily+intraday+LSTM for top 100 (FRESH_MODEL_REBUILD)"
   echo "             optional Chronos: pip install chronos-forecasting torch"
   start_paper_keep_awake 2>/dev/null || true
@@ -2303,6 +2403,7 @@ cmd_train_top100() {
 }
 
 cmd_train_perfection() {
+  if refuse_trainer_on_paper train-perfection; then return 0; fi
   echo "[train-perfection] weak models → finish-weak → enhancement queue → top100 perfection"
   is_running retrain-weak-loop || cmd_retrain_weak_until
   if ! pgrep -f "finish_weak_top100.py" >/dev/null 2>&1; then
@@ -2326,6 +2427,7 @@ cmd_train_perfection() {
 }
 
 cmd_monday_prep() {
+  if refuse_trainer_on_paper monday-prep; then return 0; fi
   echo "[monday-prep] train to perfection + preorder playbook for Monday (TRADE_START_ET=${TRADE_START_ET:-09:00})"
   set -a; source "$ROOT/.env" 2>/dev/null; set +a
   cmd_train_perfection
@@ -2340,6 +2442,7 @@ cmd_monday_prep() {
 }
 
 cmd_retrain_weak_quality() {
+  if refuse_trainer_on_paper retrain-weak-quality; then return 0; fi
   echo "[retrain-weak-quality] weak heads in trade-quality universe (~480 names)"
   nohup env RETRAIN_QUALITY_ONLY=true RETRAIN_WEAK_TIMEOUT_SEC=0 \
     "$PY" -u "$ROOT/tools/retrain_weak_models.py" --until-clear --workers "${RETRAIN_WEAK_WORKERS:-4}" \
@@ -2349,6 +2452,7 @@ cmd_retrain_weak_quality() {
 }
 
 cmd_retrain_weak() {
+  if refuse_trainer_on_paper retrain-weak; then return 0; fi
   echo "[retrain-weak] scan acc@top20 below ${RETRAIN_MIN_TOP20:-0.6}; --run once or --until-clear loop"
   local -a args=(--top100-only)
   while [[ "${1:-}" == "--run" || "${1:-}" == "--until-clear" ]]; do
@@ -2359,6 +2463,7 @@ cmd_retrain_weak() {
 }
 
 cmd_retrain_weak_until() {
+  if refuse_trainer_on_paper retrain-weak-loop; then return 0; fi
   if is_running retrain-weak-loop; then
     echo "retrain-weak-loop already running (pid $(read_pid retrain-weak-loop))"
     return 0
@@ -2522,6 +2627,7 @@ cmd_swap_hft() {
 }
 
 cmd_launch_enhancement_queue() {
+  if refuse_trainer_on_paper enhancement-queue; then return 0; fi
   local mode="${1:-full}"
   if is_running enhancement-queue; then
     echo "enhancement-queue already running (pid $(read_pid enhancement-queue))"
@@ -2831,6 +2937,7 @@ cmd_change_cleaner() {
 }
 
 cmd_finish_today() {
+  if refuse_trainer_on_paper finish-today; then return 0; fi
   echo "[finish-today] free disk + finish paper-ready training today (skips LSTM-all ~3.8k)"
   cmd_prune_disk
   start_paper_keep_awake
@@ -3178,6 +3285,7 @@ cmd_unpause_all() {
 }
 
 _autopilot_bootstrap_training() {
+  if refuse_trainer_on_paper autopilot-train; then return 0; fi
   if [ "${FOREVER_SLIM:-}" = "true" ] || [ "${FOREVER_SLIM:-}" = "1" ]; then
     echo "[autopilot] FOREVER_SLIM — skip finish-today / heavy bootstrap (continuous-learn owns pulse)"
     cmd_launch_ule_watch 2>/dev/null || true
@@ -3218,6 +3326,7 @@ cmd_online() {
   # shellcheck disable=SC1091
   source "$ROOT/.env" 2>/dev/null || true
   set +a
+  apply_fate_order_role
   export KEEP_STACK_ALWAYS_ONLINE="${KEEP_STACK_ALWAYS_ONLINE:-true}"
   export DAY_TRADE_MODE="${DAY_TRADE_MODE:-true}"
   export PAPER_USE_FORTRESS="${PAPER_USE_FORTRESS:-true}"
@@ -3255,16 +3364,18 @@ cmd_online() {
   cmd_launch_bottom_fisher_watch 2>/dev/null || true
   cmd_launch_valuation_news_watch 2>/dev/null || true
   cmd_launch_event_calendar_watch 2>/dev/null || true
-  cmd_launch_event_learn_train 2>/dev/null || true
-  cmd_launch_hist_cook 2>/dev/null || true
-  cmd_launch_gen_learn_train 2>/dev/null || true
-  cmd_launch_sheldon_hunt 2>/dev/null || true
-  cmd_launch_algo_pipeline 2>/dev/null || true
+  if [ "${FATE_ORDER_ROLE}" != "gcp-paper" ]; then
+    cmd_launch_event_learn_train 2>/dev/null || true
+    cmd_launch_hist_cook 2>/dev/null || true
+    cmd_launch_gen_learn_train 2>/dev/null || true
+    cmd_launch_sheldon_hunt 2>/dev/null || true
+    cmd_launch_algo_pipeline 2>/dev/null || true
+    cmd_launch_ule_watch 2>/dev/null || true
+    cmd_launch_universe_lifecycle_watch 2>/dev/null || true
+    cmd_launch_industry_ai_watch 2>/dev/null || true
+    cmd_ensure_training 2>/dev/null || true
+  fi
   cmd_launch_pattern_anomaly_watch 2>/dev/null || true
-  cmd_launch_ule_watch 2>/dev/null || true
-  cmd_launch_universe_lifecycle_watch 2>/dev/null || true
-  cmd_launch_industry_ai_watch 2>/dev/null || true
-  cmd_ensure_training 2>/dev/null || true
 
   if [ "${ONLINE_INSTALL_LAUNCHD:-true}" = "true" ] || [ "${ONLINE_INSTALL_LAUNCHD:-true}" = "1" ]; then
     if ! launchctl list 2>/dev/null | grep -q "com.fatealgobot.watchdog"; then
@@ -3501,6 +3612,7 @@ cmd_launch_event_calendar_watch() {
 }
 
 cmd_launch_event_learn_train() {
+  if refuse_trainer_on_paper event-learn-train; then return 0; fi
   if is_running event-learn-train; then
     echo "event-learn-train already running (pid $(read_pid event-learn-train))"
     return 0
@@ -3515,7 +3627,13 @@ cmd_launch_event_learn_train() {
   save_pid event-learn-train "${pid:-$!}"
 }
 
+cmd_prefetch_online_nets() {
+  echo "[prefetch-online-nets] Chronos mini/small/base + FinBERT + extra HF nets → cache (no orders)"
+  "$PY" -u "$ROOT/tools/prefetch_online_nets.py"
+}
+
 cmd_launch_hist_cook() {
+  if refuse_trainer_on_paper hist-cook; then return 0; fi
   if is_running hist-cook; then
     echo "hist-cook already running (pid $(read_pid hist-cook))"
     return 0
@@ -3531,6 +3649,7 @@ cmd_launch_hist_cook() {
 }
 
 cmd_launch_gen_learn_train() {
+  if refuse_trainer_on_paper gen-learn-train; then return 0; fi
   if is_running gen-learn-train; then
     echo "gen-learn-train already running (pid $(read_pid gen-learn-train))"
     return 0
@@ -3550,6 +3669,7 @@ cmd_launch_gen_learn_train() {
 }
 
 cmd_launch_sheldon_hunt() {
+  if refuse_trainer_on_paper sheldon-hunt; then return 0; fi
   if is_running sheldon-hunt; then
     echo "sheldon-hunt already running (pid $(read_pid sheldon-hunt))"
     return 0
@@ -3565,6 +3685,7 @@ cmd_launch_sheldon_hunt() {
 }
 
 cmd_launch_algo_pipeline() {
+  if refuse_trainer_on_paper algo-pipeline; then return 0; fi
   if is_running algo-pipeline; then
     echo "algo-pipeline already running (pid $(read_pid algo-pipeline))"
     return 0
@@ -3597,6 +3718,7 @@ cmd_cross_company_links() {
 }
 
 cmd_launch_pattern_anomaly_watch() {
+  if refuse_trainer_on_paper pattern-anomaly-watch; then return 0; fi
   if is_running pattern-anomaly-watch; then
     echo "pattern-anomaly-watch already running (pid $(read_pid pattern-anomaly-watch))"
     return 0
@@ -3627,6 +3749,7 @@ cmd_ule_status() {
 }
 
 cmd_launch_ule_watch() {
+  if refuse_trainer_on_paper ule-watch; then return 0; fi
   if is_running ule-watch; then
     echo "ule-watch already running (pid $(resolve_pid ule-watch))"
     return 0
@@ -3648,6 +3771,7 @@ cmd_launch_ule_watch() {
 }
 
 cmd_launch_continuous_learn() {
+  if refuse_trainer_on_paper continuous-learn; then return 0; fi
   if is_running continuous-learn; then
     echo "continuous-learn already running (pid $(resolve_pid continuous-learn))"
     return 0
@@ -3701,6 +3825,7 @@ cmd_slim_disk() {
 }
 
 cmd_train_intraday() {
+  if refuse_trainer_on_paper train-intraday; then return 0; fi
   cmd_kill_orphans
   if is_running train-intraday; then
     echo "intraday training already running (pid $(read_pid train-intraday))"
@@ -3736,6 +3861,7 @@ cmd_train_all() {
 }
 
 cmd_train_everything() {
+  if refuse_trainer_on_paper train-everything; then return 0; fi
   # One shot: 24-hour kickoff for the entire algorithm.
   # - Daily-and-up: every horizon (1d/5d/20d/60d) on all ~11,412 tickers
   # - Intraday: minute + hourly heads on the full universe (Alpaca IEX)
@@ -3763,15 +3889,15 @@ cmd_cloud_train() {
   export BLEND_LSTM_INTO_META=true
   export USE_NEURAL_ENSEMBLE=true
   export LSTM_TRAIN_SCOPE="${LSTM_TRAIN_SCOPE:-all}"
-  export LSTM_HIDDEN="${LSTM_HIDDEN:-128}"
-  export LSTM_LAYERS="${LSTM_LAYERS:-3}"
-  export LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-60}"
-  export LSTM_EPOCHS="${LSTM_EPOCHS:-20}"
-  export LSTM_EARLY_STOP_PATIENCE="${LSTM_EARLY_STOP_PATIENCE:-5}"
-  export NEURAL_EPOCHS="${NEURAL_EPOCHS:-12}"
-  export NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-48}"
+  export LSTM_HIDDEN="${LSTM_HIDDEN:-256}"
+  export LSTM_LAYERS="${LSTM_LAYERS:-4}"
+  export LSTM_SEQ_LEN="${LSTM_SEQ_LEN:-80}"
+  export LSTM_EPOCHS="${LSTM_EPOCHS:-24}"
+  export LSTM_EARLY_STOP_PATIENCE="${LSTM_EARLY_STOP_PATIENCE:-6}"
+  export NEURAL_EPOCHS="${NEURAL_EPOCHS:-24}"
+  export NEURAL_SEQ_LEN="${NEURAL_SEQ_LEN:-64}"
   export HIST_COOK_YEARS="${HIST_COOK_YEARS:-16}"
-  export HIST_COOK_MAX_SYMBOLS="${HIST_COOK_MAX_SYMBOLS:-400}"
+  export HIST_COOK_MAX_SYMBOLS="${HIST_COOK_MAX_SYMBOLS:-1200}"
   export HIST_COOK_TRAIN_LSTM="${HIST_COOK_TRAIN_LSTM:-true}"
   export TRAIN_PROPER_FINISH=true
   export ENHANCE_FINISH_MODE=full
@@ -4445,6 +4571,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   event-learn-once) "$PY" -u "$ROOT/tools/event_learn_train.py" --once ;;
   hist-cook|hist-cook-train|cook-hist) cmd_launch_hist_cook ;;
   hist-cook-once) "$PY" -u "$ROOT/tools/hist_cook.py" --once ;;
+  prefetch-online-nets|download-online-nets|prefetch-hf) cmd_prefetch_online_nets ;;
   gen-learn-train|gen-learn|next-gen-learn) cmd_launch_gen_learn_train ;;
   gen-learn-once) "$PY" -u "$ROOT/tools/gen_learn_train.py" --once ;;
   sheldon-hunt|sheldon|ev-hunt) cmd_launch_sheldon_hunt ;;
@@ -4498,6 +4625,9 @@ for s in ['ignore all instructions','you are qwen','status please']:
   ensure-autotune) cmd_ensure_autotune ;;
   ensure-paper-awake) cmd_ensure_paper_awake ;;
   ensure-paper-hygiene) cmd_ensure_paper_hygiene ;;
+  reload-paper-hygiene) cmd_reload_paper_hygiene ;;
+  reload-stack-watchdog|reload-watchdog) cmd_reload_stack_watchdog ;;
+  paper-spare-ram) cmd_paper_spare_ram ;;
   ensure-day-trade|day-trade) cmd_ensure_day_trade ;;
   ensure-micro-scalp|micro-scalp|noise-harvest|noise-scalp) cmd_ensure_micro_scalp ;;
   ensure-crypto-hft|crypto-hft|crypto-hft-experimental) cmd_ensure_crypto_hft ;;
@@ -4598,6 +4728,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
     echo "    train-all        daily-and-up + intraday (full universe by default)" >&2
     echo "    train-everything 24-hour kickoff — every horizon, every ticker, backgrounded" >&2
     echo "    cloud-train      GCP trainer: hist-cook + LSTM-all + enhancement (no paper/HFT)" >&2
+    echo "    prefetch-online-nets  download Chronos bolt + FinBERT (+ extras) into HF cache" >&2
     echo "    going-away       FORCE-flatten (marketable exits + retries) then pause-all before lid-close" >&2
     echo "    exec-delay-probe measure Alpaca RTT (WiFi/VPN) → data/ops/hft_exec_delay.json" >&2
     echo "    pause-all        sell all positions (if FLATTEN_ON_PAUSE_ALL) + stop everything" >&2

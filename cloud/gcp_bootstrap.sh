@@ -169,9 +169,22 @@ _sync_env() {
 
 _sync_models() {
   echo "[GCP] rsync models → VM (no --delete)…"
-  rsync -az --partial "$(_rsync_prog)" \
+  # Trainers rewrite .pkl while we copy. rc 23/24 is a partial success, not a
+  # 54-hour retry loop. Network/auth failures still return so the caller can retry.
+  set +e
+  rsync -az --partial --update "$(_rsync_prog)" \
     -e "$(_rsync_e)" \
     "$ROOT/models/" "${INSTANCE}:~/FATE_AlgoBot/models/"
+  local rc=$?
+  set -e
+  if [ "$rc" -eq 23 ] || [ "$rc" -eq 24 ]; then
+    echo "[GCP] models rsync vanished-file warning (rc=$rc) — copy is enough, continuing"
+    return 0
+  fi
+  if [ "$rc" -ne 0 ]; then
+    echo "[GCP] models rsync failed rc=$rc" >&2
+    return "$rc"
+  fi
 }
 
 cmd_setup() {
@@ -293,12 +306,36 @@ cmd_down() {
   echo "[GCP] deleted $INSTANCE"
 }
 
+_ensure_instance_running() {
+  local status
+  status="$(gcloud compute instances describe "$INSTANCE" --zone="$ZONE" --format='value(status)' 2>/dev/null || true)"
+  if [ -z "$status" ]; then
+    echo "[GCP] $INSTANCE not found in $ZONE." >&2
+    return 1
+  fi
+  if [ "$status" = "RUNNING" ]; then
+    return 0
+  fi
+  echo "[GCP] $INSTANCE is $status — starting…"
+  gcloud compute instances start "$INSTANCE" --zone="$ZONE"
+  local i
+  for i in $(seq 1 18); do
+    if gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='true' >/dev/null 2>&1; then
+      echo "[GCP] $INSTANCE SSH ready"
+      return 0
+    fi
+    sleep 10
+  done
+  echo "[GCP] $INSTANCE started but SSH not ready yet" >&2
+  return 1
+}
+
 cmd_push_paper() {
   INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_code
   echo "[GCP] rebuild HFT + restart fortress/HFT on $INSTANCE (no sync-env, no hygiene hang)…"
-  # Do not put 'obi-tape' in this --command string (pkill -f would match ssh).
-  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export FATE_ORDER_ROLE=gcp-paper KEEP_STACK_ALWAYS_ONLINE=true PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true NETWORK_FIRST=true && (cd hft && npm run build) && ./run_all.sh reload-intraday; ./run_all.sh stop-hft-obi || true; ./run_all.sh ensure-subsecond; ./run_all.sh ensure-earnings || true; ./run_all.sh watchdog || true; bash cloud/install_paper_systemd.sh || true"'
+  # Do not put 'obi-tape' or paper_portfolio_hygiene.py in this --command string.
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export FATE_ORDER_ROLE=gcp-paper KEEP_STACK_ALWAYS_ONLINE=true PAPER_USE_FORTRESS=true NETWORK_FIRST=true && (cd hft && npm run build) && ./run_all.sh reload-intraday; ./run_all.sh reload-paper-hygiene; ./run_all.sh reload-stack-watchdog; ./run_all.sh paper-spare-ram; ./run_all.sh stop-hft-obi || true; ./run_all.sh ensure-subsecond; ./run_all.sh ensure-earnings || true; ./run_all.sh watchdog || true; bash cloud/install_paper_systemd.sh || true"'
 }
 
 cmd_push_train() {
@@ -307,10 +344,11 @@ cmd_push_train() {
     echo "[GCP] $INSTANCE not found. Create it with: $0 up" >&2
     exit 1
   fi
+  _ensure_instance_running || exit 1
   _sync_code
-  _sync_env || true
-  echo "[GCP] resume cloud-train on $INSTANCE (no paper/HFT)…"
-  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='cd ~/FATE_AlgoBot && ./run_all.sh cloud-train'
+  # Keep the trainer's own .env. Mac sync-env has overwritten paper/order flags before.
+  echo "[GCP] resume cloud-train on $INSTANCE (no paper/HFT, no sync-env)…"
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export SKIP_PAPER_AUTO_TRAIN=true FATE_ORDER_ROLE=observe NETWORK_FIRST=true && ./run_all.sh cloud-train"'
 }
 
 case "${1:-}" in

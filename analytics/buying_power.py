@@ -15,7 +15,7 @@ import json
 import math
 import os
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +52,16 @@ def _b(name: str, default: bool = True) -> bool:
     if v is None:
         return default
     return v.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _session_is_weekend() -> bool:
+    """Sat/Sun ET — Alpaca last_equity is still Friday close."""
+    try:
+        from analytics.day_trade_risk import session_et_date
+
+        return date.fromisoformat(str(session_et_date())[:10]).weekday() >= 5
+    except Exception:
+        return False
 
 
 def overnight_leverage() -> float:
@@ -305,6 +315,27 @@ def plan_from_account(
     leftover_day = max(0.0, dtbp - overnight_budget)
     if fig["daily_pnl"] > 0:
         notes.append(f"account_green_today ${fig['daily_pnl']:.0f}")
+    last_eq = fig["last_equity"] or equity
+    pnl_pct = (equity - last_eq) / max(last_eq, 1e-9)
+    profit_lock = _f("DAY_TRADE_DAILY_PROFIT_PCT", 0.015)
+    red_eps = _f("DAILY_RED_EPS_PCT", 0.0003)
+    no_new = False
+    if _session_is_weekend():
+        notes.append("weekend_skip_inherited_last_equity_pnl")
+    else:
+        if _b("DAILY_RED_NO_NEW_ENTRIES", True) and pnl_pct <= -red_eps:
+            no_new = True
+            notes.append(f"daily_red_no_new_entries {100 * pnl_pct:.2f}%")
+        if profit_lock > 0 and pnl_pct >= profit_lock:
+            no_new = True
+            notes.append(f"daily_profit_lock {100 * pnl_pct:.2f}%")
+    if no_new:
+        hft_clip = 0.0
+        hft_day_budget = 0.0
+        day_trade_clip = 0.0
+        day_trade_budget = 0.0
+        micro_scalp_clip = 0.0
+        micro_scalp_budget = 0.0
     plan = BuyingPowerPlan(
         ts_utc=datetime.now(timezone.utc).isoformat(),
         equity=equity,

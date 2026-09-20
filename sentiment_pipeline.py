@@ -213,31 +213,58 @@ def finbert_score(texts: list[str]) -> float:
         return sum(analyze_sentiment(t) for t in texts) / len(texts)
 
     try:
-        from transformers import AutoModelForSequenceClassification, AutoTokenizer
-        import torch
-
-        name = os.getenv("FINBERT_MODEL", "ProsusAI/finbert")
-        tok = AutoTokenizer.from_pretrained(name)
-        mdl = AutoModelForSequenceClassification.from_pretrained(name)
-        mdl.eval()
-        scores = []
-        chunk = texts[:20]
-        for t in chunk:
-            if not t.strip():
-                continue
-            inp = tok(t[:512], return_tensors="pt", truncation=True, padding=True)
-            with torch.no_grad():
-                out = mdl(**inp).logits.softmax(-1)[0]
-            # FinBERT: 0 neg 1 neu 2 pos — map to [-1,1]
-            p = out.tolist()
-            s = p[2] - p[0]
-            scores.append(s)
-        return sum(scores) / max(len(scores), 1)
+        scores = [_finbert_model_score(os.getenv("FINBERT_MODEL", "ProsusAI/finbert"), texts)]
+        tone = os.getenv("FINBERT_TONE_MODEL", "yiyanghkust/finbert-tone").strip()
+        primary = os.getenv("FINBERT_MODEL", "ProsusAI/finbert").strip()
+        if tone and tone != primary:
+            try:
+                scores.append(_finbert_model_score(tone, texts))
+            except Exception as e:
+                log.debug("[SENT] FinBERT-tone skip: %s", e)
+        scores = [s for s in scores if s is not None]
+        if not scores:
+            raise RuntimeError("no finbert scores")
+        return sum(scores) / len(scores)
     except Exception as e:
         log.warning("[SENT] FinBERT unavailable (%s) — keyword fallback", e)
         from news_reader import analyze_sentiment
 
-        return sum(analyze_sentiment(t) for t in texts) / len(texts)
+        return sum(analyze_sentiment(t) for t in texts) / max(len(texts), 1)
+
+
+_FINBERT_MODELS: dict[str, tuple] = {}
+
+
+def _finbert_model_score(name: str, texts: list[str]) -> float:
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+    import torch
+
+    bundle = _FINBERT_MODELS.get(name)
+    if bundle is None:
+        tok = AutoTokenizer.from_pretrained(name)
+        mdl = AutoModelForSequenceClassification.from_pretrained(name)
+        mdl.eval()
+        _FINBERT_MODELS[name] = (tok, mdl)
+    else:
+        tok, mdl = bundle
+    scores = []
+    chunk = texts[:20]
+    for t in chunk:
+        if not t.strip():
+            continue
+        inp = tok(t[:512], return_tensors="pt", truncation=True, padding=True)
+        with torch.no_grad():
+            out = mdl(**inp).logits.softmax(-1)[0]
+        p = out.tolist()
+        # FinBERT-family: last=pos, first=neg when 3-way; 2-way uses pos-neg.
+        if len(p) >= 3:
+            s = p[2] - p[0]
+        elif len(p) == 2:
+            s = p[1] - p[0]
+        else:
+            s = p[0]
+        scores.append(s)
+    return sum(scores) / max(len(scores), 1)
 
 
 def clear_sentiment_cache(symbol: str | None = None) -> None:

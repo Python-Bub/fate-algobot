@@ -7,10 +7,10 @@ checkpoint to `models/lstm/{TICKER}_lstm.pt`. Inference happens via
 `lstm_proba_up(ticker, df)` and the result is blended into the meta-stack input
 when `BLEND_LSTM_INTO_META=true`.
 
-Architecture: LSTM(`LSTM_HIDDEN`×`LSTM_LAYERS`, default 128×3) → Dropout → Linear
+Architecture: LSTM(`LSTM_HIDDEN`×`LSTM_LAYERS`, default 256×4) → Dropout → Linear
 → sigmoid. Trained chronologically (last 20% bars held out) with early stopping
 on holdout accuracy; the **best** weights are saved (not the last epoch).
-Checkpoints store `hidden`/`num_layers` so older 64×2 heads still load.
+Checkpoints store `hidden`/`num_layers` so older 64×2 and 128×3 heads still load.
 Falls back to no-op when PyTorch is unavailable or the bundle is missing.
 """
 
@@ -109,8 +109,8 @@ def _b(name: str, default: bool) -> bool:
 
 
 def _lstm_arch() -> tuple[int, int, float]:
-    hidden = int(os.getenv("LSTM_HIDDEN", "128") or 128)
-    layers = int(os.getenv("LSTM_LAYERS", "3") or 3)
+    hidden = int(os.getenv("LSTM_HIDDEN", "256") or 256)
+    layers = int(os.getenv("LSTM_LAYERS", "4") or 4)
     dropout = float(os.getenv("LSTM_DROPOUT", "0.2") or 0.2)
     hidden = max(16, hidden)
     layers = max(1, min(8, layers))
@@ -129,7 +129,7 @@ def _torch_device():
 
 
 class _LSTMNet(nn.Module if _TORCH_OK else object):  # type: ignore[misc]
-    def __init__(self, n_features: int, hidden: int = 128, num_layers: int = 3, dropout: float = 0.2):
+    def __init__(self, n_features: int, hidden: int = 256, num_layers: int = 4, dropout: float = 0.2):
         super().__init__()
         self.hidden = int(hidden)
         self.num_layers = int(num_layers)
@@ -188,8 +188,8 @@ def train_lstm_head(
     if df.empty or target_col not in df.columns:
         return {"skipped": "no_target"}
 
-    seq_len = int(seq_len or os.getenv("LSTM_SEQ_LEN", "60"))
-    epochs = int(epochs or os.getenv("LSTM_EPOCHS", "20"))
+    seq_len = int(seq_len or os.getenv("LSTM_SEQ_LEN", "80"))
+    epochs = int(epochs or os.getenv("LSTM_EPOCHS", "24"))
     lr = float(lr or os.getenv("LSTM_LR", "1e-3"))
     hidden, num_layers, dropout = _lstm_arch()
 
@@ -374,3 +374,16 @@ def lstm_proba_up(ticker: str, df: pd.DataFrame) -> float | None:
         logit = net(torch.from_numpy(seq))
         p = float(torch.sigmoid(logit).item())
     return p
+
+
+def lstm_head_needs_upgrade(ticker: str) -> bool:
+    """True when on-disk arch is smaller than the live LSTM_HIDDEN×LSTM_LAYERS cook."""
+    if os.getenv("LSTM_UPGRADE_SMALLER", "true").lower() not in ("1", "true", "yes"):
+        return False
+    bundle = _load_bundle(ticker)
+    if not isinstance(bundle, dict):
+        return False
+    want_h, want_l, _ = _lstm_arch()
+    have_h = int(bundle.get("hidden") or 0)
+    have_l = int(bundle.get("num_layers") or 0)
+    return have_h < want_h or have_l < want_l

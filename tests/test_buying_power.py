@@ -206,7 +206,7 @@ def test_last_wins_200_tpm():
     from pathlib import Path
 
     last = (Path(__file__).resolve().parents[1] / "data" / "deploy_scale.env").read_text()
-    last = last.rsplit("200/min leftover BP", 1)[-1]
+    last = last.rsplit("leftover BP quality", 1)[-1]
     assert "HFT_MAX_ORDERS_PER_MIN=200" in last
     assert "HFT_MAX_ORDER_NOTIONAL=800" in last
 

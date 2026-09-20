@@ -349,7 +349,7 @@ def liquidate_outside_obi_scope() -> int:
 
 def paper_portfolio_hygiene() -> dict[str, int]:
     """Shorts + losers + off-scope / news-blocked names."""
-    aggressive = os.getenv("PAPER_HYGIENE_AGGRESSIVE", "true").lower() in ("1", "true", "yes")
+    aggressive = os.getenv("PAPER_HYGIENE_AGGRESSIVE", "false").lower() in ("1", "true", "yes")
     return {
         "shorts": close_all_short_positions(),
         "losers": liquidate_losing_positions() if aggressive else 0,
@@ -1167,6 +1167,23 @@ def can_add_position(
         return False
     if existing_mv <= 0:
         return rm.can_open(symbol, notional, entry, stop)
+    gain = None
+    try:
+        from alpaca_broker import get_position
+
+        pos = get_position(symbol)
+        if pos:
+            gain = _position_gain_frac(pos)
+    except Exception:
+        gain = None
+    try:
+        from analytics.buying_power import hold_is_green
+
+        if not hold_is_green(gain):
+            return False
+    except Exception:
+        if gain is not None and gain < -1e-9:
+            return False
     if not _truthy("FORTRESS_ALLOW_ADD_ON", "true"):
         # Idle cash may add to winners / crypto. Never average into a red name.
         port = {
@@ -1178,17 +1195,6 @@ def can_add_position(
         except Exception:
             port["gross_mv"] = float(existing_mv)
         if not idle_cash_fill_active(port):
-            return False
-        gain = None
-        try:
-            from alpaca_broker import get_position
-
-            pos = get_position(symbol)
-            if pos:
-                gain = _position_gain_frac(pos)
-        except Exception:
-            gain = None
-        if gain is not None and gain < -1e-9:
             return False
     try:
         from intel.downward_pressure import blocks_new_buy

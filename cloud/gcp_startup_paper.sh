@@ -29,7 +29,6 @@ sudo -u "$PAPER_USER" bash -lc "
 set -e
 cd '$ROOT'
 export PAPER_USE_FORTRESS=true
-export PAPER_USE_LONGTERM=true
 export SKIP_PAPER_AUTO_TRAIN=true
 export NETWORK_FIRST=true
 export FATE_ORDER_ROLE=gcp-paper
@@ -37,12 +36,11 @@ export KEEP_STACK_ALWAYS_ONLINE=true
 export DAY_TRADE_MODE=true
 export MICRO_SCALP_ENABLED=true
 ./run_all.sh paper >> logs/gcp_paper.log 2>&1
+./run_all.sh paper-spare-ram >> logs/gcp_paper.log 2>&1 || true
 ./run_all.sh ensure-subsecond >> logs/gcp_paper.log 2>&1 || true
 ./run_all.sh ensure-earnings >> logs/gcp_paper.log 2>&1 || true
-./run_all.sh ensure-weekly >> logs/gcp_paper.log 2>&1 || true
-./run_all.sh ensure-longterm >> logs/gcp_paper.log 2>&1 || true
 ./run_all.sh valuation-news-watch >> logs/gcp_paper.log 2>&1 || true
 ./run_all.sh event-calendar-watch >> logs/gcp_paper.log 2>&1 || true
-./run_all.sh watchdog >> logs/gcp_paper.log 2>&1 || true
+./run_all.sh reload-stack-watchdog >> logs/gcp_paper.log 2>&1 || true
 "
 echo "[startup] paper + HFT + watchdog launched"

@@ -201,6 +201,23 @@ class MicroScalpEngine:
 
     def _gate(self) -> tuple[bool, str]:
         eq, dt, _bp = _account_snapshot()
+        try:
+            from analytics.day_trade_risk import check_daily_limits, trading_halted
+
+            last_eq = eq
+            try:
+                from alpaca_broker import get_account
+
+                acct = get_account() or {}
+                last_eq = float(acct.get("last_equity") or eq)
+            except Exception:
+                last_eq = eq
+            check_daily_limits(eq, last_equity=last_eq)
+            halted, why = trading_halted()
+            if halted:
+                return False, why or "daily-halt"
+        except Exception:
+            pass
         return can_attempt(
             open_scalps=len(self.open) + len(self.pending_entry),
             open_notional=self._open_notional(),

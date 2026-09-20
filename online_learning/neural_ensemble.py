@@ -67,11 +67,11 @@ _TORCH_MODEL_CACHE: dict[str, tuple] = {}
 # Fill / fortress state dicts use different keys than FEATURE_COLS. Map them
 # so replay is not a wall of zeros (that killed online neural learning).
 _FEAT_ALIASES: dict[str, tuple[str, ...]] = {
-    "p_up_base": ("p_up_base", "p_up", "p_long_model", "p_long"),
+    "p_up_base": ("p_up_base", "p_up", "p_long_model", "p_long", "foundation_p", "lstm_p", "chronos_p", "neural_p", "ule_p"),
     "p_short_model": ("p_short_model", "p_short"),
-    "p_long_model": ("p_long_model", "p_long", "p_up", "p_up_base"),
+    "p_long_model": ("p_long_model", "p_long", "p_up", "p_up_base", "foundation_p", "lstm_p"),
     "execution_confidence": ("execution_confidence", "exec_conf", "exec_c"),
-    "sentiment": ("sentiment", "sentiment_impulse", "sentiment_intensity"),
+    "sentiment": ("sentiment", "sentiment_impulse", "sentiment_intensity", "finbert", "finbert_tone"),
     "news_factor": ("news_factor", "nf_f"),
     "transcript_factor": ("transcript_factor",),
     "volume_ratio": ("volume_ratio", "vol_regime_ratio"),
@@ -264,19 +264,19 @@ class _TransformerHead(nn.Module):
 def _train_arch() -> dict:
     """Capacity for *new* checkpoints. Missing keys on disk stay at legacy sizes."""
     return {
-        "lstm_hidden": _i("NEURAL_LSTM_HIDDEN", 128),
-        "lstm_layers": _i("NEURAL_LSTM_LAYERS", 3),
-        "cnn_channels": _i("NEURAL_CNN_CHANNELS", 96),
-        "ga_hidden": _i("NEURAL_GA_HIDDEN", 128),
-        "ga_layers": _i("NEURAL_GA_LAYERS", 2),
-        "bilstm_hidden": _i("NEURAL_BILSTM_HIDDEN", 64),
-        "bilstm_channels": _i("NEURAL_BILSTM_CHANNELS", 64),
-        "bilstm_layers": _i("NEURAL_BILSTM_LAYERS", 2),
-        "tf_d_model": _i("NEURAL_TF_D_MODEL", 64),
-        "tf_nhead": _i("NEURAL_TF_NHEAD", 4),
-        "tf_nlayers": _i("NEURAL_TF_NLAYERS", 3),
-        "tf_ff": _i("NEURAL_TF_FF", 128),
-        "dqn_width": _i("NEURAL_DQN_WIDTH", 128),
+        "lstm_hidden": _i("NEURAL_LSTM_HIDDEN", 256),
+        "lstm_layers": _i("NEURAL_LSTM_LAYERS", 4),
+        "cnn_channels": _i("NEURAL_CNN_CHANNELS", 128),
+        "ga_hidden": _i("NEURAL_GA_HIDDEN", 256),
+        "ga_layers": _i("NEURAL_GA_LAYERS", 3),
+        "bilstm_hidden": _i("NEURAL_BILSTM_HIDDEN", 128),
+        "bilstm_channels": _i("NEURAL_BILSTM_CHANNELS", 96),
+        "bilstm_layers": _i("NEURAL_BILSTM_LAYERS", 3),
+        "tf_d_model": _i("NEURAL_TF_D_MODEL", 128),
+        "tf_nhead": _i("NEURAL_TF_NHEAD", 8),
+        "tf_nlayers": _i("NEURAL_TF_NLAYERS", 4),
+        "tf_ff": _i("NEURAL_TF_FF", 256),
+        "dqn_width": _i("NEURAL_DQN_WIDTH", 256),
     }
 
 
@@ -514,13 +514,13 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
     if not use_neural_ensemble():
         return NeuralTrainReport(ticker=ticker, applied=False, reason="disabled_or_torch_missing", n_samples=0)
 
-    seq_len = _i("NEURAL_SEQ_LEN", 48)
+    seq_len = _i("NEURAL_SEQ_LEN", 64)
     min_n = _i("NEURAL_MIN_SAMPLES", 80)
-    rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_MAX_SAMPLES", 6000))
+    rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_MAX_SAMPLES", 12000))
     X, y, dqn_s, dqn_a = _build_windows(rows, seq_len=seq_len)
     save_as = ticker
     if len(X) < min_n:
-        rows = _load_replay(ticker=None, max_samples=_i("NEURAL_MAX_SAMPLES", 6000))
+        rows = _load_replay(ticker=None, max_samples=_i("NEURAL_MAX_SAMPLES", 12000))
         X, y, dqn_s, dqn_a = _build_windows(rows, seq_len=seq_len)
         save_as = GLOBAL_TICKER
         if len(X) < min_n:
@@ -534,7 +534,7 @@ def train_neural_ensemble_for_ticker(ticker: str) -> NeuralTrainReport:
     paths = {k: _checkpoint_path(save_as, k) for k in ALL_MODEL_KEYS}
     dev = torch.device("cuda" if torch.cuda.is_available() and _b("NEURAL_CUDA", True) else "cpu")
     n_feat = X.shape[-1]
-    epochs = _i("NEURAL_EPOCHS", 12)
+    epochs = _i("NEURAL_EPOCHS", 24)
     bs = _i("NEURAL_BATCH", 128)
     lr = _f("NEURAL_LR", 1e-3)
     arch = _train_arch()
@@ -656,7 +656,7 @@ def _prepare_inference_tensors(
     checkpoints still produce a p_up instead of silently returning None.
     """
     rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_PRED_MAX_SAMPLES", 2000))
-    seq_len = _i("NEURAL_SEQ_LEN", 48)
+    seq_len = _i("NEURAL_SEQ_LEN", 64)
     n_feat = len(FEATURE_COLS)
     cur = _state_vec(current_state)
     if not rows:
@@ -787,7 +787,7 @@ def model_win_rates_for_ticker(
         return {}
 
     rows = _load_replay(ticker=ticker, max_samples=_i("NEURAL_MAX_SAMPLES", 6000))
-    seq_len = _i("NEURAL_SEQ_LEN", 48)
+    seq_len = _i("NEURAL_SEQ_LEN", 64)
     X, y, dqn_s, _ = _build_windows(rows, seq_len=seq_len)
     min_eval = _i("NEURAL_WINRATE_MIN_EVAL", 12)
     if len(X) < min_eval + 5:
