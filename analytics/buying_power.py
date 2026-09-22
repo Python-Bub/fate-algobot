@@ -23,12 +23,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT_PATH = ROOT / "data" / "ops" / "buying_power.json"
 
 try:
-    from dotenv import load_dotenv
+    from data_platform.runtime_env import load_runtime_env
 
-    load_dotenv(ROOT / ".env", override=False)
-    _scale = ROOT / "data" / "deploy_scale.env"
-    if _scale.is_file():
-        load_dotenv(_scale, override=True)
+    load_runtime_env()
 except Exception:
     pass
 

@@ -304,8 +304,25 @@ def refresh_market_cap_tiers(
         "caps_known_in_pool": caps_in_pool,
         "symbols": top50,
     }
-    _write_json(TOP100_PATH, doc100)
-    _write_json(TOP50_PATH, doc50)
+    # Never wipe a nonempty on-disk cache with an empty refresh (offline / sparse caps).
+    if top100:
+        _write_json(TOP100_PATH, doc100)
+    elif prev100:
+        top100 = [str(s).upper() for s in prev100 if s]
+        doc100["symbols"] = top100
+        doc100["count"] = len(top100)
+        doc100["preserved_nonempty_cache"] = True
+    else:
+        _write_json(TOP100_PATH, doc100)
+    if top50:
+        _write_json(TOP50_PATH, doc50)
+    elif prev50:
+        top50 = [str(s).upper() for s in prev50 if s]
+        doc50["symbols"] = top50
+        doc50["count"] = len(top50)
+        doc50["preserved_nonempty_cache"] = True
+    else:
+        _write_json(TOP50_PATH, doc50)
 
     return {
         "top100": top100,

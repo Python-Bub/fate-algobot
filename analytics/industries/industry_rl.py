@@ -103,7 +103,9 @@ def update_from_trade(
         try:
             from analytics.asymmetric_loss import asymmetric_reward
 
-            rw = asymmetric_reward(side, float(realized_return), bars_held=bars_held)
+            rw = asymmetric_reward(
+                side, float(realized_return), bars_held=bars_held, position_pnl=True
+            )
             reward = float(rw.reward)
         except Exception:
             reward = float(np.tanh(float(realized_return) * 8.0))

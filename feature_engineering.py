@@ -120,8 +120,10 @@ def _price_source() -> str:
 
 def _skip_yahoo_fallback() -> bool:
     try:
-        from data_platform.price_fetch_policy import skip_yahoo_fallback
+        from data_platform.price_fetch_policy import paper_sim_skip_yahoo_fallback, skip_yahoo_fallback
 
+        if os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes"):
+            return paper_sim_skip_yahoo_fallback()
         return skip_yahoo_fallback()
     except ImportError:
         return False
