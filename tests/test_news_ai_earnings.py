@@ -1,6 +1,7 @@
 """Tests for earnings calendar + news AI agent good/bad separation."""
 from __future__ import annotations
 
+import os
 import unittest
 from datetime import date, timedelta
 from unittest.mock import patch
