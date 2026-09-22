@@ -86,7 +86,7 @@ def save_intraday_placeholder(
 ) -> Path | None:
     """Write a neutral bundle, or register in checkpoint only (network-first / slim disk)."""
     sym = ticker.upper()
-    trained_at = dt.datetime.utcnow().isoformat()
+    trained_at = dt.datetime.now(dt.timezone.utc).isoformat()
     st = start or ""
     stats: dict[str, object] = {
         "ticker": sym,
@@ -202,7 +202,7 @@ def train_intraday(ticker: str, start: str | None = None) -> dict:
     y_min = feats["target_h5"].astype(int)
     y_hr = feats["target_h60"].astype(int)
 
-    trained_at = dt.datetime.utcnow().isoformat()
+    trained_at = dt.datetime.now(dt.timezone.utc).isoformat()
     stats: dict[str, object] = {
         "ticker": sym,
         "rows": int(len(X)),

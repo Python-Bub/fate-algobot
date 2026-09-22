@@ -7,7 +7,7 @@ from __future__ import annotations
 import csv
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 JOURNAL_DECISIONS = Path(os.getenv("TRADE_DECISIONS_JSONL", "data/journal/decisions.jsonl"))
@@ -21,7 +21,7 @@ def log_decision(payload: dict) -> None:
         import json
 
         JOURNAL_DECISIONS.parent.mkdir(parents=True, exist_ok=True)
-        row = {"ts": datetime.utcnow().isoformat(), **payload}
+        row = {"ts": datetime.now(timezone.utc).isoformat(), **payload}
         with open(JOURNAL_DECISIONS, "a", encoding="utf-8") as f:
             f.write(json.dumps(row, default=str) + "\n")
     except Exception:
@@ -80,7 +80,7 @@ def _sqlite_log(
     con.execute(
         "INSERT INTO trades VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
-            datetime.utcnow().isoformat(),
+            datetime.now(timezone.utc).isoformat(),
             symbol,
             side,
             qty,
@@ -118,7 +118,7 @@ def log_trade(
         with open(JOURNAL_CSV, "a", newline="", encoding="utf-8") as f:
             csv.writer(f).writerow(
                 [
-                    datetime.utcnow().isoformat(),
+                    datetime.now(timezone.utc).isoformat(),
                     symbol,
                     side,
                     qty,

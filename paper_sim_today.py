@@ -2397,7 +2397,9 @@ def _run_paper_simulation_today_body(max_symbols: int | None, *, lock_fd) -> dic
                 if r.get("action") not in ("BUY", "SHORT"):
                     continue
                 side = "LONG" if r["action"] == "BUY" else "SHORT"
-                rw = asymmetric_reward(side, float(r.get("fwd_1d_return", 0.0)), bars_held=1)
+                rw = asymmetric_reward(
+                    side, float(r.get("fwd_1d_return", 0.0)), bars_held=1, position_pnl=False
+                )
                 state = {
                     "p_short": float(r.get("p_down", 1.0 - float(r.get("p_up", 0.5)))),
                     "p_long": float(r.get("p_up", 0.5)),
@@ -2431,7 +2433,7 @@ def _run_paper_simulation_today_body(max_symbols: int | None, *, lock_fd) -> dic
                     continue
                 side = "LONG" if r["action"] == "BUY" else "SHORT"
                 rr = float(r.get("fwd_1d_return", 0.0))
-                rw = asymmetric_reward(side, rr, bars_held=1)
+                rw = asymmetric_reward(side, rr, bars_held=1, position_pnl=False)
                 record_neural_experience(
                     ticker=str(r["ticker"]),
                     state=state,

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 
@@ -23,15 +25,22 @@ class TestTop50UniverseTier(unittest.TestCase):
 
     @patch("universe_lifecycle.rankings._refresh_caps_progressive")
     def test_refresh_writes_correct_top50_size(self, mock_refresh):
-        from universe_lifecycle.rankings import refresh_market_cap_tiers
+        from universe_lifecycle import rankings as rk
 
         mock_refresh.side_effect = lambda pool, cached: cached
-        with patch("universe_lifecycle.rankings._trainable_model_pool") as mock_pool:
-            mock_pool.return_value = [f"T{i}" for i in range(4000)]
-            out = refresh_market_cap_tiers(merge_cache=True)
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            t100, t50, caps = tmp / "t100.json", tmp / "t50.json", tmp / "caps.json"
+            with patch.object(rk, "TOP100_PATH", t100), patch.object(rk, "TOP50_PATH", t50), patch.object(
+                rk, "CAP_CACHE_PATH", caps
+            ), patch("universe_lifecycle.rankings._trainable_model_pool") as mock_pool:
+                mock_pool.return_value = [f"T{i}" for i in range(4000)]
+                out = rk.refresh_market_cap_tiers(merge_cache=True)
             self.assertEqual(out["universe_size"], 4000)
             self.assertEqual(out["top50_target"], 2000)
             self.assertGreaterEqual(len(out["top50pct"]), 2000)
+            self.assertTrue(t100.is_file())
+            self.assertTrue(t50.is_file())
 
 
 class TestAIRegistry(unittest.TestCase):

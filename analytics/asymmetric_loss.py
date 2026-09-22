@@ -42,12 +42,17 @@ def asymmetric_reward(
     side: str,
     realized_return: float,
     bars_held: int = 1,
+    *,
+    position_pnl: bool | None = None,
 ) -> AsymRewardBreakdown:
     """Compute reward signal for a single closed trade.
 
     side: "LONG" or "SHORT"
-    realized_return: signed price return realized over the trade (e.g. +0.012 = +1.2%)
+    realized_return: signed return over the trade (e.g. +0.012 = +1.2%)
     bars_held: number of bars the position was held (used for time-decay penalty)
+    position_pnl: True if realized_return is already broker P&L (positive = profit
+        on both longs and shorts). False if it is the underlying price return
+        (shorts need a sign flip). None (default) reads ASYM_POSITION_PNL.
     """
     side_u = side.upper().strip()
     if side_u not in ("LONG", "SHORT"):
@@ -71,7 +76,10 @@ def asymmetric_reward(
     # ASYM_POSITION_PNL=true (default): realized_return is broker position P&L
     # (Alpaca unrealized_plpc / closed P&L already positive when the leg made money).
     # false: realized_return is underlying price return — SHORT needs a sign flip.
-    pos_pnl = os.getenv("ASYM_POSITION_PNL", "true").lower() not in ("0", "false", "no")
+    if position_pnl is None:
+        pos_pnl = os.getenv("ASYM_POSITION_PNL", "true").lower() not in ("0", "false", "no")
+    else:
+        pos_pnl = bool(position_pnl)
     if pos_pnl:
         signed = float(realized_return)
     else:

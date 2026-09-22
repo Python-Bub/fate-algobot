@@ -78,6 +78,27 @@ _ISSUER_CANON: dict[str, str] = {
 }
 
 
+def internal_symbol(ticker: str) -> str:
+    """In-repo / Yahoo symbol (Berkshire is BRK-B, not Alpaca's BRK.B)."""
+    return price_feed_symbol(ticker)
+
+
+def alpaca_equity_symbol(ticker: str) -> str:
+    """Alpaca REST equity ticker. Class shares use a dot (BRK.B), Yahoo uses a hyphen."""
+    t = price_feed_symbol(ticker)
+    if t in ("BRK-B", "BRKB"):
+        return "BRK.B"
+    if t in ("BRK-A", "BRKA"):
+        return "BRK.A"
+    if t in ("BRK.B", "BRK.A"):
+        return t
+    if "-" in t and "." not in t:
+        head, _, tail = t.partition("-")
+        if tail in {"A", "B", "C", "D", "E", "F", "G", "H", "K", "P", "W", "Y"} and head.isalpha():
+            return f"{head}.{tail}"
+    return t
+
+
 def issuer_group(symbol: str) -> str:
     """Canonical issuer id so GOOG and GOOGL count as one name."""
     s = price_feed_symbol(symbol)

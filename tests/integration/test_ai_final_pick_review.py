@@ -25,6 +25,7 @@ class TestAiFinalPickReview(unittest.TestCase):
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
         os.environ["AI_PICK_REVIEW_WEIGHT"] = "0.5"
         os.environ["AI_PICK_REJECT_CONF"] = "0.5"
+        os.environ.setdefault("LLM_API_KEY", "test-key-not-for-live")
 
         picks = [
             {"ticker": "AAA", "p_up": 0.8, "score": 2.0, "execution_confidence": 0.7, "asym_action": "LONG"},
@@ -49,6 +50,7 @@ class TestAiFinalPickReview(unittest.TestCase):
 
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
         os.environ["AI_PICK_ALWAYS_DROP_F"] = "true"
+        os.environ.setdefault("LLM_API_KEY", "test-key-not-for-live")
         picks = [{"ticker": "ZZZ", "p_up": 0.9, "score": 3.0, "execution_confidence": 0.8, "asym_action": "LONG"}]
         out, meta = m.apply_ai_review_to_long_picks(picks, regime_name="bull", vix=18.0)
         self.assertTrue(meta.get("enabled"))
@@ -67,6 +69,7 @@ class TestAiFinalPickReview(unittest.TestCase):
 
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
         os.environ["AI_PICK_REJECT_CONF"] = "0.99"
+        os.environ.setdefault("LLM_API_KEY", "test-key-not-for-live")
         picks = [
             {"ticker": "AAA", "p_up": 0.8, "score": 2.0, "execution_confidence": 0.7, "asym_action": "LONG"},
             {"ticker": "BBB", "p_up": 0.7, "score": 1.5, "execution_confidence": 0.65, "asym_action": "LONG"},

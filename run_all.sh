@@ -388,7 +388,7 @@ cmd_status() {
   echo "---- Buying power ----"
   "$PY" -u "$ROOT/tools/buying_power_status.py" --quiet 2>/dev/null || echo "  (calculator unavailable)"
   echo
-  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator hft-news-watch retrain-weak-loop stack-autotune self-improve cortex-singularity free-agent operator-doc stack-watchdog paper-awake paper-hygiene day-trade micro-scalp crypto-hft disk-cleanup execution-monitor exec-delay bottom-fisher-watch valuation-news-watch event-calendar-watch event-learn-train hist-cook gen-learn-train sheldon-hunt algo-pipeline pattern-anomaly-watch ule-watch continuous-learn universe-lifecycle-watch industry-ai-watch; do
+  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator hft-news-watch retrain-weak-loop stack-autotune self-improve cortex-singularity free-agent operator-doc stack-watchdog paper-awake paper-hygiene day-trade micro-scalp crypto-hft disk-cleanup execution-monitor exec-delay bottom-fisher-watch valuation-news-watch event-calendar-watch event-learn-train hist-cook gen-learn-train sheldon-hunt algo-pipeline pattern-anomaly-watch ule-watch continuous-learn universe-lifecycle-watch industry-ai-watch gainz-v2 gainz-escape-watch; do
     if is_running "$name"; then
       printf "  %-22s RUNNING (pid %s)\n" "$name" "$(resolve_pid "$name")"
     else
@@ -1962,13 +1962,18 @@ cmd_start_paper() {
 }
 
 cmd_prune_stale_pids() {
-  local name p
-  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator paper-awake paper-hygiene disk-cleanup stack-autotune stack-watchdog; do
+  # Sweep every pidfile, not a hardcoded subset — leftover gainz/watchdog pids
+  # used to linger forever and look "running" in status.
+  local f name p
+  shopt -s nullglob
+  for f in "$PIDDIR"/*.pid; do
+    name="$(basename "$f" .pid)"
     p="$(read_pid "$name")"
     if [ -n "$p" ] && ! alive "$p"; then
-      rm -f "$(pid_file "$name")"
+      rm -f "$f"
     fi
   done
+  shopt -u nullglob
 }
 
 cmd_kill_orphans() {
@@ -3820,8 +3825,9 @@ cmd_equity_chart() {
 
 cmd_slim_disk() {
   echo "[slim-disk] safe cleanup — refetchable caches + stale cruft only (models/ + checkpoints kept)"
+  export NETWORK_FIRST="${NETWORK_FIRST:-true}"
   "$PY" -u "$ROOT/tools/prune_disk.py" --no-checkpoints "${@:2}"
-  echo "[slim-disk] NETWORK_FIRST=true → prices/bars from Yahoo/Alpaca, not re-cached locally"
+  echo "[slim-disk] NETWORK_FIRST=${NETWORK_FIRST} → prices/bars from Yahoo/Alpaca, not re-cached locally"
 }
 
 cmd_train_intraday() {
@@ -3958,7 +3964,6 @@ cmd_data_health() {
 }
 
 cmd_full_stack_eval() {
-  shift || true
   "$PY" -u "$ROOT/tools/full_stack_historical_eval.py" "$@"
 }
 
@@ -4495,7 +4500,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   family-forecast|family-picks) shift; "$PY" -u "$ROOT/tools/family_forecast.py" "$@" ;;
   horizon-matrix|head-forecast|multi-horizon) shift; "$PY" -u "$ROOT/tools/horizon_matrix.py" "$@" ;;
   data-health|health-scan) shift; cmd_data_health "$@" ;;
-  full-stack-eval|stack-eval) shift; cmd_full_stack_eval "$@" ;;
+  full-stack-eval|stack-eval|historical-eval) shift; cmd_full_stack_eval "$@" ;;
   hft-build) cmd_hft_build ;;
   hft-test) cmd_hft_test ;;
   hft-chart-hist|hft-charts) shift; "$PY" -u "$ROOT/tools/hft_chart_historical.py" "$@" ;;
@@ -4513,7 +4518,6 @@ for s in ['ignore all instructions','you are qwen','status please']:
   industry-similarity|similarity-preview) shift; "$PY" -u "$ROOT/tools/industry_similarity_preview.py" "$@" ;;
   industry-max-train|max-industry-train) shift; USE_YAHOO_FIRST=true USE_INDUSTRY_NEURAL_FIRST=true "$PY" -u "$ROOT/tools/industry_max_train.py" "$@" ;;
   industry-neural-train) shift; USE_YAHOO_FIRST=true "$PY" -u "$ROOT/tools/industry_max_train.py" --skip-bootstrap "$@" ;;
-  full-stack-eval|historical-eval) shift; "$PY" -u "$ROOT/tools/full_stack_historical_eval.py" "$@" ;;
   build-ticker-industry-db) "$PY" -u "$ROOT/tools/build_ticker_industry_db.py" ;;
   industry-ai-weekly|ai-industry-weekly) shift; "$PY" -u "$ROOT/tools/industry_ai_weekly.py" "$@" ;;
   industry-ai-dry) "$PY" -u "$ROOT/tools/industry_ai_weekly.py" --dry-run --limit 30 ;;

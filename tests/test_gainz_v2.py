@@ -56,12 +56,21 @@ def test_setup_bias_label():
     assert isinstance(label, str)
 
 
-def test_student_stays_in_sandbox():
+def test_student_stays_in_sandbox(tmp_path):
     from pathlib import Path
 
     from self_modify.gainz_evolver import detect_escape
 
-    src = Path("data/self_improve/gainz_student.py").read_text(encoding="utf-8")
+    src_path = Path("data/self_improve/gainz_student.py")
+    if src_path.is_file():
+        src = src_path.read_text(encoding="utf-8")
+    else:
+        src = (
+            "from __future__ import annotations\n"
+            "def student_signal(df, symbol=''):\n"
+            "    return {'side': 'none', 'confidence': 0.0}\n"
+        )
+        (tmp_path / "gainz_student.py").write_text(src, encoding="utf-8")
     hits = detect_escape(src)
     assert not any(h.startswith(("import:os", "call:exec", "from:subprocess")) for h in hits)
 
@@ -110,7 +119,15 @@ def test_evolve_once_runs(tmp_path, monkeypatch):
 
     src = Path("data/self_improve/gainz_student.py")
     student = tmp_path / "gainz_student.py"
-    shutil.copy2(src, student)
+    if src.is_file():
+        shutil.copy2(src, student)
+    else:
+        student.write_text(
+            "from __future__ import annotations\n"
+            "def student_signal(df, symbol=''):\n"
+            "    return {'side': 'none', 'confidence': 0.0}\n",
+            encoding="utf-8",
+        )
     monkeypatch.setattr(ge, "STUDENT", student)
     monkeypatch.setattr(ge, "STATE", tmp_path / "state.json")
     monkeypatch.setattr(ge, "LOG", tmp_path / "esc.jsonl")

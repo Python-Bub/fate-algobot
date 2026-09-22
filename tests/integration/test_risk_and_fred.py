@@ -22,6 +22,9 @@ class TestRiskPhase14(unittest.TestCase):
 
     def test_total_exposure_cap(self):
         os.environ["MAX_TOTAL_EXPOSURE_FRAC"] = "0.50"
+        os.environ["MAX_SINGLE_ASSET_FRAC"] = "0.50"
+        os.environ["USE_BUYING_POWER"] = "false"
+        os.environ["FORTRESS_EXPOSURE_USE_BP"] = "false"
         rm = RiskManager(equity=100_000.0)
         rm.register_open("AAA", 30_000.0, 100.0, 95.0)
         ok, why = rm.can_open_explain("BBB", 30_000.0, 100.0, 95.0)

@@ -10,4 +10,4 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 4️⃣ Start the live realtime simulator
-python live_realtime.py
+python live_realtime_multi.py

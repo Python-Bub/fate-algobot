@@ -41,9 +41,17 @@ class TestUniverseScanOrder(unittest.TestCase):
         os.environ["PAPER_SIM_ACTIVE_MODE"] = "top100_rotate"
         os.environ["PAPER_SIM_ACTIVE_MAX"] = "480"
         os.environ["SCAN_ORDER_MODE"] = "hash"
-        from paper_sim_today import _resolve_universe
+        from unittest.mock import patch
 
-        syms = _resolve_universe(None)
+        from fortress_universe import load_top100_symbols
+
+        stub = list(dict.fromkeys(list(load_top100_symbols()) + [f"Z{i:03d}" for i in range(400)] + ["AAPL"]))
+        with patch("fortress_universe.symbols_with_trained_intraday", return_value=stub), patch(
+            "fortress_universe.symbols_with_daily_models", return_value=stub
+        ):
+            from paper_sim_today import _resolve_universe
+
+            syms = _resolve_universe(None)
         self.assertGreater(len(syms), 80)
         self.assertLess(len(syms), 600)
 
