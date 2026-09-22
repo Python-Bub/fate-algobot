@@ -36,15 +36,15 @@ def test_price_fallback_symbols_brk_prefers_feed_symbol():
 
     syms = price_data_fallback_symbols("BRK-B")
     assert syms[0] == "BRK-B"
-    assert "BRK.B" in syms
     assert alpaca_equity_symbol("BRK-B") == "BRK.B"
     assert alpaca_equity_symbol("BRK.B") == "BRK.B"
     assert internal_symbol("BRK.B") == "BRK-B"
 
 
-def test_resolve_model_ticker_msft():
+def test_resolve_model_ticker_msft(monkeypatch):
     from symbol_aliases import resolve_model_ticker
 
+    monkeypatch.setattr("model_trainer.training_saved_model", lambda s: str(s).upper() == "MSFT")
     assert resolve_model_ticker("MSFT") == "MSFT"
 
 

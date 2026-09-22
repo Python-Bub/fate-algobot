@@ -23,9 +23,18 @@ os.environ.setdefault("FATE_ORDER_ROLE", "observe")
 _ENV_SNAPSHOT.setdefault("FATE_ORDER_ROLE", "observe")
 
 
+_PYTEST_ENV_PREFIX = "PYTEST_"
+
+
 def _restore_env() -> None:
-    os.environ.clear()
-    os.environ.update(_ENV_SNAPSHOT)
+    """Restore the collection-time snapshot without clobbering pytest internals."""
+    keep = {k: v for k, v in os.environ.items() if k.startswith(_PYTEST_ENV_PREFIX)}
+    extra = [k for k in os.environ if k not in _ENV_SNAPSHOT and k not in keep]
+    for k in extra:
+        os.environ.pop(k, None)
+    for k, v in _ENV_SNAPSHOT.items():
+        os.environ[k] = v
+    os.environ.update(keep)
     os.environ["FATE_ORDER_ROLE"] = "observe"
 
 
