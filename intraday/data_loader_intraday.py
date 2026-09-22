@@ -162,7 +162,7 @@ def fetch_minute_bars(
 ) -> pd.DataFrame:
     """Alpaca minute bars, then Polygon full-tape fallback — never Yahoo."""
     if end is None:
-        end = dt.datetime.utcnow().strftime("%Y-%m-%d")
+        end = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d")
     min_bars = int(os.getenv("INTRADAY_MIN_BARS", "800"))
     if use_cache is None:
         use_cache = os.getenv("INTRADAY_USE_CACHE", "true").lower() in ("1", "true", "yes")

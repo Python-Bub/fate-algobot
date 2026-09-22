@@ -24,6 +24,11 @@ _INSIDER_HEADLINE_RE = re.compile(
 _CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
 
 
+def clear_unified_intel_cache() -> None:
+    """Drop in-process intel so tests cannot leak live NVDA blocks across cases."""
+    _CACHE.clear()
+
+
 def _enabled() -> bool:
     return os.getenv("UNIFIED_INTEL_ENABLED", "true").lower() in ("1", "true", "yes")
 

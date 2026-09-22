@@ -24,9 +24,9 @@ def get_stock_trading_env_class() -> type:
     global _StockTradingEnvCls
     if _StockTradingEnvCls is not None:
         return _StockTradingEnvCls
-    from gymnasium import spaces
+    from gymnasium import Env, spaces
 
-    class StockTradingEnv(gym.Env):
+    class StockTradingEnv(Env):
         metadata = {"render_modes": []}
 
         def __init__(self, features: pd.DataFrame, ret_col: str = "returns", window: int = 1):

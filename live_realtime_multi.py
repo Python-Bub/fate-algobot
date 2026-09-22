@@ -15,6 +15,7 @@ CONFIDENCE_THRESHOLD = 0.65
 TRADE_LOG_FILE = "multi_trade_log.csv"
 
 stop_requested = False
+_chart = None
 
 
 def listen_for_stop():
@@ -26,14 +27,16 @@ def listen_for_stop():
             break
 
 
-threading.Thread(target=listen_for_stop, daemon=True).start()
+def _init_runtime() -> None:
+    """Start stdin listener + optional chart. Never run at import time (pytest)."""
+    global _chart
+    threading.Thread(target=listen_for_stop, daemon=True).start()
+    try:
+        from live_chart import show_live_chart
 
-try:
-    from live_chart import show_live_chart
-
-    _chart = show_live_chart()
-except Exception:
-    _chart = None
+        _chart = show_live_chart()
+    except Exception:
+        _chart = None
 
 
 def log_trade(ts, ticker, signal, price, equity, pnl, confidence):
@@ -84,6 +87,7 @@ def fetch_intraday(ticker: str) -> pd.DataFrame:
 
 
 def main():
+    _init_runtime()
     print(f"Paper loop: {', '.join(TICKERS)} — type 'stop' to exit.\n")
     sim = TradeSimulator()
     last_seen = {}

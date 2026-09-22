@@ -22,8 +22,8 @@ class TestAsymmetricLoss(unittest.TestCase):
         self.assertLess(rw.reward, -0.02 * 4.0)
 
     def test_short_wrong_more_penalized_than_long(self):
-        rl = asymmetric_reward("LONG", -0.02, bars_held=1).reward
-        rs = asymmetric_reward("SHORT", 0.02, bars_held=1).reward
+        rl = asymmetric_reward("LONG", -0.02, bars_held=1, position_pnl=False).reward
+        rs = asymmetric_reward("SHORT", 0.02, bars_held=1, position_pnl=False).reward
         self.assertLess(rs, rl)
 
 

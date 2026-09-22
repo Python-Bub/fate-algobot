@@ -337,6 +337,9 @@ def orders_allowed(side: str = "buy", *, for_hft: bool = False, symbol: str | No
     overnight_cash = (not flatten) and (not for_hft) and os.getenv(
         "FORTRESS_OVERNIGHT_CASH_DEPLOY", "false"
     ).lower() in ("1", "true", "yes", "on")
+    # Leftover-cash fills are a weekday overnight tool — never treat Sat/Sun as a red day.
+    if overnight_cash and not is_trading_day():
+        overnight_cash = False
 
     # NYSE holiday / early-close gate (Alpaca clock). Exits still allowed unless blocked.
     exch_ok, exch_reason = exchange_is_open(for_hft=for_hft)

@@ -124,7 +124,7 @@ def _fetch_ohlcv(symbol: str, period: str = "2y"):
     sym = symbol.strip().upper()
     # 1) Project price loader (aliases, cache, Yahoo fallback)
     try:
-        from datetime import datetime, timedelta
+        from datetime import datetime, timedelta, timezone
 
         from feature_engineering import load_price_data
         from symbol_aliases import price_data_fallback_symbols
@@ -134,7 +134,7 @@ def _fetch_ohlcv(symbol: str, period: str = "2y"):
             years = max(1, int(period.replace("y", "").replace("Y", "") or 2))
         except ValueError:
             years = 2
-        start = (datetime.utcnow() - timedelta(days=365 * years + 30)).strftime("%Y-%m-%d")
+        start = (datetime.now(timezone.utc) - timedelta(days=365 * years + 30)).strftime("%Y-%m-%d")
         for feed in price_data_fallback_symbols(sym) or [sym]:
             df = load_price_data(feed, start, None)
             if df is not None and not getattr(df, "empty", True) and len(df) >= 80:

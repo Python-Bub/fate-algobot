@@ -99,12 +99,23 @@ def test_load_yfinance_uses_stale_cache_when_yahoo_cooldown(monkeypatch):
 
 
 def test_paper_sim_skips_yahoo_fallback(monkeypatch):
+    from data_platform import price_fetch_policy as pfp
     from feature_engineering import _skip_yahoo_fallback
 
     monkeypatch.setenv("PAPER_SIM_ACTIVE_RUN", "true")
     monkeypatch.setenv("PAPER_SIM_FORCE_YAHOO", "false")
     monkeypatch.setenv("FORCE_YAHOO_PRICES", "false")
+    monkeypatch.setenv("TRAIN_FORCE_YAHOO", "false")
     monkeypatch.setenv("PAPER_SIM_SKIP_YAHOO_FALLBACK", "true")
+    monkeypatch.setenv("SKIP_YAHOO_FALLBACK", "true")
+    monkeypatch.setenv("USE_YAHOO_FIRST", "false")
+    monkeypatch.setenv("USE_POLYGON_FIRST", "true")
     monkeypatch.setenv("POLYGON_API_KEY", "test-key")
     monkeypatch.setenv("PRICE_DATA_SOURCE", "hybrid_polygon")
+    # Pin the policy functions so leftover deploy_scale.env / monkeypatch order cannot win.
+    monkeypatch.setattr(pfp, "force_yahoo_prices", lambda **_k: False)
+    monkeypatch.setattr(pfp, "skip_yahoo_fallback", lambda: True)
+    monkeypatch.setattr(pfp, "paper_sim_skip_yahoo_fallback", lambda: True)
+    monkeypatch.setattr(pfp, "use_yahoo_first", lambda: False)
+    monkeypatch.setattr(pfp, "use_polygon_first", lambda: True)
     assert _skip_yahoo_fallback() is True

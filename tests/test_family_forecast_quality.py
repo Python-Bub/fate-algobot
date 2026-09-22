@@ -69,9 +69,30 @@ class TestFamilyForecastQuality(unittest.TestCase):
         self.assertIn("block", reason.lower())
 
     def test_independent_horizons_keep_disagreeing_1d(self):
-        old = os.environ.get("HORIZON_INDEPENDENT")
+        old = {
+            k: os.environ.get(k)
+            for k in (
+                "HORIZON_INDEPENDENT",
+                "FAMILY_UNIFIED_INTEL",
+                "FAMILY_LIVE_HEADWINDS",
+                "FAMILY_LIVE_RISK_CHECK",
+                "FAMILY_TOP100_ONLY",
+                "FAMILY_MOMENTUM_GATE",
+                "FAMILY_REQUIRE_ASYM_LONG",
+                "FAMILY_MIN_SCORE",
+            )
+        }
         os.environ["HORIZON_INDEPENDENT"] = "true"
+        os.environ["FAMILY_UNIFIED_INTEL"] = "false"
+        os.environ["FAMILY_LIVE_HEADWINDS"] = "false"
+        os.environ["FAMILY_LIVE_RISK_CHECK"] = "false"
+        os.environ["FAMILY_TOP100_ONLY"] = "false"
+        os.environ["FAMILY_MOMENTUM_GATE"] = "false"
+        os.environ["FAMILY_REQUIRE_ASYM_LONG"] = "false"
+        os.environ["FAMILY_MIN_SCORE"] = "0"
         try:
+            from unittest.mock import patch
+
             from tools.family_forecast import _best_from_report
 
             row = {
@@ -85,17 +106,21 @@ class TestFamilyForecastQuality(unittest.TestCase):
                 "asym_action": "LONG",
                 "score": 0.2,
             }
-            picks = _best_from_report([row], bullish=0.55, bearish=0.45)
+            with patch("intel.unified_intel.blocks_long", return_value=(False, [])), patch(
+                "tools.family_forecast._family_intel_blocks", return_value=(False, [])
+            ), patch("tools.family_forecast._prefetch_macro_bundle", return_value={}):
+                picks = _best_from_report([row], bullish=0.55, bearish=0.45)
             by = {}
             for p in picks:
                 by.setdefault(p.label, []).append(p)
             self.assertTrue(any(p.ticker == "NVDA" and p.signal == "UP" for p in by.get("one_day", [])))
             self.assertTrue(any(p.ticker == "NVDA" and p.signal == "DOWN" for p in by.get("six_months", [])))
         finally:
-            if old is None:
-                os.environ.pop("HORIZON_INDEPENDENT", None)
-            else:
-                os.environ["HORIZON_INDEPENDENT"] = old
+            for k, v in old.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
 
     def test_bounce_name_skips_short_horizons(self):
         old = os.environ.get("HORIZON_INDEPENDENT")

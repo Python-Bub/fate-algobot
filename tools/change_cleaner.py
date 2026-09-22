@@ -105,10 +105,14 @@ def cleanup_orphan_symbols(symbols: list[str], *, dry: bool = False) -> dict[str
 
     Hard guard: CLEANER_NEVER_DELETE_MODELS / AUTO_IMPROVE_NEVER_DELETE=true
     refuses to remove any model pickle — only logs what would have been cleaned.
+    Dry-run still enumerates orphans so operators can see the plan.
     """
-    if os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in ("1", "true", "yes") or os.getenv(
-        "AUTO_IMPROVE_NEVER_DELETE", "true"
-    ).lower() in ("1", "true", "yes"):
+    never_delete = os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    ) or os.getenv("AUTO_IMPROVE_NEVER_DELETE", "true").lower() in ("1", "true", "yes")
+    if never_delete and not dry:
         return {
             "symbols": [],
             "bytes_freed": 0,

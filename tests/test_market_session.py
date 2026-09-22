@@ -123,5 +123,23 @@ def test_overnight_cash_deploy_allows_closed_session_stock_buys(monkeypatch):
     assert "session=closed" in why_hft or "buy_mode" in why_hft or "closed" in why_hft
 
 
+def test_overnight_cash_blocked_on_weekend(monkeypatch):
+    from analytics import market_session as ms
+
+    dt = datetime(2026, 8, 23, 12, 0, tzinfo=ET)  # Sunday
+    monkeypatch.setenv("FORTRESS_OVERNIGHT_CASH_DEPLOY", "true")
+    monkeypatch.setenv("TRADE_SESSION_MODE", "extended")
+    monkeypatch.setenv("TRADE_WEEKDAY_24X5", "true")
+    monkeypatch.setenv("ALPACA_CLOCK_GATE", "false")
+    monkeypatch.setenv("MORNING_SWEET_SPOT", "false")
+    monkeypatch.setenv("MIDDAY_HFT_ONLY", "false")
+    monkeypatch.setattr(ms, "now_et", lambda: dt)
+    monkeypatch.setattr(ms, "current_session", lambda _dt=None: ms.Session.CLOSED)
+    monkeypatch.setattr(ms, "exchange_is_open", lambda **_k: (False, "weekend"))
+    ok, why = ms.orders_allowed("buy", for_hft=False, symbol="AAPL")
+    assert ok is False
+    assert "overnight_cash_deploy" not in why
+
+
 if __name__ == "__main__":
     unittest.main()

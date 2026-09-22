@@ -429,12 +429,17 @@ def _yahoo_last_px(symbol: str) -> float | None:
 def _route_symbol(symbol: str) -> str:
     """Return the symbol in the format Alpaca expects.
 
-    - Equities/ETFs: as-is, with legacy alias mapping (e.g. SQ -> XYZ).
+    - Equities/ETFs: Alpaca class-share dots (BRK.B), with legacy alias mapping (SQ -> XYZ).
     - Crypto: BTC-USD (Yahoo) -> BTC/USD (Alpaca).
     """
     if is_crypto_symbol(symbol):
         return alpaca_symbol(symbol)
-    return price_feed_symbol(symbol)
+    try:
+        from symbol_aliases import alpaca_equity_symbol
+
+        return alpaca_equity_symbol(symbol)
+    except Exception:
+        return price_feed_symbol(symbol)
 
 
 def _tif(symbol: str) -> str:
@@ -1886,6 +1891,15 @@ def submit_market_order(
 
     if (qty is None and notional is None) or (qty is not None and notional is not None):
         raise ValueError("submit_market_order: pass exactly one of qty / notional")
+
+    try:
+        from analytics.alpaca_limits import can_submit_order_pace
+
+        pace = can_submit_order_pace()
+        if not pace.ok:
+            raise RuntimeError(f"order paced ({pace.reason})")
+    except ImportError:
+        pass
 
     # Buy-low / sell-high routing. A true market order pays the full spread
     # (buy the ask, sell the bid) → structural "buy high / sell low". Convert to a

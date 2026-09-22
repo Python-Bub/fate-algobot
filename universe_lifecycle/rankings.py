@@ -282,6 +282,14 @@ def refresh_market_cap_tiers(
     if len(top50) > half_n + len(top100):
         top50 = top50[: half_n + len(top100)]
 
+    # Never wipe a populated on-disk tier with an empty/tiny refresh (offline / failed caps).
+    min_keep100 = int(os.getenv("RANKINGS_MIN_KEEP_TOP100", "80"))
+    if len(top100) < min_keep100 and len(prev100) >= min_keep100:
+        top100 = list(dict.fromkeys(str(s).upper() for s in prev100 if s))[:top_n]
+    min_keep50 = int(os.getenv("RANKINGS_MIN_KEEP_TOP50", "200"))
+    if len(top50) < min_keep50 and len(prev50) >= min_keep50:
+        top50 = list(dict.fromkeys(str(s).upper() for s in prev50 if s))
+
     cap_doc = {"updated_at_utc": _now(), "count": len(cached_caps), "caps": cached_caps}
     _write_json(CAP_CACHE_PATH, cap_doc)
 

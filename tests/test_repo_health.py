@@ -32,11 +32,14 @@ def test_price_fallback_symbols_goog():
 
 
 def test_price_fallback_symbols_brk_prefers_feed_symbol():
-    from symbol_aliases import price_data_fallback_symbols
+    from symbol_aliases import alpaca_equity_symbol, internal_symbol, price_data_fallback_symbols
 
     syms = price_data_fallback_symbols("BRK-B")
-    assert syms[0] == "BRK.B"
-    assert "BRK-B" in syms
+    assert syms[0] == "BRK-B"
+    assert "BRK.B" in syms
+    assert alpaca_equity_symbol("BRK-B") == "BRK.B"
+    assert alpaca_equity_symbol("BRK.B") == "BRK.B"
+    assert internal_symbol("BRK.B") == "BRK-B"
 
 
 def test_resolve_model_ticker_msft():
