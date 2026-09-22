@@ -104,11 +104,15 @@ def cleanup_orphan_symbols(symbols: list[str], *, dry: bool = False) -> dict[str
     """Drop model/cache artifacts for delisted / removed names (never protected).
 
     Hard guard: CLEANER_NEVER_DELETE_MODELS / AUTO_IMPROVE_NEVER_DELETE=true
-    refuses to remove any model pickle — only logs what would have been cleaned.
+    refuses to remove any model pickle on a wet run. Dry-run still reports
+    what would have been cleaned.
     """
-    if os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in ("1", "true", "yes") or os.getenv(
-        "AUTO_IMPROVE_NEVER_DELETE", "true"
-    ).lower() in ("1", "true", "yes"):
+    never_delete = os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    ) or os.getenv("AUTO_IMPROVE_NEVER_DELETE", "true").lower() in ("1", "true", "yes")
+    if never_delete and not dry:
         return {
             "symbols": [],
             "bytes_freed": 0,

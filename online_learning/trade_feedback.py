@@ -55,7 +55,9 @@ def learn_from_realized_trade(
         )
         from online_learning.weight_updater import online_update_meta_for_trade, use_online_updater
 
-        rw = asymmetric_reward(side, float(realized_return), bars_held=bars_held)
+        rw = asymmetric_reward(
+            side, float(realized_return), bars_held=bars_held, position_pnl=True
+        )
         if use_online_updater():
             rep = online_update_meta_for_trade(sym, st, side, rw.reward)
             if rep.applied:

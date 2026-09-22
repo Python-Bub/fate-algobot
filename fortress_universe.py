@@ -306,6 +306,13 @@ def symbols_paper_active_universe() -> list[str]:
     else:
         pool = sorted(s for s in intra if is_core_trainable_equity(s))
 
+    # Fresh clone / no pickles yet: still rotate the liquid top-100 cache
+    # (never return an empty paper universe).
+    if not pool:
+        cached = [s for s in load_top100_symbols() if is_core_trainable_equity(s)]
+        if cached:
+            return apply_scan_order(cached)
+
     mode = os.getenv("PAPER_SIM_ACTIVE_MODE", "top100_rotate").strip().lower()
     if mode in ("all", "full", "whole", "database"):
         return apply_scan_order(pool)

@@ -23,6 +23,7 @@ class TestAiFinalPickReview(unittest.TestCase):
         m.build_web_context = fake_web  # type: ignore[method-assign]
 
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
+        os.environ["LLM_API_KEY"] = "test-key"
         os.environ["AI_PICK_REVIEW_WEIGHT"] = "0.5"
         os.environ["AI_PICK_REJECT_CONF"] = "0.5"
 
@@ -48,6 +49,7 @@ class TestAiFinalPickReview(unittest.TestCase):
         m.build_web_context = lambda _t: "x"  # type: ignore[misc]
 
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
+        os.environ["LLM_API_KEY"] = "test-key"
         os.environ["AI_PICK_ALWAYS_DROP_F"] = "true"
         picks = [{"ticker": "ZZZ", "p_up": 0.9, "score": 3.0, "execution_confidence": 0.8, "asym_action": "LONG"}]
         out, meta = m.apply_ai_review_to_long_picks(picks, regime_name="bull", vix=18.0)
@@ -66,6 +68,7 @@ class TestAiFinalPickReview(unittest.TestCase):
         m.build_web_context = lambda _t: "x"  # type: ignore[misc]
 
         os.environ["USE_AI_FINAL_PICK_REVIEW"] = "true"
+        os.environ["LLM_API_KEY"] = "test-key"
         os.environ["AI_PICK_REJECT_CONF"] = "0.99"
         picks = [
             {"ticker": "AAA", "p_up": 0.8, "score": 2.0, "execution_confidence": 0.7, "asym_action": "LONG"},

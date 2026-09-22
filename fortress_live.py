@@ -10,14 +10,9 @@ import argparse
 import os
 import time
 
-from dotenv import load_dotenv
+from data_platform.runtime_env import load_runtime_env
 
-load_dotenv()
-# deploy_scale.env last-wins over .env (order pace, deploy, overnight caps).
-_deploy = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "deploy_scale.env")
-if os.path.isfile(_deploy):
-    load_dotenv(_deploy, override=True)
-
+load_runtime_env()
 from data_platform.market_prices import configure_process_prices
 
 configure_process_prices()

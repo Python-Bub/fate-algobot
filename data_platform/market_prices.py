@@ -29,11 +29,10 @@ def _period_start(period: str) -> str:
 
 def configure_process_prices(*, training: bool = False) -> None:
     """Apply Yahoo-first price routing for this process (call after load_dotenv)."""
-    from dotenv import load_dotenv
-
-    load_dotenv()
     from data_platform.price_fetch_policy import apply_price_env_defaults
+    from data_platform.runtime_env import load_runtime_env
 
+    load_runtime_env()
     apply_price_env_defaults(training=training)
 
 
