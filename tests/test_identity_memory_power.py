@@ -81,13 +81,14 @@ def test_power_people_requires_speaker_ticker_and_direction(tmp_path, monkeypatc
     monkeypatch.setenv("USE_POWER_PEOPLE", "true")
     monkeypatch.setenv("POWER_PEOPLE_HITS_FILE", str(tmp_path / "hits.jsonl"))
     monkeypatch.setenv("POWER_PEOPLE_CAL_FILE", str(tmp_path / "cal.json"))
+    monkeypatch.setenv("POWER_PEOPLE_MAX_AGE_DAYS", "400")
     from intel.power_people import extract_mentions, power_people_boost_for, append_hits
 
     assert extract_mentions("The president talked about chips and cars and energy.") == []
     assert extract_mentions("Trump mentioned Tesla in passing.") == []  # no direction
     hits = extract_mentions(
         "President Trump said wanna get rich? Buy this Tesla.",
-        ts="2026-08-01",
+        ts="2026-09-20",
     )
     assert len(hits) == 1
     assert hits[0]["ticker"] == "TSLA"

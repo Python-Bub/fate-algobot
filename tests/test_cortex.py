@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import unittest
 from pathlib import Path
 
@@ -65,13 +66,43 @@ class TestCortex(unittest.TestCase):
         self.assertTrue(m.should_trigger_code_evolve() or m.self_improve_urge < 1.0)
 
     def test_universe_laws_enforce(self):
-        from cortex.universe_laws import enforce_laws
+        import json
+        import tempfile
+        from pathlib import Path
 
-        motor = {"buy_bias": 0.0, "rank_tilt": 0.0, "paper_boost": 0.0, "hft_conf_delta": 0.0, "size_mult": 1.0}
-        ctx = {"alpha": -0.02, "deployed_frac": 0.3, "hit_rate": 0.5, "losing_to_market": True}
-        lawful, events = enforce_laws(motor, ctx)
-        self.assertTrue(events)
-        self.assertGreater(lawful.get("buy_bias", 0), 0)
+        from cortex import universe_laws as ul
+
+        td = Path(tempfile.mkdtemp())
+        laws = td / "universe_laws.json"
+        laws.write_text(
+            json.dumps(
+                {
+                    "laws": [
+                        {
+                            "id": "buy_when_underdeployed",
+                            "name": "underdeployed",
+                            "when": "deployed_frac < 0.55",
+                            "priority": 1,
+                            "motor": {"buy_bias": 0.08},
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        old = ul.LAWS_PATH
+        ul.LAWS_PATH = laws
+        os.environ["CORTEX_LAW_GAIN"] = "1.0"
+        try:
+            from cortex.universe_laws import enforce_laws
+
+            motor = {"buy_bias": 0.0, "rank_tilt": 0.0, "paper_boost": 0.0, "hft_conf_delta": 0.0, "size_mult": 1.0}
+            ctx = {"alpha": -0.02, "deployed_frac": 0.3, "hit_rate": 0.5, "losing_to_market": True}
+            lawful, events = enforce_laws(motor, ctx)
+            self.assertTrue(events)
+            self.assertGreater(lawful.get("buy_bias", 0), 0)
+        finally:
+            ul.LAWS_PATH = old
 
     def test_matrix_tick(self):
         from cortex.matrix_engine import matrix_tick

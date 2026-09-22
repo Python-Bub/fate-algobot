@@ -53,8 +53,8 @@ def get_factor_snapshot(macro_bundle: dict[str, Any] | None = None) -> dict[str,
         try:
             from analytics.industry_comovement import _load_closes_cached
 
-            end = pd.Timestamp.utcnow().strftime("%Y-%m-%d")
-            start = (pd.Timestamp.utcnow() - pd.Timedelta(days=30)).strftime("%Y-%m-%d")
+            end = pd.Timestamp.now("UTC").strftime("%Y-%m-%d")
+            start = (pd.Timestamp.now("UTC") - pd.Timedelta(days=30)).strftime("%Y-%m-%d")
             q = _load_closes_cached(os.getenv("INDUSTRY_NASDAQ_PROXY", "QQQ"), start, end)
             if len(q) >= 6:
                 snap["nasdaq_ret_5d"] = float(q.iloc[-1] / q.iloc[-6] - 1.0)

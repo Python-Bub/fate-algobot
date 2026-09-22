@@ -50,7 +50,8 @@ data/ops/*.txt
 hft/node_modules/
 hft/dist/
 .cursor/
-analytics/generated_patterns/
+analytics/generated_patterns/*
+!analytics/generated_patterns/__init__.py
 data/*.pid
 data/pids/
 data/inbox/

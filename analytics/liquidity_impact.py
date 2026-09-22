@@ -47,8 +47,8 @@ def estimate_adv_usd(
         else:
             from feature_engineering import load_price_data
 
-            end = pd.Timestamp.utcnow().strftime("%Y-%m-%d")
-            start = (pd.Timestamp.utcnow() - pd.Timedelta(days=window + 15)).strftime("%Y-%m-%d")
+            end = pd.Timestamp.now("UTC").strftime("%Y-%m-%d")
+            start = (pd.Timestamp.now("UTC") - pd.Timedelta(days=window + 15)).strftime("%Y-%m-%d")
             df = load_price_data(sym, start, end)
             if df is not None and not df.empty and "Volume" in df.columns:
                 close_col = "Adj Close" if "Adj Close" in df.columns else "Close"

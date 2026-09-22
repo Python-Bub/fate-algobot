@@ -48,6 +48,12 @@ def _clear_module_caches() -> None:
     except Exception:
         pass
     try:
+        import analytics.industries.engine as eng
+
+        eng._SNAP_CACHE = None
+    except Exception:
+        pass
+    try:
         from intel.unified_intel import clear_unified_intel_cache
 
         clear_unified_intel_cache()
