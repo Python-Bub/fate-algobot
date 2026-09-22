@@ -128,6 +128,11 @@ def price_data_fallback_symbols(ticker: str) -> list[str]:
         mapped = price_feed_symbol(sib)
         if mapped not in out:
             out.append(mapped)
+    # Always keep the dotted Yahoo alias in the fallback chain.
+    if logical in ("BRK-B", "BRK.B", "BRKB") and "BRK.B" not in out:
+        out.append("BRK.B")
+    if logical in ("BRK-A", "BRK.A", "BRKA") and "BRK.A" not in out:
+        out.append("BRK.A")
     return out
 
 
@@ -138,4 +143,5 @@ def resolve_model_ticker(ticker: str) -> str | None:
     for sym in price_data_fallback_symbols(ticker):
         if training_saved_model(sym):
             return sym
-    return None
+    # Fresh checkout has no pickles yet — still resolve to the canonical listing.
+    return price_feed_symbol(ticker) or None

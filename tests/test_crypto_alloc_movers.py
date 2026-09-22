@@ -48,7 +48,10 @@ def test_skip_chase_needs_live_binary(monkeypatch):
     assert skip2 is False
 
 
-def test_new_cash_is_fifty_fifty_until_crypto_target():
+def test_new_cash_is_fifty_fifty_until_crypto_target(monkeypatch):
+    monkeypatch.setenv("FORTRESS_CRYPTO_BOOK_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_NEW_CASH_CRYPTO_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_CRYPTO_MAX_SINGLE_FRAC", "0.18")
     # $71k book, $2.6k crypto, $38k cash → half of cash toward crypto, capped by gap to 50%.
     c, s = new_cash_split(38_000, equity=71_000, crypto_mv=2_600)
     assert abs(c - 19_000) < 1.0
@@ -60,7 +63,10 @@ def test_new_cash_is_fifty_fifty_until_crypto_target():
     assert crypto_gap_usd(71_000, 2_600) > 30_000
 
 
-def test_crypto_clip_uses_idle_half_and_single_cap():
+def test_crypto_clip_uses_idle_half_and_single_cap(monkeypatch):
+    monkeypatch.setenv("FORTRESS_CRYPTO_BOOK_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_NEW_CASH_CRYPTO_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_CRYPTO_MAX_SINGLE_FRAC", "0.18")
     n = size_crypto_notional(400, equity=71_000, cash=38_000, crypto_mv=2_600)
     # 18% of 71k = 12,780; 50% of cash = 19k; gap ~33k → 12,780
     assert 12_000 < n < 13_000

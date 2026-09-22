@@ -157,6 +157,7 @@ class TestNewsAIAgent(unittest.TestCase):
     def test_score_adjustments_good_vs_bad(self):
         from intel.news_ai_agent import score_adjustments
 
+        os.environ["USE_NEWS_AI_AGENT"] = "true"
         good_p, good_s = score_adjustments(
             {"boost_long": True, "good_news_score": 0.7, "bad_news_score": 0.1, "narrative": "good_news"}
         )

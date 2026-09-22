@@ -52,7 +52,7 @@ def asymmetric_reward(
     bars_held: number of bars the position was held (used for time-decay penalty)
     position_pnl: True when realized_return is already position P&L (broker / RL).
         False when it is underlying price return (paper-sim fwd bar). None reads
-        ASYM_POSITION_PNL (default true).
+        ASYM_POSITION_PNL (default false = price return; deploy sets true).
     """
     side_u = side.upper().strip()
     if side_u not in ("LONG", "SHORT"):
@@ -73,11 +73,11 @@ def asymmetric_reward(
     time_decay_per_bar = _f("ASYM_TIME_DECAY", 0.0)
     clip = _f("ASYM_REWARD_CLIP", 5.0)
 
-    # ASYM_POSITION_PNL=true (default): realized_return is broker position P&L
+    # ASYM_POSITION_PNL=true: realized_return is broker position P&L
     # (Alpaca unrealized_plpc / closed P&L already positive when the leg made money).
-    # false: realized_return is underlying price return — SHORT needs a sign flip.
+    # false (code default; deploy_scale.env sets true): price return — SHORT sign-flips.
     if position_pnl is None:
-        pos_pnl = os.getenv("ASYM_POSITION_PNL", "true").lower() not in ("0", "false", "no")
+        pos_pnl = os.getenv("ASYM_POSITION_PNL", "false").lower() in ("1", "true", "yes")
     else:
         pos_pnl = bool(position_pnl)
     if pos_pnl:

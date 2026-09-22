@@ -1,12 +1,14 @@
 """Session isolation for pytest.
 
-Import-time ``load_dotenv(..., override=True)`` (paper_sim, fortress, buying_power)
-and unittest ``os.environ[...]`` leaks used to bleed into later tests. Snapshot the
-process environment *before* collection so each test starts from the original pins.
-Also restore git-tracked universe caches and clear in-memory intel/forecast state.
+Import-time dotenv and unittest ``os.environ`` leaks used to bleed into later tests.
+Baseline = original process env plus layered file env (``.env`` then
+``data/deploy_scale.env``, files last-win, process pins win). Each test starts
+from that baseline so Mac observe / GCP paper knobs remain, then monkeypatch can
+still pin ``FORCE_YAHOO_PRICES=false``.
 
-Live family/unified intel is off unless a test opts in — otherwise
-``blocks_long`` hits news-AI and can drop NVDA 1d from independent-horizon math.
+Also restore git-tracked universe caches and clear in-memory intel/forecast state.
+Live family intel is off unless a test opts in — otherwise ``blocks_long`` hits
+news-AI and can drop NVDA 1d from independent-horizon math.
 """
 
 from __future__ import annotations
@@ -20,6 +22,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Capture BEFORE other test modules import loaders that dump deploy_scale.env.
 _ENV_SNAPSHOT = dict(os.environ)
+
+_BASELINE = dict(_ENV_SNAPSHOT)
+try:
+    from data_platform.runtime_env import layered_dotenv_values
+
+    for _k, _v in layered_dotenv_values().items():
+        if _k not in _BASELINE:
+            _BASELINE[_k] = _v
+except Exception:
+    pass
 
 _PROTECTED_FILES = (
     ROOT / "data" / "top100_market_cap.json",
@@ -96,14 +108,29 @@ def _reset_process_caches() -> None:
             pass
 
 
+def _ensure_runtime_seeds() -> None:
+    student = ROOT / "data" / "self_improve" / "gainz_student.py"
+    if student.is_file():
+        return
+    student.parent.mkdir(parents=True, exist_ok=True)
+    student.write_text(
+        "from __future__ import annotations\n"
+        "GENERATION = 0\n\n"
+        "def student_signal(df, symbol=''):\n"
+        "    return {'side': 'none', 'confidence': 0.0}\n",
+        encoding="utf-8",
+    )
+
+
 @pytest.fixture(autouse=True)
 def _isolate_env_and_caches():
-    """Start (and end) every test from the original process env + on-disk caches."""
-    _restore_env(_ENV_SNAPSHOT)
+    """Start (and end) every test from file+process baseline + on-disk caches."""
+    _restore_env(_BASELINE)
     os.environ.update(_TEST_ISOLATION_ENV)
     _restore_protected_files()
+    _ensure_runtime_seeds()
     _reset_process_caches()
     yield
     _restore_protected_files()
     _reset_process_caches()
-    _restore_env(_ENV_SNAPSHOT)
+    _restore_env(_BASELINE)

@@ -57,7 +57,14 @@ def fetch_news(ticker: str, limit: int = 15) -> list[dict]:
             if key in seen:
                 continue
             seen.add(key)
-            out.append({"headline": title, "title": title, "summary": summary, "source_symbol": sym})
+            out.append(
+                {
+                    "headline": title,
+                    "title": title,
+                    "summary": summary,
+                    "source_symbol": sym,
+                }
+            )
             if len(out) >= max(1, int(limit)):
                 return out
     return out

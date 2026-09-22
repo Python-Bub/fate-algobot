@@ -46,14 +46,35 @@ def _eval_when(expr: str, ctx: dict[str, Any]) -> bool:
         return False
 
 
+DEFAULT_LAWS: list[dict[str, Any]] = [
+    {
+        "id": "underdeployed_buy",
+        "name": "Buy when idle cash is high",
+        "axiom": "never sit in cash when alpha is available",
+        "priority": 10,
+        "when": "deployed_frac < 0.55",
+        "motor": {"buy_bias": 0.06, "paper_boost": 0.04, "size_mult": 1.08},
+    },
+    {
+        "id": "losing_to_market_tilt",
+        "name": "Tilt rank when lagging the tape",
+        "axiom": "catch up without panic",
+        "priority": 20,
+        "when": "losing_to_market",
+        "motor": {"buy_bias": 0.04, "rank_tilt": 0.03},
+    },
+]
+
+
 def load_laws() -> list[dict[str, Any]]:
     if not LAWS_PATH.is_file():
-        return []
+        return list(DEFAULT_LAWS)
     try:
         doc = json.loads(LAWS_PATH.read_text(encoding="utf-8"))
-        return sorted(doc.get("laws") or [], key=lambda x: int(x.get("priority", 99)))
+        laws = sorted(doc.get("laws") or [], key=lambda x: int(x.get("priority", 99)))
+        return laws or list(DEFAULT_LAWS)
     except Exception:
-        return []
+        return list(DEFAULT_LAWS)
 
 
 def enforce_laws(

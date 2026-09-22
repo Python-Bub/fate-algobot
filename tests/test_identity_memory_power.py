@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -87,7 +88,7 @@ def test_power_people_requires_speaker_ticker_and_direction(tmp_path, monkeypatc
     assert extract_mentions("Trump mentioned Tesla in passing.") == []  # no direction
     hits = extract_mentions(
         "President Trump said wanna get rich? Buy this Tesla.",
-        ts="2026-08-01",
+        ts=date.today().isoformat(),
     )
     assert len(hits) == 1
     assert hits[0]["ticker"] == "TSLA"

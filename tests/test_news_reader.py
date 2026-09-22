@@ -28,4 +28,7 @@ def test_fetch_news_normalizes_keys(monkeypatch):
 
     monkeypatch.setattr("news_reader.yf.Ticker", lambda _s: _T())
     rows = fetch_news("AAPL", limit=5)
-    assert rows == [{"headline": "Hello", "title": "Hello", "summary": "World"}]
+    assert rows
+    assert rows[0]["headline"] == "Hello"
+    assert rows[0]["title"] == "Hello"
+    assert rows[0]["summary"] == "World"

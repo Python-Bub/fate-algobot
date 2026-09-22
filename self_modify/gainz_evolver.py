@@ -153,13 +153,26 @@ def _recipes(generation: int) -> str:
     return extra
 
 
+DEFAULT_STUDENT_SRC = (
+    "from __future__ import annotations\n"
+    "GENERATION = 0\n\n"
+    "def student_signal(df, symbol=''):\n"
+    "    return {'side': 'none', 'confidence': 0.0}\n"
+)
+
+
+def ensure_student() -> None:
+    STUDENT.parent.mkdir(parents=True, exist_ok=True)
+    if not STUDENT.is_file():
+        STUDENT.write_text(DEFAULT_STUDENT_SRC, encoding="utf-8")
+
+
 def evolve_once() -> dict[str, Any]:
     st = _load_state()
     STUDENT.parent.mkdir(parents=True, exist_ok=True)
     ARCHIVE.mkdir(parents=True, exist_ok=True)
     ESCAPE.mkdir(parents=True, exist_ok=True)
-    if not STUDENT.is_file():
-        return {"ok": False, "reason": "no_student"}
+    ensure_student()
     src = STUDENT.read_text(encoding="utf-8")
     snap = snapshot_files([str(STUDENT)], tag="gainz_student")
     hits = detect_escape(src)
