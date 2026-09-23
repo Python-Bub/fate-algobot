@@ -119,10 +119,14 @@ def _price_source() -> str:
 
 
 def _skip_yahoo_fallback() -> bool:
+    """Look up policy on the module so test monkeypatches of the functions win."""
     try:
-        from data_platform.price_fetch_policy import skip_yahoo_fallback
+        from data_platform import price_fetch_policy as _pfp
 
-        return skip_yahoo_fallback()
+        paper = os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes")
+        if paper:
+            return bool(_pfp.paper_sim_skip_yahoo_fallback())
+        return bool(_pfp.skip_yahoo_fallback())
     except ImportError:
         return False
 

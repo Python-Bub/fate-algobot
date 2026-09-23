@@ -45,8 +45,11 @@ def _load_json(path: Path, default: dict) -> dict:
 
 
 def _write_json(path: Path, doc: dict) -> None:
+    """Atomic replace so readers never parse a half-written top-100 cache."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    tmp.replace(path)
 
 
 def _tier_diff(prev: list[str], cur: list[str]) -> dict[str, list[str]]:
@@ -304,8 +307,12 @@ def refresh_market_cap_tiers(
         "caps_known_in_pool": caps_in_pool,
         "symbols": top50,
     }
-    _write_json(TOP100_PATH, doc100)
-    _write_json(TOP50_PATH, doc50)
+    # A degenerate refresh (empty pool / no caps) must never wipe a good cache — fortress
+    # and paper-sim treat an empty top-100 as "no quality universe" and stop picking.
+    if top100 or not prev100:
+        _write_json(TOP100_PATH, doc100)
+    if top50 or not prev50:
+        _write_json(TOP50_PATH, doc50)
 
     return {
         "top100": top100,

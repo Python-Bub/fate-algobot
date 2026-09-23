@@ -27,12 +27,10 @@ sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
 try:
-    from dotenv import load_dotenv
+    from data_platform.runtime_env import load_runtime_env
 
-    load_dotenv(ROOT / ".env", override=False)
-    _scale = ROOT / "data" / "deploy_scale.env"
-    if _scale.is_file():
-        load_dotenv(_scale, override=True)
+    # Process pins win, so HIST_COOK_TRAIN_LSTM=false is not rewritten by deploy_scale.env.
+    load_runtime_env()
 except Exception:
     pass
 
@@ -93,20 +91,36 @@ def _train_hist_lstm(symbol: str) -> dict:
 
 
 def _closes(symbol: str, start: str, end: str) -> pd.DataFrame | None:
-    try:
-        from data_platform.market_prices import fetch_daily
+    """Fetch daily bars, but don't let one stuck request stall the whole cook."""
+    import concurrent.futures
 
-        df = fetch_daily(symbol, start, end)
-        if df is not None and not getattr(df, "empty", True):
-            return df
-    except Exception:
-        pass
-    try:
-        from feature_engineering import load_price_data
+    def _go() -> pd.DataFrame | None:
+        try:
+            from data_platform.market_prices import fetch_daily
 
-        return load_price_data(symbol, start, end)
-    except Exception:
+            df = fetch_daily(symbol, start, end)
+            if df is not None and not getattr(df, "empty", True):
+                return df
+        except Exception:
+            pass
+        try:
+            from feature_engineering import load_price_data
+
+            return load_price_data(symbol, start, end)
+        except Exception:
+            return None
+
+    timeout = float(os.getenv("HIST_COOK_FETCH_TIMEOUT", "40"))
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    fut = pool.submit(_go)
+    try:
+        return fut.result(timeout=timeout)
+    except Exception as e:
+        print(f"[HIST_COOK] {symbol} bars timed out ({timeout:.0f}s): {e}", flush=True)
         return None
+    finally:
+        # Don't wait on a stuck download — the context-manager shutdown would hang the cook.
+        pool.shutdown(wait=False, cancel_futures=True)
 
 
 def _rsi(close: pd.Series, n: int = 14) -> pd.Series:
@@ -156,9 +170,12 @@ def cook_symbol(
         spy_al = spy.reindex(c.index).ffill()
     if len(c) < 280:
         return {"symbol": symbol, "n": 0, "X": [], "y": []}
+    from analytics.horizon_picks import directional_conviction
+
     tight_rets: list[float] = []
     loose_rets: list[float] = []
     mom_rets: list[float] = []
+    conv_rets: list[float] = []
     xs: list[np.ndarray] = []
     ys: list[float] = []
     n_tight = n_loose = 0
@@ -213,9 +230,15 @@ def cook_symbol(
         n_loose += 1
         if mom5 > 0:
             mom_rets.append(fwd)
-        if ev.get("ok"):
-            tight_rets.append(fwd)
-            n_tight += 1
+        conv = directional_conviction(p_up)
+        # Same rule the live book sorts on: a real long edge, not a flat 0.50.
+        conviction_long = p_up >= 0.55 and conv >= 0.12
+        if conviction_long:
+            conv_rets.append(fwd)
+        if ev.get("ok") or conviction_long:
+            if ev.get("ok"):
+                tight_rets.append(fwd)
+                n_tight += 1
             cr = credit_outcome(symbol, fwd, side="LONG", persist=False, st=st)
             if cr.get("st"):
                 st = cr["st"]
@@ -239,11 +262,55 @@ def cook_symbol(
         "tight_mean": float(np.mean(tight_rets)) if tight_rets else None,
         "loose_mean": float(np.mean(loose_rets)) if loose_rets else None,
         "mom_mean": float(np.mean(mom_rets)) if mom_rets else None,
+        "n_conv": len(conv_rets),
+        "conv_mean": float(np.mean(conv_rets)) if conv_rets else None,
+        "conv_hit": float(np.mean([1.0 if r > 0 else 0.0 for r in conv_rets])) if conv_rets else None,
         "tight_hit": float(np.mean([1.0 if r > 0 else 0.0 for r in tight_rets])) if tight_rets else None,
         "loose_hit": float(np.mean([1.0 if r > 0 else 0.0 for r in loose_rets])) if loose_rets else None,
         "st": st,
         "X": xs,
         "y": ys,
+    }
+
+
+def _cook_event_history(frames: list[tuple[str, pd.Series]]) -> dict[str, Any]:
+    """Walk-forward the event model on the same historical closes. Deploy only if it beats naive."""
+    from analytics.event_learn import redesign_until_best, samples_from_closes, save_state
+
+    samples: list[Any] = []
+    for sym, closes in frames:
+        dates: list[date] = []
+        try:
+            from feature_engineering import load_earnings_dates
+
+            dates = list(load_earnings_dates(sym) or [])
+        except Exception:
+            dates = []
+        try:
+            samples.extend(samples_from_closes(sym, closes, dates))
+        except Exception as e:
+            print(f"[HIST_COOK] event samples {sym}: {e}", flush=True)
+        if len(samples) >= 6000:
+            break
+    if len(samples) < 80:
+        print(f"[HIST_COOK] event-learn skip: {len(samples)} samples", flush=True)
+        return {"ok": False, "n": len(samples)}
+    st = redesign_until_best(samples)
+    deployed = float(st.get("skill") or 0) > 0 or bool(st.get("beat_baseline"))
+    if deployed:
+        save_state(st)
+    print(
+        f"[HIST_COOK] event-learn n={st.get('n_samples')} ic={st.get('oos_ic')} "
+        f"acc={st.get('oos_acc')} skill={st.get('skill')} deployed={deployed}",
+        flush=True,
+    )
+    return {
+        "ok": True,
+        "deployed": deployed,
+        "n": st.get("n_samples"),
+        "ic": st.get("oos_ic"),
+        "acc": st.get("oos_acc"),
+        "skill": st.get("skill"),
     }
 
 
@@ -265,13 +332,16 @@ def main() -> int:
     os.environ.setdefault("USE_LSTM_HEAD", "true")
     syms = _cook_symbols(max(1, int(args.max_symbols)))
     print(f"[HIST_COOK] proven walk-forward names={len(syms)} window={start_s}..{end_s} stride={args.stride}", flush=True)
+    print("[HIST_COOK] fetching SPY", flush=True)
     spy_df = _closes("SPY", start_s, end_s)
+    print(f"[HIST_COOK] SPY bars={0 if spy_df is None else len(spy_df)}", flush=True)
     spy = None
     if spy_df is not None and not spy_df.empty:
         col = "Adj Close" if "Adj Close" in spy_df.columns else "Close"
         spy = spy_df[col].astype(float)
     st = default_state()
     rows: list[dict[str, Any]] = []
+    rows_closes: list[tuple[str, pd.Series]] = []
     used = 0
     for i, sym in enumerate(syms, 1):
         try:
@@ -279,6 +349,9 @@ def main() -> int:
             if df is None or getattr(df, "empty", True):
                 print(f"[HIST_COOK] skip {sym}: no bars", flush=True)
                 continue
+            col = "Adj Close" if "Adj Close" in df.columns else "Close"
+            if col in df.columns:
+                rows_closes.append((sym, df[col].astype(float)))
             rec = cook_symbol(sym, df, spy, stride=max(1, int(args.stride)), st=st)
             if rec.get("st"):
                 st = rec.pop("st")
@@ -289,7 +362,8 @@ def main() -> int:
             if i % 8 == 0 or rec.get("n_tight"):
                 print(
                     f"[HIST_COOK] {i}/{len(syms)} {sym} bars={rec.get('n')} tight={rec.get('n_tight')} "
-                    f"tight_mean={rec.get('tight_mean')} loose_mean={rec.get('loose_mean')}",
+                    f"conv={rec.get('n_conv')} tight_mean={rec.get('tight_mean')} "
+                    f"conv_mean={rec.get('conv_mean')} loose_mean={rec.get('loose_mean')}",
                     flush=True,
                 )
         except Exception as e:
@@ -317,6 +391,9 @@ def main() -> int:
         "tight_mean_1d": _wavg("tight_mean", "n_tight"),
         "loose_mean_1d": _wavg("loose_mean", "n"),
         "mom_mean_1d": _wavg("mom_mean", "n"),
+        "conv_mean_1d": _wavg("conv_mean", "n_conv"),
+        "conv_hit": _wavg("conv_hit", "n_conv"),
+        "n_conv": int(sum(int(r.get("n_conv") or 0) for r in rows)),
         "tight_hit": _wavg("tight_hit", "n_tight"),
         "loose_hit": _wavg("loose_hit", "n"),
         "n_updates": st.get("n_updates"),
@@ -344,6 +421,11 @@ def main() -> int:
         except Exception as e:
             report["gen_learn"] = {"ok": False, "error": str(e)[:200]}
             print(f"[HIST_COOK] gen-learn skip: {e}", flush=True)
+    try:
+        report["event_learn"] = _cook_event_history(rows_closes)
+    except Exception as e:
+        report["event_learn"] = {"ok": False, "error": str(e)[:200]}
+        print(f"[HIST_COOK] event-learn skip: {e}", flush=True)
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(report, indent=2, default=float), encoding="utf-8")
     print(
@@ -353,9 +435,23 @@ def main() -> int:
         flush=True,
     )
     beat = (report["tight_mean_1d"] or -1) >= (report["loose_mean_1d"] or 0)
+    conv_beat = (report.get("conv_mean_1d") or -1) >= (report["loose_mean_1d"] or 0)
     print(f"[HIST_COOK] tight vs always-long: {'BEATS' if beat else 'lags (weights still cooked)'}", flush=True)
+    print(
+        f"[HIST_COOK] conviction vs always-long: {'BEATS' if conv_beat else 'lags'} "
+        f"n={report.get('n_conv')} mean={report.get('conv_mean_1d')} hit={report.get('conv_hit')}",
+        flush=True,
+    )
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except Exception:
+        import traceback
+
+        traceback.print_exc()
+        raise SystemExit(1)

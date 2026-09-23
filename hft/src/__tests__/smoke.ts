@@ -220,20 +220,20 @@ ok("fill persist forces DAY and refuses cancel-unfilled", () => {
   process.env.HFT_FILL_PERSIST = "true";
 });
 
-ok("RTH spread cap is tight; charged spread is capped for edge gate", () => {
+ok("charged spread is the real bid-ask, not a flat 12 bps discount", () => {
   const b = new L2Book("MSFT");
   b.applySnapshot([[393.02, 100]], [[435.08, 100]], Date.now());
   assert.ok(spreadBps(b) > 500);
   assert.equal(spreadOk(b), false);
   assert.equal(spreadOkForSession(b, "regular"), false);
   assert.equal(flattenQuoteOk(b), false);
-  process.env.HFT_EDGE_SPREAD_CAP_BPS = "12";
-  assert.equal(chargedSpreadBps(b), 12);
+  assert.ok(chargedSpreadBps(b) > 500);
   const tight = new L2Book("KO");
   tight.applySnapshot([[70.00, 100]], [[70.02, 100]], Date.now());
   assert.ok(spreadOkForSession(tight, "regular"));
   assert.ok(flattenQuoteOk(tight));
-  assert.ok(chargedSpreadBps(tight) < 12);
+  const tightBps = chargedSpreadBps(tight);
+  assert.ok(tightBps > 2 && tightBps < 4);
 });
 
 ok("185/min buffer leaves headroom under 200 cap", () => {

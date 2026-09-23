@@ -658,7 +658,8 @@ def _best_from_report(
             if isinstance(hw, dict) and hw.get("block_playbook"):
                 continue
             blocked, _ = _family_intel_blocks(t)
-            if blocked:
+            # Long-block must not hide an independent DOWN call on another horizon.
+            if blocked and not (independent and sig == "DOWN"):
                 continue
             rk = _family_rank(row, prefix, days, macro_bundle=macro_bundle)
             conv = directional_conviction(p)

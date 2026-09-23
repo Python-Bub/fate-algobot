@@ -1,16 +1,16 @@
 {
   "ok": true,
-  "updated_at_utc": "2026-09-08T05:27:56.674802+00:00",
+  "updated_at_utc": "2026-09-08T05:37:43.879166+00:00",
   "pipeline": {
     "pipeline": "big_brain",
     "ok": true,
-    "finished_at_utc": "2026-09-08T05:27:56.673322+00:00",
+    "finished_at_utc": "2026-09-08T05:37:43.878363+00:00",
     "stages": [
       {
         "name": "cramer_hot_picks",
         "ok": true,
         "optional": false,
-        "elapsed_ms": 1,
+        "elapsed_ms": 0,
         "result": {
           "hot_buys": [
             "COST",
@@ -26,7 +26,7 @@
         "name": "cramer_post_market",
         "ok": true,
         "optional": true,
-        "elapsed_ms": 4437,
+        "elapsed_ms": 2978,
         "result": {
           "ok": true,
           "ingested": false,
@@ -39,10 +39,10 @@
         "name": "investor_succession",
         "ok": true,
         "optional": false,
-        "elapsed_ms": 1328,
+        "elapsed_ms": 1227,
         "result": {
           "ok": true,
-          "updated_at_utc": "2026-09-08T05:27:50.888107+00:00",
+          "updated_at_utc": "2026-09-08T05:37:38.426769+00:00",
           "failover_active": false,
           "primary": {
             "stale": false,
@@ -50,11 +50,11 @@
             "stale_threshold_h": 36.0,
             "primary_urls_ok": 3,
             "details": {
-              "transcript_age_h": 2.61,
-              "cramer_post_market_latest.json": 2.64,
-              "morning_club_latest.json": 2.61,
+              "transcript_age_h": 2.78,
+              "cramer_post_market_latest.json": 2.8,
+              "morning_club_latest.json": 2.78,
               "cramer_hot_picks.json": 0.0,
-              "cramer_cnbc_top10_sync.json": 101.55,
+              "cramer_cnbc_top10_sync.json": 101.71,
               "https://www.cnbc.com/mad-money/": {
                 "ok": true,
                 "reason": "http_200"
@@ -126,7 +126,7 @@
         "name": "safe_knowledge",
         "ok": true,
         "optional": true,
-        "elapsed_ms": 4285,
+        "elapsed_ms": 2929,
         "result": {
           "ok": true,
           "pairs": 56,
@@ -140,21 +140,21 @@
         "name": "talk_brain",
         "ok": true,
         "optional": false,
-        "elapsed_ms": 1476,
+        "elapsed_ms": 2519,
         "result": {
           "ready": true,
           "codebase": true,
           "edits": false,
           "backend": "local_char_lstm",
-          "sha256_16": "4c4e156f7e3a8852",
+          "sha256_16": "0e6c973e342a722d",
           "path": "/Users/demirgenc/FATE_AlgoBot/data/talk_brain/brain.pt",
           "not_qwen": true,
           "edit_gate": {
-            "ts": 1788845276.6513338,
-            "problems_done": 23519643900,
+            "ts": 1788845863.8771682,
+            "problems_done": 23527643900,
             "billion_threshold": 1000000000,
             "billion_unlocked": true,
-            "pct_of_1b": 2351.96439,
+            "pct_of_1b": 2352.76439,
             "remaining_to_1b": 0,
             "env_TALK_ALLOW_EDITS": false,
             "edits_allowed": false,
@@ -183,7 +183,7 @@
         "name": "letter_coverage",
         "ok": true,
         "optional": false,
-        "elapsed_ms": 21,
+        "elapsed_ms": 0,
         "result": {
           "models_gb": 4.78,
           "target_gb": 100,
@@ -207,7 +207,7 @@
           "events": [
             {
               "path": "data/intel/cramer_hot_picks.json",
-              "mtime": 1788845265.1239378
+              "mtime": 1788845854.2230678
             },
             {
               "path": "data/intel/cramer_post_market_latest.json",
@@ -215,7 +215,7 @@
             },
             {
               "path": "data/intel/investor_succession.json",
-              "mtime": 1788845270.8890269
+              "mtime": 1788845858.428039
             }
           ]
         }

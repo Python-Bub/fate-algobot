@@ -23,12 +23,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT_PATH = ROOT / "data" / "ops" / "buying_power.json"
 
 try:
-    from dotenv import load_dotenv
+    from data_platform.runtime_env import load_runtime_env
 
-    load_dotenv(ROOT / ".env", override=False)
-    _scale = ROOT / "data" / "deploy_scale.env"
-    if _scale.is_file():
-        load_dotenv(_scale, override=True)
+    load_runtime_env()
 except Exception:
     pass
 
@@ -257,6 +254,23 @@ def plan_from_account(
     overnight_gap = max(0.0, overnight_target - long_mv)
     cash_reserve = max(0.0, _f("FORTRESS_CASH_RESERVE_USD", 0.0))
     overnight_budget = min(overnight_gap, max(0.0, cash - cash_reserve))
+    # Reg T buying power is the extra we can still hold overnight. The 4× figure
+    # stays with same-day HFT. Only an explicit regt_buying_power field counts —
+    # missing it must not fall through to the full intraday buying_power.
+    regt_spend = 0.0
+    if _b("FORTRESS_DEPLOY_REGT", True):
+        raw_regt = acct.get("regt_buying_power")
+        try:
+            regt_spend = float(raw_regt) if raw_regt not in (None, "") else 0.0
+        except (TypeError, ValueError):
+            regt_spend = 0.0
+    if regt_spend > 0:
+        target_frac = max(target_frac, min(2.0, _f("FORTRESS_REGT_TARGET_FRAC", 2.0)))
+        overnight_target = equity * target_frac
+        overnight_gap = max(0.0, overnight_target - long_mv)
+        legal = max(max(0.0, cash - cash_reserve), regt_spend)
+        cap_bp = bp if bp > 0 else legal
+        overnight_budget = min(overnight_gap, legal, cap_bp)
     overnight_full = overnight_gap <= slack * equity + 50.0
 
     slots = sizing_slots()

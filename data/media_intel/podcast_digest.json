@@ -1,60 +1,60 @@
 {
-  "ts": 1788841510.32624,
+  "ts": 1790046824.776714,
   "n": 8,
   "items": [
     {
-      "title": "Chancellor calls for 'confidence about Britain' despite 'historic high' borrowing costs",
-      "link": "https://www.bbc.co.uk/news/articles/cgjqg450w28o?at_medium=RSS&at_campaign=rss",
-      "summary": "John Healey detailed plans to spread growth more widely across the UK, ahead of his first Budget.",
-      "sentiment": 0.3333333333333333,
+      "title": "Paramount settles lawsuit with US states, clearing way for $110bn merger with Warner Bros",
+      "link": "https://www.bbc.co.uk/news/articles/cm4gjr1qepr8o?at_medium=RSS&at_campaign=rss",
+      "summary": "The deal includes an agreement to produce 30 films a year, or Paramount will be forced to sell off parts of its company.",
+      "sentiment": -0.3333333333333333,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "'I performed on stage to get my first job' - the firms turning recruitment into competitions",
-      "link": "https://www.bbc.co.uk/news/articles/cgk43mn42g7o?at_medium=RSS&at_campaign=rss",
-      "summary": "Applicants have to pitch their ideas on stage in front of a panel of judges and an audience. But is this exciting or unfair?",
+      "title": "Vet prescription fees capped under rule changes",
+      "link": "https://www.bbc.co.uk/news/articles/cqzjz2gx18ggo?at_medium=RSS&at_campaign=rss",
+      "summary": "Vets must also tell clients if cheaper medicine is available online as part of the rule updates which surgeries have the coming months to bring in.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "AI cancer cures slowed by chip shortage, says UK's biggest tech boss",
-      "link": "https://www.bbc.co.uk/news/articles/c0m39g7xzevo?at_medium=RSS&at_campaign=rss",
-      "summary": "The head of chip designer Arm says modelling how a DNA marker is impacted by cancer cannot be done now, but computers are \"going to solve it\".",
+      "title": "I'd rather pay thousands on a holiday: Meet the pensioners spending the kids' inheritance",
+      "link": "https://www.bbc.co.uk/news/articles/cje8y3w2zdpo?at_medium=RSS&at_campaign=rss",
+      "summary": "The phenomenon sees retirees spend all their money on enjoying life to the full.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "Trump threatens to stop sale of Canadian Bombardier jets in US",
-      "link": "https://www.bbc.co.uk/news/articles/c4gj8xx5010o?at_medium=RSS&at_campaign=rss",
-      "summary": "The threat against one of Canada's largest companies comes amid an escalating trade war between the two neighbours.",
+      "title": "Repeated air traffic control failures leave us in worrying territory",
+      "link": "https://www.bbc.co.uk/news/articles/cmde0pp22r5go?at_medium=RSS&at_campaign=rss",
+      "summary": "The question is whether all of these incidents were isolated and unavoidable, or whether they point to something more systemic.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "Next wins key appeal to overturn \u00a330m equal pay ruling",
-      "link": "https://www.bbc.co.uk/news/articles/c05r61rqe4yo?at_medium=RSS&at_campaign=rss",
-      "summary": "A judge ruled Next can pay warehouse workers more because it is harder to recruit and retain them.",
+      "title": "Flights at major US airports delayed after cable cut by construction workers",
+      "link": "https://www.bbc.co.uk/news/articles/ckvgyzzgvv4wo?at_medium=RSS&at_campaign=rss",
+      "summary": "The cable had been repaired and airports are resuming normal operations, the US transportation secretary says.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "Faisal Islam: Chancellor's attempts to boost vibes may limit tax rises",
-      "link": "https://www.bbc.co.uk/news/articles/c39mz7xlvjzo?at_medium=RSS&at_campaign=rss",
-      "summary": "The new leadership is trying to maintain both confidence and the promotion of economic animal spirits.",
+      "title": "Airlines criticise air traffic control as second glitch causes more disruption",
+      "link": "https://www.bbc.co.uk/news/articles/cqp80p78mxx5o?at_medium=RSS&at_campaign=rss",
+      "summary": "Prime Minister Andy Burnham said further issues \"cause even greater concern\" about the UK's air traffic control and the head of the organisation that runs it.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "Why the 'Temu Range Rover' is such a threat to Jaguar Land Rover",
-      "link": "https://www.bbc.co.uk/news/articles/c5y4l22p262o?at_medium=RSS&at_campaign=rss",
-      "summary": "Job cuts come as JLR faces falling sales and intense Chinese competition while trying to switch to electric vehicles.",
+      "title": "What are my rights if my flight is cancelled or delayed?",
+      "link": "https://www.bbc.co.uk/news/articles/c9qxnyengdjo?at_medium=RSS&at_campaign=rss",
+      "summary": "Flights are affected again owing to air traffic control problems, so what are your rights if you're affected?",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     },
     {
-      "title": "Why are European countries moving their gold out of North America?",
-      "link": "https://www.bbc.co.uk/news/articles/cvgyn8q8gqxo?at_medium=RSS&at_campaign=rss",
-      "summary": "The Netherlands has relocated 86 tonnes of the shiny stuff - what's going on?",
+      "title": "UK should 'team up' with Canada in new Europe alliance, Canadian minister tells BBC",
+      "link": "https://www.bbc.co.uk/news/articles/cmed7p06epxjo?at_medium=RSS&at_campaign=rss",
+      "summary": "It comes after European Commission President proposed \"opening the door\" for Canada to become an associate member of the EU.",
       "sentiment": 0.0,
       "feed": "https://feeds.bbci.co.uk/news/business/rss.xml"
     }

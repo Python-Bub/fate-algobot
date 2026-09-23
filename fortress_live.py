@@ -10,13 +10,10 @@ import argparse
 import os
 import time
 
-from dotenv import load_dotenv
+from data_platform.runtime_env import load_runtime_env
 
-load_dotenv()
-# deploy_scale.env last-wins over .env (order pace, deploy, overnight caps).
-_deploy = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "deploy_scale.env")
-if os.path.isfile(_deploy):
-    load_dotenv(_deploy, override=True)
+# Files last-win (.env then deploy_scale.env). Process env / test pins are kept.
+load_runtime_env()
 
 from data_platform.market_prices import configure_process_prices
 
@@ -36,6 +33,7 @@ from sentiment_pipeline import block_long_on_sentiment, composite_sentiment
 from feature_store import volume_confirmed
 from trade_journal import log_trade
 from fortress_universe import load_fortress_scan_list
+from symbol_aliases import internal_symbol as _internal_symbol
 
 
 def _call_with_timeout(fn, timeout_sec: float, *args, **kwargs):
@@ -1530,12 +1528,16 @@ def run_fortress_pass(args) -> None:
                 raw = str(p.get("symbol") or "")
                 if is_crypto_symbol(raw):
                     held_c.append(yahoo_symbol(raw))
+            coin_set = set(held_c + coins)
+            equities = [s for s in syms if s not in coin_set and not is_crypto_symbol(s)]
             before = len(syms)
-            syms = list(dict.fromkeys(held_c + coins))
+            # Coins first (they can fill now), then the stock rotation. Do not drop either.
+            syms = list(dict.fromkeys(held_c + coins + equities))
             log.info(
-                "[FORTRESS] crypto-session final scan %d → %d (coins only; equity exits via hygiene)",
+                "[FORTRESS] crypto-session scan %d coins + %d equities (was %d)",
+                len(set(coins)),
+                len(equities),
                 before,
-                len(syms),
             )
         except Exception as e:
             log.debug("[FORTRESS] crypto-session final scan: %s", e)
@@ -1643,90 +1645,6 @@ def run_fortress_pass(args) -> None:
     scanned = 0
     scan_t0 = time.monotonic()
     pass_max_sec = float(os.getenv("FORTRESS_PASS_MAX_SEC", "900") or 0)
-    weekend_hold_fill = False
-    if (
-        use_real
-        and broker == "alpaca"
-        and os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in ("1", "true", "yes")
-    ):
-        try:
-            from alpaca_broker import list_positions as _lp_we
-            from fortress_portfolio import allocate_idle_cash_split, deploy_budget_usd, idle_cash_fill_active
-
-            ctx = portfolio_ctx or {}
-            if idle_cash_fill_active(ctx):
-                bud = deploy_budget_usd(ctx)
-                leftover = float(bud.get("budget") or 0)
-                min_n = float(os.getenv("MIN_ORDER_NOTIONAL", "100") or 100)
-                pos_idle = _lp_we() or []
-                extra = allocate_idle_cash_split(
-                    leftover,
-                    positions=pos_idle,
-                    equity=float(bud.get("equity") or rm.equity or 0),
-                    max_single_usd=float(bud.get("max_single_usd") or 0),
-                    min_n=min_n,
-                    already={},
-                    banned={
-                        x.strip().upper()
-                        for x in os.getenv(
-                            "FORTRESS_BAN_INDEX_ETFS",
-                            "SPY,QQQ,IWM,DIA,VOO,VTI,SOXX,XLK,XLF,XLE",
-                        ).split(",")
-                        if x.strip()
-                    },
-                )
-                by_sym = {
-                    str(p.get("symbol") or "").replace("/", "-").upper(): p
-                    for p in pos_idle
-                    if float(p.get("qty") or 0) > 0
-                }
-                for t, n_add in extra.items():
-                    tu = str(t).replace("/", "-").upper()
-                    p = by_sym.get(tu) or {}
-                    px = float(p.get("current_price") or p.get("avg_entry_price") or 0)
-                    if px <= 0 or float(n_add) < min_n:
-                        continue
-                    gain = p.get("unrealized_plpc")
-                    try:
-                        gain_f = float(gain) if gain is not None else 0.0
-                    except (TypeError, ValueError):
-                        gain_f = 0.0
-                    buy_candidates.append(
-                        {
-                            "ticker": tu,
-                            "p_up": 0.58,
-                            "p_adj": 0.58,
-                            "p_entry": 0.58,
-                            "exec_c": 0.62,
-                            "sent": 0.0,
-                            "nf_f": 0.0,
-                            "top100": False,
-                            "px": px,
-                            "scale": 1.0,
-                            "row": None,
-                            "existing_mv": abs(float(p.get("market_value") or 0)),
-                            "existing_gain": gain_f,
-                            "exited": False,
-                            "score": 0.20,
-                            "hf_boost": 0.0,
-                            "hf_meta": {},
-                            "jp_candle": {},
-                            "force_priority": False,
-                            "earnings_meta": {},
-                            "conviction": 0.16,
-                            "weekend_idle_n": float(n_add),
-                        }
-                    )
-                if buy_candidates:
-                    weekend_hold_fill = True
-                    scanned = len(buy_candidates)
-                    log.info(
-                        "[FORTRESS] weekend idle-cash %d hold(s) $%.0f — skip slow coin ticks",
-                        len(buy_candidates),
-                        sum(float(c.get("weekend_idle_n") or 0) for c in buy_candidates),
-                    )
-        except Exception as e:
-            log.warning("[FORTRESS] weekend idle-cash prefill: %s", e)
     bench_closes = None
     if spy is not None and not spy.empty and "Close" in spy.columns:
         bench_closes = spy["Close"].astype(float)
@@ -1745,16 +1663,6 @@ def run_fortress_pass(args) -> None:
     regime_hf = float(market_bull_bear.get("bull_bear_score", 0.0))
 
     for t in syms:
-        if weekend_hold_fill:
-            break
-        if os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in ("1", "true", "yes"):
-            try:
-                from crypto_universe import is_crypto_symbol
-
-                if not is_crypto_symbol(t):
-                    continue
-            except Exception:
-                continue
         if is_halted():
             log.error("[FORTRESS] Kill switch — stopping")
             break
@@ -3116,27 +3024,21 @@ def run_fortress_pass(args) -> None:
                 c["score"] = base
                 c["cooldown"] = in_cooldown(t)
             try:
-                from analytics.horizon_picks import directional_conviction, horizon_independent
+                from analytics.horizon_picks import directional_conviction
 
-                if horizon_independent():
-                    for c in buy_candidates:
-                        conv = directional_conviction(float(c.get("p_entry", c.get("p_adj", 0.5))))
-                        c["conviction"] = conv
-                        # This sleeve's 1d conviction first; other rank extras as a small tie-break.
-                        c["score"] = float(conv) * 2.0 + 0.20 * float(c.get("score") or 0.0)
+                for c in buy_candidates:
+                    conv = directional_conviction(float(c.get("p_entry", c.get("p_adj", 0.5))))
+                    c["conviction"] = conv
+                    # Directional edge first. The rest of the rank stack is a tie-break
+                    # so hooks cannot outvote a weak probability.
+                    c["score"] = float(conv) * 2.0 + 0.20 * float(c.get("score") or 0.0)
             except Exception:
                 pass
             if os.getenv("TRADE_COOLDOWN_SKIP_BUYS", "true").lower() in ("1", "true", "yes"):
-                if weekend_hold_fill:
-                    log.info("[FORTRESS] weekend fill — keep cooldown holds")
-                else:
-                    buy_candidates = [c for c in buy_candidates if not c.get("cooldown")]
+                buy_candidates = [c for c in buy_candidates if not c.get("cooldown")]
         except Exception:
             pass
         ranked = select_diversified_buys(buy_candidates, top_buys_per_pass, held=held_syms)
-        if weekend_hold_fill and buy_candidates and not ranked:
-            ranked = list(buy_candidates)
-            log.warning("[FORTRESS] weekend fill — diversify dropped holds, using all %d", len(ranked))
         risk_scale = 1.0
         if use_real and broker == "alpaca":
             try:
@@ -3218,19 +3120,11 @@ def run_fortress_pass(args) -> None:
     # Cross-sectional vectorized sizing — deploy full equity target across ranked names
     # that still have room under the single-name equity cap (skip capped / ADD_ON-blocked).
     vec_notionals: dict[str, float] = {}
-    for c in buy_candidates:
-        n_we = float(c.get("weekend_idle_n") or 0)
-        if n_we > 0:
-            tu = str(c.get("ticker") or "").replace("/", "-").upper()
-            if tu:
-                vec_notionals[tu] = n_we
     use_vec = os.getenv("FORTRESS_USE_VECTORIZED_WEIGHTS", "true").lower() in (
         "1",
         "true",
         "yes",
     )
-    if weekend_hold_fill and vec_notionals:
-        use_vec = False
     if use_vec:
         try:
             from analytics.rank_pipeline import vectorized_target_weights
@@ -3378,7 +3272,12 @@ def run_fortress_pass(args) -> None:
                     leftover -= add
             allocated = sum(vec_notionals.values())
             idle_left = max(float(leftover), max(0.0, float(budget) - allocated))
-            if idle_left >= min_n and idle_cash_fill_active(ctx):
+            if halted:
+                log.info(
+                    "[FORTRESS] idle cash stays cash — buy halt (%s)",
+                    halt_why or "halted",
+                )
+            elif idle_left >= min_n and idle_cash_fill_active(ctx):
                 leftover = idle_left
                 try:
                     from alpaca_broker import list_positions as _lp_idle
@@ -3408,20 +3307,12 @@ def run_fortress_pass(args) -> None:
                         for c in ranked
                         if float(c.get("score") or 0) > 0
                     }
-                    held = set()
-                    for p in pos_idle:
-                        try:
-                            if float(p.get("qty") or 0) <= 0:
-                                continue
-                        except (TypeError, ValueError):
-                            continue
-                        held.add(str(p.get("symbol") or "").replace("/", "-").upper())
                     kept_idle = 0.0
                     for t, n_add in extra.items():
                         tu = str(t).upper()
-                        # Winners already in the book may take idle cash even if this
-                        # pass did not re-score them. Skip only *new* zero-score dumps.
-                        if tu not in scored and tu not in held:
+                        # Cash follows this pass's positive scores only. A hold with
+                        # no edge, and a new coin the model did not rank, stay unfunded.
+                        if tu not in scored and _internal_symbol(tu) not in scored:
                             log.info(
                                 "[FORTRESS] idle skip %s $%.0f — no scored edge this pass",
                                 tu,
@@ -3470,7 +3361,9 @@ def run_fortress_pass(args) -> None:
                         continue
                 except (TypeError, ValueError):
                     continue
-                held_syms.add(str(p.get("symbol") or "").replace("/", "-").upper())
+                _raw_sym = str(p.get("symbol") or "")
+                held_syms.add(_raw_sym.replace("/", "-").upper())
+                held_syms.add(_internal_symbol(_raw_sym))
         except Exception:
             pass
         if ranked or vec_notionals:
@@ -3526,6 +3419,19 @@ def run_fortress_pass(args) -> None:
                 log.info(
                     "[FORTRESS] skip BUY %s — no rank score (refuse dummy p=0.55 cash dump)",
                     t,
+                )
+                continue
+            _p_buy = float(cand.get("p_adj") or cand.get("p_up") or 0.5)
+            _conv = cand.get("conviction")
+            if _conv is None:
+                _conv = abs(_p_buy - 0.5) * 2.0
+            _min_conv = float(os.getenv("FORTRESS_MIN_CONVICTION", "0.16"))
+            if float(_conv) < _min_conv and not cand.get("force_priority"):
+                log.info(
+                    "[FORTRESS] skip BUY %s — conviction %.3f < %.3f",
+                    t,
+                    float(_conv),
+                    _min_conv,
                 )
                 continue
         except (TypeError, ValueError):

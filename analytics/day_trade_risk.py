@@ -91,6 +91,17 @@ def _is_weekend_et(day: str | None = None) -> bool:
         return False
 
 
+def _before_cash_open_et() -> bool:
+    """True from midnight until 04:00 ET, before the new session can trade."""
+    try:
+        from zoneinfo import ZoneInfo
+
+        now = datetime.now(ZoneInfo("America/New_York"))
+    except Exception:
+        return False
+    return now.hour < 4
+
+
 def ensure_session_anchor(equity: float, last_equity: float | None = None) -> float:
     """Anchor today's P&L at prior close (`last_equity`) so overnight marks count.
 
@@ -103,6 +114,12 @@ def ensure_session_anchor(equity: float, last_equity: float | None = None) -> fl
         start = float(last_equity or 0)
         if _is_weekend_et(today):
             start = float(equity or 0) or start
+        elif _before_cash_open_et() and start > 0 and float(equity or 0) > 0:
+            # Alpaca last_equity lags the ET date roll. Anchoring Tuesday at
+            # Monday's stale prior close re-locks yesterday's gain before the open.
+            gap = (float(equity) - start) / start
+            if abs(gap) >= _f("DAILY_RED_EPS_PCT", 0.0003):
+                start = float(equity)
         if start <= 0:
             try:
                 from alpaca_broker import get_account

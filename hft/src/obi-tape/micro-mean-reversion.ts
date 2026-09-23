@@ -296,10 +296,10 @@ export class MicroMeanReversion {
       process.env.HFT_TRADE_SESSION === "extended" &&
       currentSession() !== "regular";
     const effMinObiLong = restExtended
-      ? Number(process.env.HFT_MR_REST_MIN_OBI_LONG ?? -0.99)
+      ? Number(process.env.HFT_MR_REST_MIN_OBI_LONG ?? 0.08)
       : minObiLong;
     const requirePattern = restExtended
-      ? process.env.HFT_MR_REST_REQUIRE_PATTERN === "true"
+      ? process.env.HFT_MR_REST_REQUIRE_PATTERN !== "false"
       : process.env.HFT_MR_REQUIRE_PATTERN !== "false";
     const jpUltra = process.env.HFT_JP_ULTRA === "true";
     const longOnly = process.env.HFT_LONG_ONLY !== "false";
@@ -322,6 +322,9 @@ export class MicroMeanReversion {
     const dipScalp = process.env.HFT_DIP_SCALP !== "false";
     const patternOkLong = bullishPattern && (!candleOnly || bullishPattern);
     const patternOkShort = bearishPattern && (!candleOnly || bearishPattern);
+    // A dip with no candle, or against a bearish candle, is not a buy.
+    const dipOkLong = dipScalp && dipBelowVwap && patternBias(pattern) !== -1;
+    const dipOkShort = dipScalp && popAboveVwap && patternBias(pattern) !== 1;
     const useMicroProb = process.env.HFT_MICROSTRUCTURE_PROB !== "false";
     const tapeBurst = tape.lastBurstRatio >= Number(process.env.TAPE_VELOCITY_MULTIPLIER ?? 2.5);
     const microIn = {
@@ -343,12 +346,12 @@ export class MicroMeanReversion {
     let goLong =
       trendOkLong &&
       book.obi > effMinObiLong &&
-      (patternOkLong || (dipScalp && dipBelowVwap) || (!requirePattern && !candleOnly && dipBelowVwap));
+      (patternOkLong || (!requirePattern && !candleOnly && dipOkLong));
     let goShort =
       !longOnly &&
       trendOkShort &&
       book.obi < minObiShort &&
-      (patternOkShort || (!requirePattern && !candleOnly && popAboveVwap));
+      (patternOkShort || (!requirePattern && !candleOnly && dipOkShort));
     if (useMicroProb) {
       const upP = upwardProbability(microIn, tapeBurst);
       const minP = Number(process.env.HFT_MICRO_MIN_UP_PROB ?? 0.52);

@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 PERSIST_FILE = "session_data.json"
 
@@ -35,7 +35,7 @@ def log_trade(ticker, pnl):
     """Call this for each executed trade with real pnl != 0."""
     _reload_data()
     record = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
         "ticker": ticker,
         "pnl": round(pnl, 2)
     }

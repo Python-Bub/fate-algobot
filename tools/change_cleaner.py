@@ -106,15 +106,14 @@ def cleanup_orphan_symbols(symbols: list[str], *, dry: bool = False) -> dict[str
     Hard guard: CLEANER_NEVER_DELETE_MODELS / AUTO_IMPROVE_NEVER_DELETE=true
     refuses to remove any model pickle — only logs what would have been cleaned.
     """
-    if os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in ("1", "true", "yes") or os.getenv(
-        "AUTO_IMPROVE_NEVER_DELETE", "true"
-    ).lower() in ("1", "true", "yes"):
-        return {
-            "symbols": [],
-            "bytes_freed": 0,
-            "skipped": "never_delete_guard",
-            "would_touch": [s.strip().upper() for s in symbols if s.strip()][:50],
-        }
+    never_delete = os.getenv("CLEANER_NEVER_DELETE_MODELS", "true").lower() in (
+        "1",
+        "true",
+        "yes",
+    ) or os.getenv("AUTO_IMPROVE_NEVER_DELETE", "true").lower() in ("1", "true", "yes")
+    # A dry run never unlinks anything, so it can always report the protected-aware plan;
+    # only a real delete is refused by the guard (and still reports what it would touch).
+    plan_only = dry or never_delete
     protected = _protected_symbols()
     removed: list[str] = []
     freed = 0
@@ -126,8 +125,16 @@ def cleanup_orphan_symbols(symbols: list[str], *, dry: bool = False) -> dict[str
         if not hits:
             continue
         for p in hits:
-            freed += _rm_file(p, dry=dry)
+            freed += _rm_file(p, dry=plan_only)
         removed.append(sym)
+    if never_delete and not dry:
+        return {
+            "symbols": [],
+            "bytes_freed": 0,
+            "skipped": "never_delete_guard",
+            "would_touch": removed[:50],
+            "would_free_bytes": freed,
+        }
     return {"symbols": removed, "bytes_freed": freed}
 
 

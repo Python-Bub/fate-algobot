@@ -27,7 +27,7 @@ class TestAllHandlersPresent(unittest.TestCase):
                 continue
             ctx = IndustryContext(symbol=hints[0], sector="", yahoo_industry="")
             hit = h.classify(ctx)
-            self.assertIsNotNone(hit)
+            self.assertIsNotNone(hit, msg=f"{iid} did not classify hint {hints[0]!r}")
             self.assertEqual(hit.industry_id, iid)
 
 

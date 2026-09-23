@@ -8,7 +8,7 @@ Live price for orders still comes from the last printed close/quote.
 from __future__ import annotations
 
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Any
 
 import pandas as pd
@@ -72,7 +72,7 @@ def completed_daily_signal_row(
 
         today = (now or now_et()).date()
     except Exception:
-        today = (now or datetime.utcnow()).date()
+        today = (now or datetime.now(timezone.utc).replace(tzinfo=None)).date()
     if last_d is not None and last_d == today and not session_complete_et(now):
         return df.iloc[-2].copy(), live_px
     return last.copy(), live_px

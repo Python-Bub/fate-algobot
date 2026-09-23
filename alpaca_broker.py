@@ -17,7 +17,7 @@ import requests
 
 from utils import log
 
-from symbol_aliases import price_feed_symbol
+from symbol_aliases import alpaca_equity_symbol
 
 
 def _require_order_host() -> None:
@@ -122,7 +122,7 @@ def fetch_alpaca_daily_bars(
     if not _alpaca_bars_enabled:
         return pd.DataFrame()
 
-    sym = price_feed_symbol(symbol)
+    sym = alpaca_equity_symbol(symbol)
     base = _normalize_base(os.getenv("ALPACA_DATA_URL", "https://data.alpaca.markets"))
     end_iso = end or (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
     start_iso = pd.Timestamp(start).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -249,7 +249,7 @@ def get_quote_bid_ask(symbol: str) -> tuple[float, float] | None:
     k, s = _keys()
     if not k:
         return None
-    sym = price_feed_symbol(symbol)
+    sym = alpaca_equity_symbol(symbol)
     try:
         from analytics.alpaca_limits import (
             acquire_data_token,
@@ -429,12 +429,13 @@ def _yahoo_last_px(symbol: str) -> float | None:
 def _route_symbol(symbol: str) -> str:
     """Return the symbol in the format Alpaca expects.
 
-    - Equities/ETFs: as-is, with legacy alias mapping (e.g. SQ -> XYZ).
+    - Equities/ETFs: legacy alias mapping (e.g. SQ -> XYZ) and Yahoo class-share
+      hyphen -> Alpaca dot (BRK-B -> BRK.B; Alpaca 404s the hyphenated form).
     - Crypto: BTC-USD (Yahoo) -> BTC/USD (Alpaca).
     """
     if is_crypto_symbol(symbol):
         return alpaca_symbol(symbol)
-    return price_feed_symbol(symbol)
+    return alpaca_equity_symbol(symbol)
 
 
 def _tif(symbol: str) -> str:
@@ -1915,6 +1916,17 @@ def submit_market_order(
                     return submit_limit_order(symbol, qty, side, lp)
             elif _ext:
                 raise ValueError(f"no quote for extended-hours limit {symbol}")
+
+    # Same rolling 200/min trade-API pacer as submit_limit_order — a burst of raw
+    # market orders (crypto / no-quote fallback) must not 429-starve HFT.
+    try:
+        from analytics.alpaca_limits import can_submit_order_pace
+
+        pace = can_submit_order_pace()
+        if not pace.ok:
+            raise RuntimeError(f"order paced ({pace.reason})")
+    except ImportError:
+        pass
 
     sym = _route_symbol(symbol)
     base = _normalize_base(os.getenv("ALPACA_BASE_URL", "https://paper-api.alpaca.markets"))

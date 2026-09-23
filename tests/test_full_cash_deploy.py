@@ -182,15 +182,18 @@ def test_addon_on_still_refuses_red_when_winners_only(monkeypatch):
     assert can_add_position(rm, "LCID", 200.0, 5.0, 4.0, existing_mv=98.0) is False
 
 
-def test_fortress_keeps_held_idle_when_scan_scores_nothing():
+def test_fortress_sizes_from_scores_not_dummy_fills():
     from pathlib import Path
 
     text = Path(__file__).resolve().parents[1].joinpath("fortress_live.py").read_text()
-    assert "skip idle-cash fill — scan scored 0 ticks this pass" not in text
+    assert "p_up\": 0.58" not in text
+    assert "weekend_idle_n" not in text
+    assert "if weekend_hold_fill:" not in text
+    assert "idle cash stays cash — buy halt" in text
+    assert "no scored edge this pass" in text
     assert "keep held idle fills" in text
+    assert "Directional edge first" in text
     assert "FORTRESS_CRYPTO_TICK_TIMEOUT_SEC" in text
     assert 'os.environ["FORTRESS_LITE_INTEL"] = "true"' in text
-    assert "weekend idle-cash" in text
-    assert "weekend fill — keep cooldown holds" in text
     assert "lite tick" in text
     assert "overnight_cash_deploy can make buy_ok true" in text

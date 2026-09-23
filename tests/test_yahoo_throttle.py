@@ -105,6 +105,11 @@ def test_paper_sim_skips_yahoo_fallback(monkeypatch):
     monkeypatch.setenv("PAPER_SIM_FORCE_YAHOO", "false")
     monkeypatch.setenv("FORCE_YAHOO_PRICES", "false")
     monkeypatch.setenv("PAPER_SIM_SKIP_YAHOO_FALLBACK", "true")
+    # Deploy knobs currently run Yahoo-first with fallback on; pin the polygon-first
+    # policy this test is about (the code path, not the operator's live setting).
+    monkeypatch.setenv("SKIP_YAHOO_FALLBACK", "true")
+    monkeypatch.setenv("USE_YAHOO_FIRST", "false")
+    monkeypatch.setenv("USE_POLYGON_FIRST", "true")
     monkeypatch.setenv("POLYGON_API_KEY", "test-key")
     monkeypatch.setenv("PRICE_DATA_SOURCE", "hybrid_polygon")
     assert _skip_yahoo_fallback() is True

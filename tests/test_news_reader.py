@@ -28,4 +28,11 @@ def test_fetch_news_normalizes_keys(monkeypatch):
 
     monkeypatch.setattr("news_reader.yf.Ticker", lambda _s: _T())
     rows = fetch_news("AAPL", limit=5)
-    assert rows == [{"headline": "Hello", "title": "Hello", "summary": "World"}]
+    # Empty titles are dropped; duplicates across related symbols are de-duped by title.
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["headline"] == "Hello"
+    assert row["title"] == "Hello"
+    assert row["summary"] == "World"
+    # Provenance: which listing (live ticker or former name / spinoff) the headline came from.
+    assert row["source_symbol"] == "AAPL"

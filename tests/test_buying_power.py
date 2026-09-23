@@ -88,7 +88,9 @@ def test_plan_uses_get_v2_account_buying_power_without_dtbp(monkeypatch):
         },
         [{"symbol": "AAPL", "qty": "10", "market_value": "53000"}],
     )
-    assert abs(plan.overnight_budget - 19_000.0) < 1.0
+    # Reg T $144k is usable overnight, capped at 2× equity minus what is already held.
+    assert abs(plan.overnight_budget - 91_000.0) < 1.0
+    assert plan.overnight_budget < plan.buying_power
     assert abs(plan.buying_power - 224_000.0) < 1.0
     assert abs(plan.day_buying_power - 224_000.0) < 1.0
     assert plan.daily_pnl > 0

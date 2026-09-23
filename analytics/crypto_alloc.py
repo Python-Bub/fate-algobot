@@ -71,13 +71,15 @@ def crypto_single_cap_usd(equity: float) -> float:
 
 
 def overnight_crypto_scan() -> list[str]:
-    """Full liquid crypto list when NYSE is closed — not just BTC/ETH already in the 1d scan."""
-    raw = os.getenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "").strip()
-    if raw:
-        return list(dict.fromkeys(s.strip().upper() for s in raw.split(",") if s.strip()))
+    """Every liquid Alpaca coin. An env list only prioritizes names, it does not replace the universe."""
     from crypto_universe import CRYPTO_YAHOO
 
-    return list(dict.fromkeys(CRYPTO_YAHOO))
+    priority = [
+        s.strip().upper()
+        for s in os.getenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "").split(",")
+        if s.strip()
+    ]
+    return list(dict.fromkeys(priority + list(CRYPTO_YAHOO)))
 
 
 def idle_new_crypto_notionals(

@@ -22,9 +22,25 @@ class TestAsymmetricLoss(unittest.TestCase):
         self.assertLess(rw.reward, -0.02 * 4.0)
 
     def test_short_wrong_more_penalized_than_long(self):
+        # Default convention is position P&L: a losing short is a negative number.
         rl = asymmetric_reward("LONG", -0.02, bars_held=1).reward
-        rs = asymmetric_reward("SHORT", 0.02, bars_held=1).reward
+        rs = asymmetric_reward("SHORT", -0.02, bars_held=1).reward
+        self.assertLess(rl, 0.0)
         self.assertLess(rs, rl)
+
+    def test_price_return_convention_flips_short(self):
+        # position_pnl=False: input is the underlying price return, so a SHORT
+        # into a +2% move is a loss and a SHORT into a -2% move is a win.
+        lose = asymmetric_reward("SHORT", 0.02, bars_held=1, position_pnl=False)
+        win = asymmetric_reward("SHORT", -0.02, bars_held=1, position_pnl=False)
+        self.assertFalse(lose.correct)
+        self.assertLess(lose.reward, 0.0)
+        self.assertTrue(win.correct)
+        self.assertGreater(win.reward, 0.0)
+        # Explicit position_pnl=True must ignore the env fallback.
+        with mock.patch.dict(os.environ, {"ASYM_POSITION_PNL": "false"}):
+            pos = asymmetric_reward("SHORT", 0.02, bars_held=1, position_pnl=True)
+            self.assertTrue(pos.correct)
 
 
 class TestAsymmetricFilter(unittest.TestCase):

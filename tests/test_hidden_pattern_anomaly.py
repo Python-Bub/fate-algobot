@@ -13,6 +13,12 @@ from analytics.hidden_pattern_anomaly import (
 
 
 def test_analyze_synthetic_spike(tmp_path, monkeypatch):
+    # Synthetic scenario: neutralize the live bot's learned per-family multipliers
+    # (data/intel/hidden_pattern_weights.json) and the auto-generated cross-symbol
+    # detectors (which fetch peer bars) so this checks the detectors, not live state.
+    monkeypatch.setattr("analytics.hidden_pattern_learn.load_detector_weights", lambda: {})
+    monkeypatch.setenv("USE_GENERATED_PATTERNS", "false")
+    monkeypatch.setenv("HIDDEN_ANOMALY_MIN_SCORE", "0.42")
     # Quiet series then a huge idiosyncratic jump → residual / iforest should fire
     rng = np.random.default_rng(0)
     closes = 100 + np.cumsum(rng.normal(0, 0.3, 120))

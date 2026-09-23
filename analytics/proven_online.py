@@ -363,7 +363,11 @@ def evaluate(
         and p_c >= hedge_floor
         and not chase
     )
+    if p_c != p_c or p_c in (float("inf"), float("-inf")):
+        p_c = 0.5
     boost = max(-1.0, min(1.0, (p_c - 0.5) * 2.0))
+    if boost != boost:
+        boost = 0.0
     _remember_votes(ticker, votes)
     out.update(
         {

@@ -334,9 +334,16 @@ def orders_allowed(side: str = "buy", *, for_hft: bool = False, symbol: str | No
     exit_mode = _mode("TRADE_EXIT_SESSION_MODE", buy_mode)
 
     flatten = side_l in ("sell", "close", "exit", "short", "cover")
-    overnight_cash = (not flatten) and (not for_hft) and os.getenv(
-        "FORTRESS_OVERNIGHT_CASH_DEPLOY", "false"
-    ).lower() in ("1", "true", "yes", "on")
+    # Overnight leftover-cash deploy is a weeknight (20:00→04:00 ET) allowance so cash
+    # is working at the next open. Equities stay 24/5: a Sat/Sun buy would only queue
+    # through the weekend gap, so the weekend gate below still applies.
+    overnight_cash = (
+        (not flatten)
+        and (not for_hft)
+        and is_trading_day()
+        and os.getenv("FORTRESS_OVERNIGHT_CASH_DEPLOY", "false").lower()
+        in ("1", "true", "yes", "on")
+    )
 
     # NYSE holiday / early-close gate (Alpaca clock). Exits still allowed unless blocked.
     exch_ok, exch_reason = exchange_is_open(for_hft=for_hft)

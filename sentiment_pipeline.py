@@ -236,6 +236,9 @@ _FINBERT_MODELS: dict[str, tuple] = {}
 
 
 def _finbert_model_score(name: str, texts: list[str]) -> float:
+    # Missing tokenizer files 404 in a long probe. Cap that so a scan is not stuck.
+    os.environ.setdefault("HF_HUB_ETAG_TIMEOUT", "3")
+    os.environ.setdefault("HF_HUB_DOWNLOAD_TIMEOUT", "8")
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
     import torch
 

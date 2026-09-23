@@ -246,3 +246,42 @@ def test_stick_plan_off_after_bmo_print(gap_env, monkeypatch):
     assert plan["allow_overnight_hold"] is True
     assert plan["fear_dump_watch"] is True
     assert plan["print_released"] is True
+
+
+def test_trail_locks_a_winner_that_gives_back(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setattr(
+        "analytics.conviction_exit._trade_row",
+        lambda _s: {"mfe": 0.025, "scaled": True},
+    )
+    d = decide_exit("AAPL", p_adj=0.62, gain=0.016, take_profit_pct=0.035, stop_loss_pct=0.028)
+    assert d.action == "take_profit"
+    assert "trail" in d.reason
+
+
+def test_new_high_is_not_trailed_out(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setenv("FORTRESS_SCALE_OUT_PCT", "0.05")
+    monkeypatch.setattr("analytics.conviction_exit._trade_row", lambda _s: {"mfe": 0.02})
+    d = decide_exit("AAPL", p_adj=0.70, gain=0.024, take_profit_pct=0.035, stop_loss_pct=0.028)
+    assert d.action == "hold"
+
+
+def test_scale_out_happens_once(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setenv("FORTRESS_SCALE_OUT_PCT", "0.022")
+    monkeypatch.setattr("analytics.conviction_exit._trade_row", lambda _s: {"scaled": True, "mfe": 0.024})
+    d = decide_exit("AAPL", p_adj=0.66, gain=0.024, take_profit_pct=0.035, stop_loss_pct=0.028)
+    assert d.action == "hold"
+
+
+def test_early_cut_when_model_has_flipped(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setattr("analytics.conviction_exit._trade_row", lambda _s: {})
+    d = decide_exit("AAPL", p_adj=0.40, gain=-0.013, take_profit_pct=0.035, stop_loss_pct=0.028)
+    assert d.action == "stop_loss"
+    assert "early_cut" in d.reason

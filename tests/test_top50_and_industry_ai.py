@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 
@@ -23,15 +25,30 @@ class TestTop50UniverseTier(unittest.TestCase):
 
     @patch("universe_lifecycle.rankings._refresh_caps_progressive")
     def test_refresh_writes_correct_top50_size(self, mock_refresh):
-        from universe_lifecycle.rankings import refresh_market_cap_tiers
+        import universe_lifecycle.rankings as rk
 
         mock_refresh.side_effect = lambda pool, cached: cached
-        with patch("universe_lifecycle.rankings._trainable_model_pool") as mock_pool:
+        # refresh_market_cap_tiers() writes the *production* top-100 / top-50% caches
+        # that fortress + paper-sim read. Redirect every output path to a temp dir so a
+        # synthetic T0..T3999 pool never clobbers data/top100_market_cap.json.
+        with tempfile.TemporaryDirectory() as td, patch.object(
+            rk, "TOP100_PATH", Path(td) / "top100.json"
+        ), patch.object(rk, "TOP50_PATH", Path(td) / "top50.json"), patch.object(
+            rk, "CAP_CACHE_PATH", Path(td) / "caps.json"
+        ), patch("universe_lifecycle.rankings._trainable_model_pool") as mock_pool:
             mock_pool.return_value = [f"T{i}" for i in range(4000)]
-            out = refresh_market_cap_tiers(merge_cache=True)
+            out = rk.refresh_market_cap_tiers(merge_cache=True)
             self.assertEqual(out["universe_size"], 4000)
             self.assertEqual(out["top50_target"], 2000)
             self.assertGreaterEqual(len(out["top50pct"]), 2000)
+            self.assertTrue((Path(td) / "top50.json").is_file())
+        from universe_lifecycle.paths import TOP100_PATH
+
+        # Production cache must still hold real tickers after the test.
+        import json
+
+        real = json.loads(TOP100_PATH.read_text(encoding="utf-8")).get("symbols") or []
+        self.assertFalse(any(s.startswith("T") and s[1:].isdigit() for s in real), real[:10])
 
 
 class TestAIRegistry(unittest.TestCase):
