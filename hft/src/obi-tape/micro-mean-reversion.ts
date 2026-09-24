@@ -6,6 +6,7 @@ import { AlpacaExecutor, type OrderResponse, type TimeInForce } from "../common/
 import { CFG, confidenceNotionalMult } from "../common/config.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
+import { lossSizeMult } from "../common/loss-memory.js";
 import { currentSession, hftExtendedHoursFlag, hftExitTif, hftLimitTif, ordersAllowed, shouldTtlCancelWorking } from "../common/market-session.js";
 import { nowNs, nsToMs } from "../common/latency.js";
 import { fileLogger, stdoutTag } from "../common/logger.js";
@@ -208,10 +209,24 @@ export class MicroMeanReversion {
 
     const { exitMs, debounceMs } = mrTimingFor(t, this.mrExitMs, this.mrDebounceMs);
     const maxHoldMs = Number(process.env.HFT_MR_MAX_HOLD_MS ?? 12_000);
-    const stopPct = Number(process.env.HFT_MR_STOP_PCT ?? 0.0015);
+    // STOP_PCT=0 turns off the tight noise stop. A real loss still has a floor.
+    const configuredStop = Number(process.env.HFT_MR_STOP_PCT ?? 0.0015);
+    const hardFloor = Number(process.env.HFT_MR_HARD_STOP_PCT ?? 0.008);
+    const stopPct = configuredStop > 0 ? configuredStop : hardFloor;
     const heldMs = Date.now() - pos.openedMs;
 
-    // 1) Hard stop-loss → forced exit (protect capital). Disabled when stop pct <= 0.
+    if (dayTradeBuysHalted() && pos.entryPx > 0) {
+      const dayAdverse =
+        pos.side === "buy"
+          ? (pos.entryPx - book.bestBid) / pos.entryPx
+          : (book.bestAsk - pos.entryPx) / pos.entryPx;
+      if (dayAdverse >= 0.002) {
+        void this.flatten(pos, debounceMs, exitMs, true);
+        return;
+      }
+    }
+
+    // 1) Hard stop-loss → forced exit (protect capital).
     if (stopPct > 0 && pos.entryPx > 0) {
       const adverse =
         pos.side === "buy"
@@ -469,7 +484,7 @@ export class MicroMeanReversion {
     const conf = candleOnly || bullishPattern || bearishPattern
       ? 0.55 * patternStrength + 0.25 * dipStrength + 0.2 * obiAlign
       : 0.4 * patternStrength + 0.3 * dipStrength + 0.3 * obiAlign;
-    const sizeMult = confidenceNotionalMult(conf);
+    const sizeMult = confidenceNotionalMult(conf) * lossSizeMult(t);
     if (sizeMult <= 0) return false;
 
     const newsTilt = tradeNewsSizingTilt(t);
@@ -764,9 +779,17 @@ export class MicroMeanReversion {
         : book.bestAsk > 0 && pos.entryPx > 0 && book.bestAsk > pos.entryPx + 1e-12;
     // Default: max-hold sells high. Last-wins HFT_MAX_HOLD_FORCE_EXIT recycles
     // leftover BP instead of sitting red in all 15 IEX slots.
+    const adverseFrac =
+      pos.entryPx > 0
+        ? pos.side === "buy"
+          ? (pos.entryPx - book.bestBid) / pos.entryPx
+          : (book.bestAsk - pos.entryPx) / pos.entryPx
+        : 0;
+    const hardFloor = Number(process.env.HFT_MR_HARD_STOP_PCT ?? 0.008);
     const forced =
       forceExit ||
       process.env.HFT_FORCE_FLATTEN === "true" ||
+      (underwater && adverseFrac >= hardFloor) ||
       (timedOut && underwater && process.env.HFT_MAX_HOLD_FORCE_EXIT === "true");
 
     // Green TP, or max-hold sell-high, or hard forced exit.

@@ -12,6 +12,7 @@ import { AlpacaExecutor } from "../common/alpaca-exec.js";
 import { CFG, confidenceNotionalMult, effectiveConfidenceFloor } from "../common/config.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
+import { lossSizeMult } from "../common/loss-memory.js";
 import { nowNs, nsToMs } from "../common/latency.js";
 import { fileLogger, stdoutTag } from "../common/logger.js";
 import { hftExtendedHoursFlag, hftLimitTif, ordersAllowed, shouldTtlCancelWorking } from "../common/market-session.js";
@@ -301,7 +302,7 @@ export class ObiTapeSignals {
     if (paceFill) conf = Math.max(conf, effectiveConfidenceFloor());
     const minObi = Number(process.env.HFT_MIN_OBI_STRENGTH ?? 0);
     if (minObi > 0 && obiStrength < minObi) return false;
-    const sizeMult = confidenceNotionalMult(conf);
+    const sizeMult = confidenceNotionalMult(conf) * lossSizeMult(book.ticker);
     if (sizeMult <= 0) return false;
 
     const newsTilt = tradeNewsSizingTilt(t);

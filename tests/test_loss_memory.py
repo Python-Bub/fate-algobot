@@ -72,6 +72,21 @@ def test_saved_votes_credit_without_process_memory(monkeypatch, tmp_path):
     assert out["win"] is False
 
 
+def test_agreed_crash_still_has_a_stop():
+    import fortress_live as fl
+
+    gain = fl._position_unrealized_gain(
+        {"avg_entry_price": 100, "unrealized_plpc": -0.62},
+        38,
+    )
+    assert gain is not None and gain < -0.50
+    phantom = fl._position_unrealized_gain(
+        {"avg_entry_price": 100, "unrealized_plpc": 1.75},
+        101,
+    )
+    assert phantom is not None and abs(phantom) < 0.05
+
+
 def test_protective_exit_ignores_min_hold(monkeypatch):
     import fortress_live as fl
 

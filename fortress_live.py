@@ -444,7 +444,10 @@ def _position_unrealized_gain(pos: dict, price: float) -> float | None:
     except (TypeError, ValueError):
         return from_px
     # Phantom 100%+ TPs on flipped shorts / bad avg cost — prefer price/entry, else skip.
+    # A loss both feeds agree on is real. Returning None here left a crash with no stop.
     if abs(g) > 0.50:
+        if from_px is not None and g < -0.50 and from_px < -0.50:
+            return from_px
         if from_px is not None and abs(from_px) <= 0.50:
             return from_px
         if from_px is not None and abs(from_px) + 1e-9 < abs(g):
@@ -989,18 +992,6 @@ def _scan_alpaca_exits(*, use_real: bool, broker: str, rm: RiskManager) -> None:
             sym = str(pos.get("symbol", "")).replace("/", "-").upper()
             if not sym or not is_tradeable_instrument(sym):
                 continue
-            if os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in (
-                "1",
-                "true",
-                "yes",
-            ):
-                try:
-                    from crypto_universe import is_crypto_symbol
-
-                    if not is_crypto_symbol(sym):
-                        continue
-                except Exception:
-                    continue
             px = float(pos.get("current_price") or pos.get("avg_entry_price") or 0)
             if px > 0:
                 try:

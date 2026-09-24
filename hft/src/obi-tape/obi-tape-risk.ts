@@ -18,7 +18,7 @@ import {
   waitForGreenExit,
 } from "./order-pricing.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
-import { KillSwitch } from "../common/kill-switch.js";
+import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
 import { type Position } from "./obi-tape-signals.js";
 
 const log = stdoutTag("[OBI/RISK]");
@@ -261,6 +261,25 @@ export class ObiTapeRiskManager {
     const maxHoldMs = Number(process.env.HFT_MAX_HOLD_MS ?? 800);
     const nowMs = Date.now();
     const heldMs = nowMs - pos.openedMs;
+    if (dayTradeBuysHalted() && pos.entryPx > 0) {
+      const dayAdverse =
+        pos.side === "buy" ? pos.entryPx - book.bestBid : book.bestAsk - pos.entryPx;
+      if (dayAdverse >= pos.entryPx * 0.002) {
+        void this.flatten(book, pos, "sl");
+        return;
+      }
+    }
+    const hardFrac = Number(process.env.HFT_OBI_HARD_STOP_PCT ?? 0.008);
+    if (hardFrac > 0 && pos.entryPx > 0) {
+      const adverseFrac =
+        pos.side === "buy"
+          ? (pos.entryPx - book.bestBid) / pos.entryPx
+          : (book.bestAsk - pos.entryPx) / pos.entryPx;
+      if (adverseFrac >= hardFrac) {
+        void this.flatten(book, pos, "sl");
+        return;
+      }
+    }
     if (maxHoldMs > 0 && heldMs >= maxHoldMs) {
       void this.flatten(book, pos, "hold");
       return;
