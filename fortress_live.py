@@ -513,6 +513,23 @@ def _min_hold_minutes() -> float:
     return float(os.getenv("FORTRESS_MIN_HOLD_MINUTES", "0"))
 
 
+_PASS_SESSION_PNL: float | None = None
+
+
+def _remember_session_pnl(equity: float | None) -> float | None:
+    """Cache today's session return from equity already in hand. No account GET."""
+    global _PASS_SESSION_PNL
+    try:
+        from analytics.day_trade_risk import session_pnl_frac
+
+        pnl = session_pnl_frac(float(equity or 0))
+    except Exception:
+        pnl = None
+    if pnl is not None:
+        _PASS_SESSION_PNL = float(pnl)
+    return _PASS_SESSION_PNL
+
+
 def _credit_closed_trade(ticker: str, gain: float, p_adj: float) -> None:
     try:
         from online_learning.trade_feedback import learn_from_realized_trade
@@ -595,6 +612,9 @@ def _maybe_exit_alpaca(
                 if close_position_alpaca(ticker):
                     rm.legs.pop(ticker, None)
                     rm.legs.pop(ticker.upper(), None)
+                    _sym_gain = _position_unrealized_gain(pos, float(price or 0))
+                    if _sym_gain is not None:
+                        _credit_closed_trade(ticker, float(_sym_gain), _p_adj)
                     return True
     except Exception as e:
         log.debug("[FORTRESS] sympathy exit check %s: %s", ticker, e)
@@ -694,6 +714,7 @@ def _maybe_exit_alpaca(
                 if close_position_alpaca(ticker):
                     rm.legs.pop(ticker, None)
                     rm.legs.pop(ticker.upper(), None)
+                    _credit_closed_trade(ticker, float(gain), _p_adj)
                     return True
         # Conviction exit engine: thesis death vs noise, TP, scale-out/rotate
         try:
@@ -889,6 +910,13 @@ def _apply_earnings_gap_guard() -> list[str]:
             try:
                 if close_position_alpaca(sym, force=True):
                     log.warning("[FORTRESS] EARNINGS_GAP_KILL submitted %s", sym)
+                    _g = _position_unrealized_gain(
+                        p, float(p.get("current_price") or p.get("avg_entry_price") or 0)
+                    )
+                    if _g is None and gain is not None:
+                        _g = float(gain)
+                    if _g is not None:
+                        _credit_closed_trade(sym, float(_g), 0.5)
             except Exception as e:
                 log.warning("[FORTRESS] EARNINGS_GAP_KILL %s failed: %s", sym, e)
         elif dec.trim_frac > 0:
@@ -905,7 +933,14 @@ def _apply_earnings_gap_guard() -> list[str]:
                 dec.reason,
             )
             try:
-                close_position_alpaca(sym, force=True, qty=sell_qty)
+                if close_position_alpaca(sym, force=True, qty=sell_qty):
+                    _g = _position_unrealized_gain(
+                        p, float(p.get("current_price") or p.get("avg_entry_price") or 0)
+                    )
+                    if _g is None and gain is not None:
+                        _g = float(gain)
+                    if _g is not None:
+                        _credit_closed_trade(sym, float(_g), 0.5)
             except Exception as e:
                 log.warning("[FORTRESS] EARNINGS_PRE_TRIM %s failed: %s", sym, e)
     # Peer-print cascade (WMT −9% → COST) — same first tick, before the crawl.
@@ -943,6 +978,9 @@ def _apply_earnings_gap_guard() -> list[str]:
                 try:
                     if close_position_alpaca(s, force=True):
                         log.warning("[FORTRESS] PEER_CASCADE_KILL submitted %s", s)
+                        _pg = act.get("own_gap")
+                        if _pg is not None:
+                            _credit_closed_trade(s, float(_pg), 0.5)
                 except Exception as e:
                     log.warning("[FORTRESS] PEER_CASCADE_KILL %s failed: %s", s, e)
             elif float(act.get("trim_frac") or 0) > 0:
@@ -959,7 +997,10 @@ def _apply_earnings_gap_guard() -> list[str]:
                     act.get("reason"),
                 )
                 try:
-                    close_position_alpaca(s, force=True, qty=sell_qty)
+                    if close_position_alpaca(s, force=True, qty=sell_qty):
+                        _pg = act.get("own_gap")
+                        if _pg is not None:
+                            _credit_closed_trade(s, float(_pg), 0.5)
                 except Exception as e:
                     log.warning("[FORTRESS] PEER_CASCADE_TRIM %s failed: %s", s, e)
     except Exception as e:
@@ -975,19 +1016,14 @@ def _scan_alpaca_exits(*, use_real: bool, broker: str, rm: RiskManager) -> None:
         from alpaca_broker import list_positions
         from alt_assets import is_tradeable_instrument
 
-        session_pnl = None
+        session_pnl = _PASS_SESSION_PNL
         try:
             from alpaca_broker import get_account
-            from analytics.day_trade_risk import session_et_date, _load_session
 
             acct = get_account() or {}
-            eq = float(acct.get("equity") or 0)
-            st = _load_session()
-            start = float(st.get("start_equity") or 0)
-            if eq > 0 and start > 0 and str(st.get("date") or "") == session_et_date():
-                session_pnl = (eq - start) / start
+            session_pnl = _remember_session_pnl(float(acct.get("equity") or 0))
         except Exception:
-            session_pnl = None
+            session_pnl = _PASS_SESSION_PNL
         for pos in list_positions():
             sym = str(pos.get("symbol", "")).replace("/", "-").upper()
             if not sym or not is_tradeable_instrument(sym):
@@ -1645,6 +1681,7 @@ def run_fortress_pass(args) -> None:
             live_eq = float(_acct_halt.get("equity") or rm.equity or 0)
             last_eq = float(_acct_halt.get("last_equity") or 0)
             check_daily_limits(live_eq if live_eq >= 100.0 else float(rm.equity), last_equity=last_eq)
+            _remember_session_pnl(live_eq if live_eq >= 100.0 else float(rm.equity))
             halted, halt_why = trading_halted()
             if halted:
                 log.warning("[FORTRESS] BUY HALT — %s (exits/hygiene still allowed)", halt_why)
@@ -2738,6 +2775,7 @@ def run_fortress_pass(args) -> None:
                                 _exit_why,
                             )
                         elif close_position_alpaca(t, force=True):
+                            _credit_closed_trade(t, float(existing_gain), float(p_adj))
                             rm.legs.pop(t, None)
                             rm.legs.pop(t.upper(), None)
                             existing_mv, existing_gain = (0.0, None)
@@ -2759,6 +2797,7 @@ def run_fortress_pass(args) -> None:
                     and os.getenv("FORTRESS_ROTATE_ON_PROFIT", "true").lower()
                     in ("1", "true", "yes")
                 ),
+                session_pnl=_PASS_SESSION_PNL,
             )
             if exited:
                 existing_mv, existing_gain = (0.0, None)
@@ -3547,6 +3586,12 @@ def run_fortress_pass(args) -> None:
                 from analytics.loss_memory import advise as _loss_advise
 
                 lesson = _loss_advise(t)
+                if lesson.get("same_day") and not cand.get("force_priority"):
+                    log.info(
+                        "[FORTRESS] skip BUY %s — loss already closed today",
+                        t,
+                    )
+                    continue
                 lesson_mult = float(lesson.get("size_mult") or 1.0)
                 extra = float(lesson.get("extra_conviction") or 0.0)
                 if extra > 0 and float(_conv) < _min_conv + extra and not cand.get("force_priority"):

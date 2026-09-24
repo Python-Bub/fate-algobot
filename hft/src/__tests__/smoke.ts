@@ -24,6 +24,7 @@ import {
   shouldReleasePending,
 } from "../common/order-lifecycle.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
+import { lossSizeMult, rememberRealized } from "../common/loss-memory.js";
 import { L2Book, L2_LEVELS } from "../obi-tape/l2-book.js";
 import {
   bestLevelObi,
@@ -895,6 +896,37 @@ ok("TapeVelocity records lastPx", () => {
   const tape = new TapeVelocity("UBER", 100, 5000);
   tape.onTrade(Date.now(), 91.25, 10);
   assert.equal(tape.lastPx, 91.25);
+});
+
+ok("same-day HFT loss skips the next fire", () => {
+  const file = path.join("/tmp", `loss-mem-${process.pid}.json`);
+  const prev = process.env.LOSS_MEMORY_PATH;
+  process.env.LOSS_MEMORY_PATH = file;
+  try {
+    fs.writeFileSync(
+      file,
+      JSON.stringify({
+        symbols: {
+          ZZZ: { trades: [{ ret: -0.02, ts: new Date().toISOString(), source: "test" }] },
+        },
+      }),
+    );
+    assert.equal(lossSizeMult("ZZZ"), 0);
+    const yesterday = new Date(Date.now() - 3 * 86400_000).toISOString();
+    fs.writeFileSync(
+      file,
+      JSON.stringify({
+        symbols: { ZZZ: { trades: [{ ret: -0.02, ts: yesterday, source: "test" }] } },
+      }),
+    );
+    assert.equal(lossSizeMult("ZZZ"), 0.45);
+    rememberRealized("QQQ", -0.01, "test");
+    assert.equal(lossSizeMult("QQQ"), 0);
+  } finally {
+    if (prev === undefined) delete process.env.LOSS_MEMORY_PATH;
+    else process.env.LOSS_MEMORY_PATH = prev;
+    fs.rmSync(file, { force: true });
+  }
 });
 
 if (failed > 0) {

@@ -10,6 +10,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 
 def _path() -> Path:
@@ -60,27 +61,59 @@ def record_outcome(symbol: str, realized_return: float, *, source: str = "") -> 
     _save(doc)
 
 
-def advise(symbol: str) -> dict[str, Any]:
-    """size_mult 1 and extra_conviction 0 when the last close was not a loss."""
+def _et_day(ts: datetime) -> str:
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
+    return ts.astimezone(ZoneInfo("America/New_York")).date().isoformat()
+
+
+def advise(symbol: str, *, now: datetime | None = None) -> dict[str, Any]:
+    """size_mult 1 and extra_conviction 0 when the last close was not a loss.
+
+    A loss closed today is not reopened today. The name is still tradable tomorrow, smaller.
+    """
     sym = str(symbol or "").strip().upper()
-    neutral = {"size_mult": 1.0, "extra_conviction": 0.0, "losses": 0, "reason": ""}
+    neutral = {
+        "size_mult": 1.0,
+        "extra_conviction": 0.0,
+        "losses": 0,
+        "same_day": False,
+        "reason": "",
+    }
     rows = list((_load()["symbols"].get(sym) or {}).get("trades") or [])
     if not rows:
         return neutral
     last = float(rows[-1].get("ret") or 0)
     if last >= 0:
         return neutral
+    cur = now or datetime.now(timezone.utc)
+    same_day = False
+    try:
+        closed = datetime.fromisoformat(str(rows[-1].get("ts") or "").replace("Z", "+00:00"))
+        same_day = _et_day(closed) == _et_day(cur)
+    except ValueError:
+        same_day = False
     losses = sum(1 for r in rows[-5:] if float(r.get("ret") or 0) < 0)
+    if same_day:
+        return {
+            "size_mult": 0.0,
+            "extra_conviction": 1.0,
+            "losses": losses,
+            "same_day": True,
+            "reason": "loss already closed today",
+        }
     if losses >= 2:
         return {
             "size_mult": 0.25,
             "extra_conviction": 0.10,
             "losses": losses,
+            "same_day": False,
             "reason": f"{losses} recent losses",
         }
     return {
         "size_mult": 0.45,
         "extra_conviction": 0.06,
         "losses": losses,
+        "same_day": False,
         "reason": "last close was a loss",
     }

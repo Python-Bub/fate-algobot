@@ -6,7 +6,7 @@ import { AlpacaExecutor, type OrderResponse, type TimeInForce } from "../common/
 import { CFG, confidenceNotionalMult } from "../common/config.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
-import { lossSizeMult } from "../common/loss-memory.js";
+import { lossSizeMult, rememberRealized } from "../common/loss-memory.js";
 import { currentSession, hftExtendedHoursFlag, hftExitTif, hftLimitTif, ordersAllowed, shouldTtlCancelWorking } from "../common/market-session.js";
 import { nowNs, nsToMs } from "../common/latency.js";
 import { fileLogger, stdoutTag } from "../common/logger.js";
@@ -377,10 +377,7 @@ export class MicroMeanReversion {
       }
     }
     if (!goLong && !goShort) return false;
-    if (goLong && dayTradeBuysHalted()) {
-      if (!goShort) return false;
-      goLong = false;
-    }
+    if (dayTradeBuysHalted()) return false;
     if (goLong && process.env.HFT_BLOCK_ADD_TO_BROKER_LONG !== "false") {
       if (!this.broker.positionsReady()) return false;
       const live = issuerCachedLongQty((s) => this.broker.cachedLongQty(s), t);
@@ -935,6 +932,7 @@ export class MicroMeanReversion {
         const pnlPerShare =
           pos.side === "buy" ? exitPx - pos.entryPx : pos.entryPx - exitPx;
         this.circuit.recordRoundTripPnl(pnlPerShare * pos.qty);
+        if (pos.entryPx > 0) rememberRealized(t, pnlPerShare / pos.entryPx, "hft-mr");
         if (this.circuit.isTripped()) {
           this.kill.setGlobal(true);
           log("CIRCUIT-BREAKER", {

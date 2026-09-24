@@ -250,8 +250,8 @@ export class ObiTapeSignals {
       long = book.bestBid > 0 && book.bestAsk > 0 && book.bestAsk >= book.bestBid;
     }
     if (!long && !short) return false;
-    // Day-loss halt (shared with fortress): no new longs; shorts already gated by longOnly.
-    if (long && dayTradeBuysHalted()) return false;
+    // Day-loss halt: no new risk on either side. Shorts were still opening after the book was red.
+    if (dayTradeBuysHalted()) return false;
 
     const skipBudget = process.env.HFT_SKIP_LATENCY_BUDGET === "true";
     // Local proc is ~8–15ms; raw OBI_BUDGET_LATENCY_MS=8 false-missed every fire.

@@ -42,6 +42,24 @@ def session_et_date() -> str:
         return date.today().isoformat()
 
 
+def session_pnl_frac(equity: float) -> float | None:
+    """Session return vs today's anchored start. None when this ET date has no anchor."""
+    try:
+        eq = float(equity or 0)
+    except (TypeError, ValueError):
+        return None
+    if eq <= 0:
+        return None
+    st = _load_session()
+    try:
+        start = float(st.get("start_equity") or 0)
+    except (TypeError, ValueError):
+        return None
+    if start <= 0 or str(st.get("date") or "") != session_et_date():
+        return None
+    return (eq - start) / start
+
+
 def session_start_equity() -> float:
     try:
         from alpaca_broker import get_account

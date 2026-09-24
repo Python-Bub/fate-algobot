@@ -34,16 +34,51 @@ def test_loss_then_win_clears_penalty(monkeypatch, tmp_path):
     monkeypatch.setenv("LOSS_MEMORY_PATH", str(tmp_path / "loss.json"))
     from analytics.loss_memory import advise, record_outcome
 
+    later = datetime.now(timezone.utc) + timedelta(days=2)
     record_outcome("TSLA", -0.02, source="test")
-    one = advise("TSLA")
+    one = advise("TSLA", now=later)
+    assert one["same_day"] is False
     assert one["size_mult"] == 0.45
     assert one["extra_conviction"] == 0.06
     record_outcome("TSLA", -0.01, source="test")
-    two = advise("TSLA")
+    two = advise("TSLA", now=later)
     assert two["size_mult"] == 0.25
     assert two["extra_conviction"] == 0.10
     record_outcome("TSLA", 0.015, source="test")
-    assert advise("TSLA")["size_mult"] == 1.0
+    assert advise("TSLA", now=later)["size_mult"] == 1.0
+
+
+def test_same_day_loss_is_not_reopened(monkeypatch, tmp_path):
+    monkeypatch.setenv("LOSS_MEMORY_PATH", str(tmp_path / "loss.json"))
+    from analytics.loss_memory import advise, record_outcome
+
+    record_outcome("NVDA", -0.03, source="test")
+    hit = advise("NVDA")
+    assert hit["same_day"] is True
+    assert hit["size_mult"] == 0.0
+    assert hit["extra_conviction"] == 1.0
+    assert "today" in hit["reason"]
+
+
+def test_session_pnl_frac_uses_today_anchor(monkeypatch, tmp_path):
+    monkeypatch.setenv("DAY_TRADE_SESSION_PATH", str(tmp_path / "sess.json"))
+    from analytics.day_trade_risk import session_et_date, session_pnl_frac
+    import fortress_live as fl
+
+    (tmp_path / "sess.json").write_text(
+        '{"date": "%s", "start_equity": 100000}' % session_et_date(),
+        encoding="utf-8",
+    )
+    pnl = session_pnl_frac(99000)
+    assert pnl is not None and abs(pnl - (-0.01)) < 1e-9
+    remembered = fl._remember_session_pnl(99000)
+    assert remembered is not None and abs(remembered - (-0.01)) < 1e-9
+    (tmp_path / "sess.json").write_text(
+        '{"date": "2000-01-01", "start_equity": 100000}',
+        encoding="utf-8",
+    )
+    assert session_pnl_frac(99000) is None
+    assert fl._remember_session_pnl(98000) == remembered
 
 
 def test_add_does_not_reset_position_clock(monkeypatch, tmp_path):

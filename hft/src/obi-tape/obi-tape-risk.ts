@@ -19,6 +19,7 @@ import {
 } from "./order-pricing.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
+import { rememberRealized } from "../common/loss-memory.js";
 import { type Position } from "./obi-tape-signals.js";
 
 const log = stdoutTag("[OBI/RISK]");
@@ -240,6 +241,10 @@ export class ObiTapeRiskManager {
         this.lastFlattenAttemptMs.delete(t);
         const pnl = pos.side === "buy" ? (px - pos.entryPx) * qty : (pos.entryPx - px) * qty;
         this.circuit.recordRoundTripPnl(pnl);
+        if (pos.entryPx > 0) {
+          const ret = pos.side === "buy" ? (px - pos.entryPx) / pos.entryPx : (pos.entryPx - px) / pos.entryPx;
+          rememberRealized(t, ret, "hft-obi");
+        }
       } else if (!keepLock) {
         this.flattenBackoffMs.set(t, flattenDebounceMs());
       }
