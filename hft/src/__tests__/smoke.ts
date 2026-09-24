@@ -55,7 +55,7 @@ import { assessQuoteHealth } from "../obi-tape/quote-health.js";
 import { AlpacaExecutor } from "../common/alpaca-exec.js";
 import { execDelayFeeBps, effectiveBudgetMs, loadExecDelayMs } from "../obi-tape/exec-delay.js";
 
-import { fuseObiMicro, fuseObiTape, expectedBps, shouldEnterEv } from "../obi-tape/trade-ev.js";
+import { fuseObiMicro, fuseObiTape, expectedBps, shouldEnterEv, targetEdgeBps } from "../obi-tape/trade-ev.js";
 import { plumbingHitsTarget, rollingCount, tpmTarget } from "../obi-tape/pace-governor.js";
 import { clipNotional, combinedHaircut, inventoryHaircut, lagHaircut, sizeHftClip } from "../obi-tape/firm-risk.js";
 import { resolveSignalMode, wantsDirection } from "../obi-tape/signal-mode.js";
@@ -687,6 +687,22 @@ ok("trade-ev logit fuse prefers aligned OBI+tape", () => {
   const strong = fuseObiTape(0.7, 4.0, 2.4);
   assert.ok(strong > weak);
   assert.ok(strong > 0.7);
+});
+
+ok("bps scalp clears a tight book that 12 cents cannot", () => {
+  const prev = process.env.HFT_TARGET_EDGE_BPS;
+  delete process.env.HFT_TARGET_EDGE_BPS;
+  const cents = targetEdgeBps(200, 12, 0.01);
+  assert.ok(cents < 8, "12 cents on $200 is under an 8 bps spread");
+  process.env.HFT_TARGET_EDGE_BPS = "8";
+  const bps = targetEdgeBps(200, 12, 0.01);
+  assert.equal(bps, 8);
+  const wide = shouldEnterEv(0.55, bps, 12, 0.6, 0.52);
+  const tight = shouldEnterEv(0.55, bps, 3, 0.6, 0.52);
+  assert.equal(wide.ok, false);
+  assert.equal(tight.ok, true);
+  if (prev === undefined) delete process.env.HFT_TARGET_EDGE_BPS;
+  else process.env.HFT_TARGET_EDGE_BPS = prev;
 });
 
 ok("trade-ev skips when cost eats the edge", () => {

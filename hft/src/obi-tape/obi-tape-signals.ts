@@ -30,7 +30,7 @@ import { TapeVelocity } from "./tape-velocity.js";
 import { flowIsSellToxic, microPriceDriftBps, microPriceSupportsLong } from "./micro-price.js";
 import { execDelayFeeBps, effectiveBudgetMs } from "./exec-delay.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
-import { fuseObiMicro, fuseObiTape, shouldEnterEv } from "./trade-ev.js";
+import { fuseObiMicro, fuseObiTape, shouldEnterEv, targetEdgeBps } from "./trade-ev.js";
 import { sizeHftClip } from "./firm-risk.js";
 import { resolveSignalMode, signalConfidence, wantsDirection } from "./signal-mode.js";
 
@@ -315,7 +315,7 @@ export class ObiTapeSignals {
     const tpTicks = Number(process.env.HFT_TAKE_PROFIT_TICKS ?? 4);
     const mid = book.mid > 0 ? book.mid : (book.bestBid + book.bestAsk) / 2;
     if (!(mid > 0)) return false;
-    const edgeBps = ((tpTicks * tick) / mid) * 10_000;
+    const edgeBps = targetEdgeBps(mid, tpTicks, tick);
     const sBps = chargedSpreadBps(book);
     const feeBps = Number(process.env.HFT_FEE_BPS ?? 1) + execDelayFeeBps();
     const required = sBps + feeBps;

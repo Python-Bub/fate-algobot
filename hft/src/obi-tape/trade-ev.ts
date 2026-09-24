@@ -36,6 +36,18 @@ export function fuseObiMicro(obi: number, microDriftBps: number): number {
   return sigmoid(0.62 * logit(obiP) + 0.38 * logit(microP));
 }
 
+/**
+ * Scalp target in bps. A fixed tick target (12 cents) is ~6 bps on a $200
+ * name and loses to the real spread, so liquid books never fired.
+ * HFT_TARGET_EDGE_BPS is price-independent. Ticks remain the fallback.
+ */
+export function targetEdgeBps(mid: number, tpTicks: number, tick = 0.01): number {
+  const fromEnv = Number(process.env.HFT_TARGET_EDGE_BPS ?? 0);
+  if (Number.isFinite(fromEnv) && fromEnv > 0) return fromEnv;
+  if (!(mid > 0) || !(tpTicks > 0) || !(tick > 0)) return 0;
+  return ((tpTicks * tick) / mid) * 10_000;
+}
+
 export function expectedBps(
   pUp: number,
   tpBps: number,
