@@ -18,6 +18,12 @@ def learn_from_realized_trade(
     sym = str(ticker).strip().upper()
     if not sym:
         return
+    try:
+        from analytics.loss_memory import record_outcome
+
+        record_outcome(sym, float(realized_return), source=source)
+    except Exception:
+        pass
     entry = ""
     if state:
         entry = str(

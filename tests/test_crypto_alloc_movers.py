@@ -111,6 +111,16 @@ def test_crypto_single_cap_is_wider_than_equity_10pct(monkeypatch):
     monkeypatch.setenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "BTC-USD,ETH-USD,SOL-USD")
     pinned = overnight_crypto_scan()
     assert pinned[0] == "BTC-USD" and "DOGE-USD" in pinned and len(pinned) >= 10
+    from analytics.crypto_alloc import crypto_session_scan_order
+
+    ordered = crypto_session_scan_order(
+        ["AAPL", "MSFT", "BTC-USD", "NVDA"],
+        ["ETHUSD"],
+    )
+    assert ordered[0] == "ETH-USD"
+    assert "DOGE-USD" in ordered and "AAPL" in ordered and "NVDA" in ordered
+    assert ordered.index("DOGE-USD") < ordered.index("AAPL")
+    assert len(ordered) >= 21
     # Equity XGB 0.35 must not keep the coin at a no-buy after overlay.
     assert overlay_equity_p(0.35, 0.62, 0.80) > 0.55
     assert overlay_equity_p(0.70, 0.40, 0.80) < 0.50

@@ -185,6 +185,7 @@ def decide_exit(
     bars_held: float | None = None,
     session_gap: float | None = None,
     now_et=None,
+    session_pnl: float | None = None,
 ) -> ExitDecision:
     """Single decision for open long — priority: thesis death > stop > TP/rotate > signal."""
     # 1) Confirmed thesis death (not noise)
@@ -211,6 +212,17 @@ def decide_exit(
             f"early_cut gain={gain:.4f} p={float(p_adj):.3f}",
             trim_frac=1.0,
         )
+
+    # Day is already red: cut open losers before they turn a small red into a large one.
+    # Winners are left to the trail. New buys are already halted by the same session.
+    if session_pnl is not None and float(session_pnl) <= -_f("FORTRESS_RED_DAY_SESSION_PCT", 0.005):
+        red_cut = _f("FORTRESS_RED_DAY_CUT_PCT", 0.008)
+        if float(gain) <= -abs(red_cut):
+            return ExitDecision(
+                "stop_loss",
+                f"red_day_cut session={float(session_pnl):.4f} gain={gain:.4f}",
+                trim_frac=1.0,
+            )
 
     row = _trade_row(symbol)
     mfe = max(float(gain), float(row.get("mfe") or gain))
@@ -299,6 +311,7 @@ def update_trade_quality(
     action: str,
     reason: str,
     entry_p: float | None = None,
+    filled: bool = False,
 ) -> dict[str, Any]:
     """Persist rolling trade quality scorecard for open / recent names."""
     from pathlib import Path
@@ -334,7 +347,7 @@ def update_trade_quality(
             "quality": quality,
             "last_action": action,
             "last_reason": reason,
-            "scaled": bool(row.get("scaled") or action == "scale_out"),
+            "scaled": bool(row.get("scaled") or (action == "scale_out" and filled)),
             "entry_p": entry_p if entry_p is not None else row.get("entry_p"),
             "updated_utc": doc["updated_utc"],
         }

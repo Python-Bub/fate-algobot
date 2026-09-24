@@ -132,8 +132,43 @@ def _row_f(row: Any, *keys: str, default: float = 0.0) -> float:
 _LAST_VOTES: dict[str, dict[str, int]] = {}
 
 
+def _votes_path() -> Path:
+    return Path(os.getenv("PROVEN_VOTES_PATH", "data/intel/proven_last_votes.json"))
+
+
+def _load_saved_votes(ticker: str) -> dict[str, int]:
+    sym = str(ticker or "").strip().upper()
+    p = _votes_path()
+    if not sym or not p.is_file():
+        return {}
+    try:
+        doc = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    row = (doc.get("votes") or {}).get(sym) if isinstance(doc, dict) else None
+    if not isinstance(row, dict):
+        return {}
+    return {k: int(row.get(k) or 0) for k in EXPERTS}
+
+
 def _remember_votes(ticker: str, votes: dict[str, int]) -> None:
-    _LAST_VOTES[str(ticker).strip().upper()] = {k: int(votes.get(k) or 0) for k in EXPERTS}
+    sym = str(ticker).strip().upper()
+    stored = {k: int(votes.get(k) or 0) for k in EXPERTS}
+    _LAST_VOTES[sym] = stored
+    p = _votes_path()
+    doc: dict[str, Any] = {"votes": {}}
+    if p.is_file():
+        try:
+            loaded = json.loads(p.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict) and isinstance(loaded.get("votes"), dict):
+                doc = loaded
+        except Exception:
+            doc = {"votes": {}}
+    doc.setdefault("votes", {})[sym] = stored
+    p.parent.mkdir(parents=True, exist_ok=True)
+    tmp = p.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(doc), encoding="utf-8")
+    os.replace(tmp, p)
 
 
 def default_state() -> dict[str, Any]:
@@ -462,9 +497,13 @@ def credit_outcome(
     if not enabled():
         return {"applied": False, "reason": "disabled"}
     st = st if st is not None else load_state()
-    votes = _LAST_VOTES.get(str(ticker).strip().upper()) or (st.get("last_votes") or {}).get(
-        str(ticker).strip().upper()
-    ) or {}
+    sym_key = str(ticker).strip().upper()
+    votes = (
+        _LAST_VOTES.get(sym_key)
+        or (st.get("last_votes") or {}).get(sym_key)
+        or _load_saved_votes(sym_key)
+        or {}
+    )
     if not votes:
         return {"applied": False, "reason": "no_votes"}
     ret = float(realized_return)
