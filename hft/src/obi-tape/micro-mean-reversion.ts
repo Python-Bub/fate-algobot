@@ -45,7 +45,7 @@ import {
   wantAggressiveEntry,
 } from "./order-pricing.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
-import { isEarnedSymbol, mrTimingFor } from "./profit-cushion-gate.js";
+import { hftMayEnter, isEarnedSymbol, mrTimingFor, requireProfitCushion } from "./profit-cushion-gate.js";
 import {
   logTradeNewsBlock,
   tradeNewsAllowsLong,
@@ -274,7 +274,10 @@ export class MicroMeanReversion {
     if (this.circuit.isTripped()) return false;
     if (this.hasExposure(t)) return false;
     if (book.syntheticNbbo && process.env.HFT_ALLOW_SYNTHETIC_NBBO !== "true") return false;
-    if (!isEarnedSymbol(t)) return false;
+    const liveQty = this.broker.positionsReady()
+      ? issuerCachedLongQty((s) => this.broker.cachedLongQty(s), t)
+      : Number.NaN;
+    if (!hftMayEnter(t, liveQty)) return false;
 
     const candleOnly = process.env.HFT_JP_CANDLE_ONLY === "true";
     const fireOnClose = process.env.HFT_JP_FIRE_ON_CLOSE !== "false";
@@ -378,10 +381,10 @@ export class MicroMeanReversion {
     }
     if (!goLong && !goShort) return false;
     if (dayTradeBuysHalted()) return false;
-    if (goLong && process.env.HFT_BLOCK_ADD_TO_BROKER_LONG !== "false") {
+    const greenAdd = liveQty > 0 && requireProfitCushion() && isEarnedSymbol(t);
+    if (goLong && process.env.HFT_BLOCK_ADD_TO_BROKER_LONG !== "false" && !greenAdd) {
       if (!this.broker.positionsReady()) return false;
-      const live = issuerCachedLongQty((s) => this.broker.cachedLongQty(s), t);
-      if (skipBuyAlreadyLong(live, 0)) {
+      if (skipBuyAlreadyLong(liveQty, 0)) {
         this.kill.lock(t, Date.now());
         return false;
       }

@@ -49,6 +49,18 @@ export function isEarnedSymbol(ticker: string): boolean {
   return Object.prototype.hasOwnProperty.call(earned, ticker.toUpperCase());
 }
 
+/**
+ * A name we do not hold is a fresh HFT round trip.
+ * A fortress long is only added to when it is already green.
+ * Unknown qty fails closed so a red hold is not doubled while the snapshot loads.
+ */
+export function hftMayEnter(ticker: string, liveQty: number): boolean {
+  if (!Number.isFinite(liveQty)) return false;
+  if (!(liveQty > 1e-8)) return true;
+  if (!requireProfitCushion()) return false;
+  return isEarnedSymbol(ticker);
+}
+
 export function earnedGainFrac(ticker: string): number | null {
   const earned = loadGate().earned ?? {};
   const g = earned[ticker.toUpperCase()];

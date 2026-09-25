@@ -25,6 +25,7 @@ import {
 } from "../common/order-lifecycle.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
 import { lossSizeMult, rememberRealized } from "../common/loss-memory.js";
+import { hftMayEnter } from "../obi-tape/profit-cushion-gate.js";
 import { L2Book, L2_LEVELS } from "../obi-tape/l2-book.js";
 import {
   bestLevelObi,
@@ -912,6 +913,27 @@ ok("TapeVelocity records lastPx", () => {
   const tape = new TapeVelocity("UBER", 100, 5000);
   tape.onTrade(Date.now(), 91.25, 10);
   assert.equal(tape.lastPx, 91.25);
+});
+
+ok("fresh names trade; only a green hold can be added to", () => {
+  const file = path.join("/tmp", `cushion-${process.pid}.json`);
+  const prevPath = process.env.PROFIT_CUSHION_GATE_PATH;
+  const prevReq = process.env.HFT_REQUIRE_PROFIT_CUSHION;
+  process.env.PROFIT_CUSHION_GATE_PATH = file;
+  process.env.HFT_REQUIRE_PROFIT_CUSHION = "true";
+  fs.writeFileSync(file, JSON.stringify({ earned: { AAPL: 0.01 }, require_cushion: true }));
+  try {
+    assert.equal(hftMayEnter("NVDA", 0), true);
+    assert.equal(hftMayEnter("AAPL", 10), true);
+    assert.equal(hftMayEnter("TSLA", 10), false);
+    assert.equal(hftMayEnter("NVDA", Number.NaN), false);
+  } finally {
+    if (prevPath === undefined) delete process.env.PROFIT_CUSHION_GATE_PATH;
+    else process.env.PROFIT_CUSHION_GATE_PATH = prevPath;
+    if (prevReq === undefined) delete process.env.HFT_REQUIRE_PROFIT_CUSHION;
+    else process.env.HFT_REQUIRE_PROFIT_CUSHION = prevReq;
+    fs.rmSync(file, { force: true });
+  }
 });
 
 ok("same-day HFT loss skips the next fire", () => {
