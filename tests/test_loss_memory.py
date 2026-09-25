@@ -28,6 +28,36 @@ def test_red_day_cuts_loser_and_keeps_winner(monkeypatch, tmp_path):
         session_pnl=-0.012,
     )
     assert winner.action != "stop_loss"
+    # Through the daily-loss line a scratch loser is cut. A small red session
+    # still keeps a name that is only a few bps underwater.
+    deep = decide_exit(
+        "MSFT",
+        p_adj=0.70,
+        gain=-0.001,
+        take_profit_pct=0.035,
+        stop_loss_pct=0.028,
+        session_pnl=-0.012,
+    )
+    assert deep.action == "stop_loss"
+    assert "red_day_cut" in deep.reason
+    scratch = decide_exit(
+        "AMD",
+        p_adj=0.70,
+        gain=-0.001,
+        take_profit_pct=0.035,
+        stop_loss_pct=0.028,
+        session_pnl=-0.006,
+    )
+    assert scratch.action != "stop_loss"
+    mild = decide_exit(
+        "META",
+        p_adj=0.70,
+        gain=-0.004,
+        take_profit_pct=0.035,
+        stop_loss_pct=0.028,
+        session_pnl=-0.006,
+    )
+    assert mild.action == "stop_loss"
 
 
 def test_loss_then_win_clears_penalty(monkeypatch, tmp_path):

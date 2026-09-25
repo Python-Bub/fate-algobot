@@ -3126,6 +3126,24 @@ def run_fortress_pass(args) -> None:
         top_buys_per_pass,
     )
 
+    # The scan can run for many minutes. Re-read the account once before any buy
+    # so a pass that started green does not keep spending after the day turns red.
+    if use_real and broker == "alpaca":
+        try:
+            from alpaca_broker import get_account as _ga_prebuy
+            from analytics.day_trade_risk import check_daily_limits as _limits_prebuy
+            from analytics.day_trade_risk import trading_halted as _halt_prebuy
+
+            _acct_pre = _ga_prebuy() or {}
+            _eq_pre = float(_acct_pre.get("equity") or 0)
+            _last_pre = float(_acct_pre.get("last_equity") or 0)
+            if _eq_pre >= 100.0:
+                _limits_prebuy(_eq_pre, last_equity=_last_pre)
+                halted, halt_why = _halt_prebuy()
+                _remember_session_pnl(_eq_pre)
+        except Exception as e:
+            log.debug("[FORTRESS] pre-buy halt refresh: %s", e)
+
     # Execute only the strongest N buys for this pass.
     if halted:
         log.warning("[FORTRESS] skipping buys this pass — %s", halt_why or "halted")

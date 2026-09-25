@@ -220,7 +220,8 @@ export class MicroMeanReversion {
         pos.side === "buy"
           ? (pos.entryPx - book.bestBid) / pos.entryPx
           : (book.bestAsk - pos.entryPx) / pos.entryPx;
-      if (dayAdverse >= 0.002) {
+      const haltFrac = Number(process.env.HFT_HALT_FLATTEN_ADVERSE ?? 0.0005);
+      if (dayAdverse >= haltFrac) {
         void this.flatten(pos, debounceMs, exitMs, true);
         return;
       }

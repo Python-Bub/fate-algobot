@@ -269,7 +269,8 @@ export class ObiTapeRiskManager {
     if (dayTradeBuysHalted() && pos.entryPx > 0) {
       const dayAdverse =
         pos.side === "buy" ? pos.entryPx - book.bestBid : book.bestAsk - pos.entryPx;
-      if (dayAdverse >= pos.entryPx * 0.002) {
+      const haltFrac = Number(process.env.HFT_HALT_FLATTEN_ADVERSE ?? 0.0005);
+      if (dayAdverse >= pos.entryPx * haltFrac) {
         void this.flatten(book, pos, "sl");
         return;
       }
