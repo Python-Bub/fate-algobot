@@ -243,6 +243,8 @@ export async function cancelStaleOpenOrders(
     if (!OPEN_ORDER_STATUSES.has(o.status) && o.status !== "") continue;
     // Never cancel working sells (exits / hygiene / orphan flatten).
     if ((o.side ?? "").toLowerCase() === "sell") continue;
+    // Cancelling a live entry and letting the signal fire again is the repeat loop.
+    if (isHftEntryClientId(o.clientOrderId || "")) continue;
     const c = await broker.cancel(o.id);
     if (c.ok) n++;
   }

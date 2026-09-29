@@ -150,6 +150,22 @@ ok("KillSwitch spaces burst submits to max-per-sec", () => {
   assert.equal(k.reserveOrderSlot(1250), true);
 });
 
+ok("a short fill lock does not erase the repeat block", () => {
+  const prev = process.env.HFT_REPEAT_ORDER_MS;
+  process.env.HFT_REPEAT_ORDER_MS = "60000";
+  try {
+    const k = new KillSwitch(["AAPL"], 120, 200);
+    k.blockRepeat("AAPL", 1_000);
+    assert.equal(k.isLocked("AAPL", 51_000), true);
+    k.lock("AAPL", 2_000);
+    assert.equal(k.isLocked("AAPL", 51_000), true);
+    assert.equal(k.isLocked("AAPL", 62_000), false);
+  } finally {
+    if (prev === undefined) delete process.env.HFT_REPEAT_ORDER_MS;
+    else process.env.HFT_REPEAT_ORDER_MS = prev;
+  }
+});
+
 ok("KillSwitch allows 200 submits inside a rolling minute", () => {
   process.env.HFT_GLOBAL_MAX_ORDERS_PER_MIN = "0";
   process.env.HFT_MAX_ORDERS_PER_SEC = "0";

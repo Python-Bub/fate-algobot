@@ -530,6 +530,7 @@ export class MicroMeanReversion {
 
     if (!this.kill.reserveOrderSlot(nowMs)) return false;
     this.pending.add(t);
+    this.kill.blockRepeat(t, nowMs);
 
     const orderId = nextId();
     const extended = hftExtendedHoursFlag();

@@ -394,6 +394,7 @@ export class ObiTapeSignals {
     if (!this.kill.reserveOrderSlot(nowMs)) return false;
 
     this.pending.add(t);
+    this.kill.blockRepeat(t, nowMs);
     log("FIRE", {
       ticker: t,
       side,
