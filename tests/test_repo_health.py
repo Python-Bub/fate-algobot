@@ -34,9 +34,38 @@ def test_price_fallback_symbols_goog():
 def test_price_fallback_symbols_brk_prefers_feed_symbol():
     from symbol_aliases import price_data_fallback_symbols
 
+    # Yahoo is the price feed: hyphenated Berkshire first (dotted BRK.B is often empty),
+    # then the other share class as a sibling fallback.
     syms = price_data_fallback_symbols("BRK-B")
-    assert syms[0] == "BRK.B"
-    assert "BRK-B" in syms
+    assert syms[0] == "BRK-B"
+    assert "BRK-A" in syms
+    assert price_data_fallback_symbols("BRK.B")[0] == "BRK-B"
+
+
+def test_alpaca_symbol_boundary_for_class_shares():
+    from symbol_aliases import alpaca_equity_symbol, internal_symbol
+
+    # Alpaca trading/data API only knows the dotted class form (BRK-B → 404).
+    assert alpaca_equity_symbol("BRK-B") == "BRK.B"
+    assert alpaca_equity_symbol("BRK.B") == "BRK.B"
+    assert alpaca_equity_symbol("BF-B") == "BF.B"
+    assert alpaca_equity_symbol("SQ") == "XYZ"
+    assert alpaca_equity_symbol("AAPL") == "AAPL"
+    # Warrants/units and multi-letter suffixes are not share classes — leave alone.
+    assert alpaca_equity_symbol("ABCD-WT") == "ABCD-WT"
+    # Broker → internal canonical (models/BRK-B_model.pkl, universe files).
+    assert internal_symbol("BRK.B") == "BRK-B"
+    assert internal_symbol("BTCUSD") == "BTC-USD"
+    assert internal_symbol("BTC/USD") == "BTC-USD"
+    assert internal_symbol("AAPL") == "AAPL"
+
+
+def test_route_symbol_sends_alpaca_form():
+    from alpaca_broker import _route_symbol
+
+    assert _route_symbol("BRK-B") == "BRK.B"
+    assert _route_symbol("BTC-USD") == "BTC/USD"
+    assert _route_symbol("SQ") == "XYZ"
 
 
 def test_resolve_model_ticker_msft():

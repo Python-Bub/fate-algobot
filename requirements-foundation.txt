@@ -1,3 +1,13 @@
-# Optional: online foundation forecast (Chronos). Statistical fallback works without these.
+# Optional heavy stack. Statistical fallbacks work without these; install via
+#   ./venv/bin/pip install -r requirements-foundation.txt
+# (run_all.sh proper-finish does this automatically; GCP VMs need it for the neural path).
+#
+# Online foundation forecast (Chronos) + LSTM / neural ensemble / talk brain
 chronos-forecasting>=1.4.0
 torch>=2.2.0
+# FinBERT headline scoring (sentiment_pipeline) + Chronos / HF model downloads
+transformers>=4.40
+huggingface_hub>=0.23
+accelerate>=1.0
+# Streamlit picks dashboard (dashboard/app.py)
+streamlit>=1.35

@@ -20,7 +20,9 @@ def _session_file(tmp_path, monkeypatch):
     monkeypatch.setenv("DAILY_RED_EPS_PCT", "0.0003")
     monkeypatch.setenv("SESSION_EQUITY_TARGET_USD", "0")
     # Pin a weekday so Saturday's weekend rebase cannot hide red/max-loss cases.
+    # Also pin the clock: before 04:00 ET the live anchor ignores a stale prior close.
     monkeypatch.setattr("analytics.day_trade_risk.session_et_date", lambda: "2026-09-18")
+    monkeypatch.setattr("analytics.day_trade_risk._before_cash_open_et", lambda: False)
     yield
 
 
@@ -43,6 +45,22 @@ def test_profit_lock_at_one_point_five_percent():
     ok, why = check_daily_limits(start * 1.016, last_equity=start)
     assert ok is False
     assert why == "daily-profit-pct"
+
+
+def test_new_et_day_before_open_does_not_relock_yesterdays_gain(monkeypatch):
+    """Stale Alpaca last_equity must not freeze Tuesday on Monday's already-locked gain."""
+    monkeypatch.setattr("analytics.day_trade_risk.session_et_date", lambda: "2026-09-21")
+    monkeypatch.setattr("analytics.day_trade_risk._before_cash_open_et", lambda: False)
+    ok, why = check_daily_limits(72_336.0, last_equity=69_920.0)
+    assert ok is False
+    assert why == "daily-profit-pct"
+
+    monkeypatch.setattr("analytics.day_trade_risk.session_et_date", lambda: "2026-09-22")
+    monkeypatch.setattr("analytics.day_trade_risk._before_cash_open_et", lambda: True)
+    ok2, why2 = check_daily_limits(72_336.0, last_equity=69_920.0)
+    assert ok2 is True
+    assert why2 == ""
+    assert is_trading_halted() is False
 
 
 def test_false_zero_equity_halt_clears_on_live_mark():

@@ -116,7 +116,9 @@ class BaseIndustryHandler(ABC):
         return best, pat
 
     def ticker_hint_score(self, symbol: str) -> float:
-        return 0.95 if symbol.upper() in self.TICKER_HINTS else 0.0
+        sym = str(symbol or "").strip().upper()
+        hints = {str(s).strip().upper() for s in (self.TICKER_HINTS or ())}
+        return 0.95 if sym and sym in hints else 0.0
 
     def classify(self, ctx: IndustryContext) -> ClassificationResult | None:
         sym = ctx.symbol.strip().upper()

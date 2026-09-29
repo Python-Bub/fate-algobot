@@ -159,7 +159,10 @@ export class CandleBuilder {
     if (i1 < 0) return PAT_NONE;
     const o1 = this.open[i1], h1 = this.high[i1], l1 = this.low[i1], c1 = this.close[i1];
     const range1 = h1 - l1;
-    if (!(range1 > 0)) return PAT_NONE;
+    if (!(range1 > 0) || !(c1 > 0)) return PAT_NONE;
+    // A one-tick wiggle is not a hammer. The bar has to move in real bps.
+    const rangeBps = (range1 / c1) * 10_000;
+    if (rangeBps < 4) return PAT_NONE;
     const body1 = Math.abs(c1 - o1);
     const upperShadow1 = h1 - Math.max(o1, c1);
     const lowerShadow1 = Math.min(o1, c1) - l1;
@@ -186,8 +189,8 @@ export class CandleBuilder {
       const bearish1 = c1 < o1;
       const bullish2 = c2 > o2;
       const bearish2 = c2 < o2;
-      if (bullish1 && bearish2 && c1 > o2 && o1 < c2 && body1 > body2) return PAT_BULLISH_ENGULF;
-      if (bearish1 && bullish2 && c1 < o2 && o1 > c2 && body1 > body2) return PAT_BEARISH_ENGULF;
+      if (bullish1 && bearish2 && c1 > o2 && o1 < c2 && body1 > body2 * 1.15) return PAT_BULLISH_ENGULF;
+      if (bearish1 && bullish2 && c1 < o2 && o1 > c2 && body1 > body2 * 1.15) return PAT_BEARISH_ENGULF;
     }
 
     // DOJI — very small body relative to range (fallback after specific patterns).

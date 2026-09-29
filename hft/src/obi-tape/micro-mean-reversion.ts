@@ -6,6 +6,7 @@ import { AlpacaExecutor, type OrderResponse, type TimeInForce } from "../common/
 import { CFG, confidenceNotionalMult } from "../common/config.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
+import { lossSizeMult, rememberRealized } from "../common/loss-memory.js";
 import { currentSession, hftExtendedHoursFlag, hftExitTif, hftLimitTif, ordersAllowed, shouldTtlCancelWorking } from "../common/market-session.js";
 import { nowNs, nsToMs } from "../common/latency.js";
 import { fileLogger, stdoutTag } from "../common/logger.js";
@@ -44,7 +45,7 @@ import {
   wantAggressiveEntry,
 } from "./order-pricing.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
-import { isEarnedSymbol, mrTimingFor } from "./profit-cushion-gate.js";
+import { hftMayEnter, isEarnedSymbol, mrTimingFor, requireProfitCushion } from "./profit-cushion-gate.js";
 import {
   logTradeNewsBlock,
   tradeNewsAllowsLong,
@@ -208,10 +209,25 @@ export class MicroMeanReversion {
 
     const { exitMs, debounceMs } = mrTimingFor(t, this.mrExitMs, this.mrDebounceMs);
     const maxHoldMs = Number(process.env.HFT_MR_MAX_HOLD_MS ?? 12_000);
-    const stopPct = Number(process.env.HFT_MR_STOP_PCT ?? 0.0015);
+    // STOP_PCT=0 turns off the tight noise stop. A real loss still has a floor.
+    const configuredStop = Number(process.env.HFT_MR_STOP_PCT ?? 0.0015);
+    const hardFloor = Number(process.env.HFT_MR_HARD_STOP_PCT ?? 0.008);
+    const stopPct = configuredStop > 0 ? configuredStop : hardFloor;
     const heldMs = Date.now() - pos.openedMs;
 
-    // 1) Hard stop-loss → forced exit (protect capital). Disabled when stop pct <= 0.
+    if (dayTradeBuysHalted() && pos.entryPx > 0) {
+      const dayAdverse =
+        pos.side === "buy"
+          ? (pos.entryPx - book.bestBid) / pos.entryPx
+          : (book.bestAsk - pos.entryPx) / pos.entryPx;
+      const haltFrac = Number(process.env.HFT_HALT_FLATTEN_ADVERSE ?? 0.0005);
+      if (dayAdverse >= haltFrac) {
+        void this.flatten(pos, debounceMs, exitMs, true);
+        return;
+      }
+    }
+
+    // 1) Hard stop-loss → forced exit (protect capital).
     if (stopPct > 0 && pos.entryPx > 0) {
       const adverse =
         pos.side === "buy"
@@ -259,7 +275,10 @@ export class MicroMeanReversion {
     if (this.circuit.isTripped()) return false;
     if (this.hasExposure(t)) return false;
     if (book.syntheticNbbo && process.env.HFT_ALLOW_SYNTHETIC_NBBO !== "true") return false;
-    if (!isEarnedSymbol(t)) return false;
+    const liveQty = this.broker.positionsReady()
+      ? issuerCachedLongQty((s) => this.broker.cachedLongQty(s), t)
+      : Number.NaN;
+    if (!hftMayEnter(t, liveQty)) return false;
 
     const candleOnly = process.env.HFT_JP_CANDLE_ONLY === "true";
     const fireOnClose = process.env.HFT_JP_FIRE_ON_CLOSE !== "false";
@@ -296,10 +315,10 @@ export class MicroMeanReversion {
       process.env.HFT_TRADE_SESSION === "extended" &&
       currentSession() !== "regular";
     const effMinObiLong = restExtended
-      ? Number(process.env.HFT_MR_REST_MIN_OBI_LONG ?? -0.99)
+      ? Number(process.env.HFT_MR_REST_MIN_OBI_LONG ?? 0.08)
       : minObiLong;
     const requirePattern = restExtended
-      ? process.env.HFT_MR_REST_REQUIRE_PATTERN === "true"
+      ? process.env.HFT_MR_REST_REQUIRE_PATTERN !== "false"
       : process.env.HFT_MR_REQUIRE_PATTERN !== "false";
     const jpUltra = process.env.HFT_JP_ULTRA === "true";
     const longOnly = process.env.HFT_LONG_ONLY !== "false";
@@ -322,6 +341,9 @@ export class MicroMeanReversion {
     const dipScalp = process.env.HFT_DIP_SCALP !== "false";
     const patternOkLong = bullishPattern && (!candleOnly || bullishPattern);
     const patternOkShort = bearishPattern && (!candleOnly || bearishPattern);
+    // A dip with no candle, or against a bearish candle, is not a buy.
+    const dipOkLong = dipScalp && dipBelowVwap && patternBias(pattern) !== -1;
+    const dipOkShort = dipScalp && popAboveVwap && patternBias(pattern) !== 1;
     const useMicroProb = process.env.HFT_MICROSTRUCTURE_PROB !== "false";
     const tapeBurst = tape.lastBurstRatio >= Number(process.env.TAPE_VELOCITY_MULTIPLIER ?? 2.5);
     const microIn = {
@@ -343,12 +365,12 @@ export class MicroMeanReversion {
     let goLong =
       trendOkLong &&
       book.obi > effMinObiLong &&
-      (patternOkLong || (dipScalp && dipBelowVwap) || (!requirePattern && !candleOnly && dipBelowVwap));
+      (patternOkLong || (!requirePattern && !candleOnly && dipOkLong));
     let goShort =
       !longOnly &&
       trendOkShort &&
       book.obi < minObiShort &&
-      (patternOkShort || (!requirePattern && !candleOnly && popAboveVwap));
+      (patternOkShort || (!requirePattern && !candleOnly && dipOkShort));
     if (useMicroProb) {
       const upP = upwardProbability(microIn, tapeBurst);
       const minP = Number(process.env.HFT_MICRO_MIN_UP_PROB ?? 0.52);
@@ -359,14 +381,11 @@ export class MicroMeanReversion {
       }
     }
     if (!goLong && !goShort) return false;
-    if (goLong && dayTradeBuysHalted()) {
-      if (!goShort) return false;
-      goLong = false;
-    }
-    if (goLong && process.env.HFT_BLOCK_ADD_TO_BROKER_LONG !== "false") {
+    if (dayTradeBuysHalted()) return false;
+    const greenAdd = liveQty > 0 && requireProfitCushion() && isEarnedSymbol(t);
+    if (goLong && process.env.HFT_BLOCK_ADD_TO_BROKER_LONG !== "false" && !greenAdd) {
       if (!this.broker.positionsReady()) return false;
-      const live = issuerCachedLongQty((s) => this.broker.cachedLongQty(s), t);
-      if (skipBuyAlreadyLong(live, 0)) {
+      if (skipBuyAlreadyLong(liveQty, 0)) {
         this.kill.lock(t, Date.now());
         return false;
       }
@@ -466,7 +485,7 @@ export class MicroMeanReversion {
     const conf = candleOnly || bullishPattern || bearishPattern
       ? 0.55 * patternStrength + 0.25 * dipStrength + 0.2 * obiAlign
       : 0.4 * patternStrength + 0.3 * dipStrength + 0.3 * obiAlign;
-    const sizeMult = confidenceNotionalMult(conf);
+    const sizeMult = confidenceNotionalMult(conf) * lossSizeMult(t);
     if (sizeMult <= 0) return false;
 
     const newsTilt = tradeNewsSizingTilt(t);
@@ -511,6 +530,7 @@ export class MicroMeanReversion {
 
     if (!this.kill.reserveOrderSlot(nowMs)) return false;
     this.pending.add(t);
+    this.kill.blockRepeat(t, nowMs);
 
     const orderId = nextId();
     const extended = hftExtendedHoursFlag();
@@ -761,9 +781,17 @@ export class MicroMeanReversion {
         : book.bestAsk > 0 && pos.entryPx > 0 && book.bestAsk > pos.entryPx + 1e-12;
     // Default: max-hold sells high. Last-wins HFT_MAX_HOLD_FORCE_EXIT recycles
     // leftover BP instead of sitting red in all 15 IEX slots.
+    const adverseFrac =
+      pos.entryPx > 0
+        ? pos.side === "buy"
+          ? (pos.entryPx - book.bestBid) / pos.entryPx
+          : (book.bestAsk - pos.entryPx) / pos.entryPx
+        : 0;
+    const hardFloor = Number(process.env.HFT_MR_HARD_STOP_PCT ?? 0.008);
     const forced =
       forceExit ||
       process.env.HFT_FORCE_FLATTEN === "true" ||
+      (underwater && adverseFrac >= hardFloor) ||
       (timedOut && underwater && process.env.HFT_MAX_HOLD_FORCE_EXIT === "true");
 
     // Green TP, or max-hold sell-high, or hard forced exit.
@@ -909,6 +937,7 @@ export class MicroMeanReversion {
         const pnlPerShare =
           pos.side === "buy" ? exitPx - pos.entryPx : pos.entryPx - exitPx;
         this.circuit.recordRoundTripPnl(pnlPerShare * pos.qty);
+        if (pos.entryPx > 0) rememberRealized(t, pnlPerShare / pos.entryPx, "hft-mr");
         if (this.circuit.isTripped()) {
           this.kill.setGlobal(true);
           log("CIRCUIT-BREAKER", {

@@ -24,9 +24,9 @@ def get_stock_trading_env_class() -> type:
     global _StockTradingEnvCls
     if _StockTradingEnvCls is not None:
         return _StockTradingEnvCls
-    from gymnasium import spaces
+    from gymnasium import Env, spaces
 
-    class StockTradingEnv(gym.Env):
+    class StockTradingEnv(Env):
         metadata = {"render_modes": []}
 
         def __init__(self, features: pd.DataFrame, ret_col: str = "returns", window: int = 1):
@@ -74,7 +74,7 @@ def get_stock_trading_env_class() -> type:
 
                     side = "LONG" if prev_pos > 0 else "SHORT"
                     realized = linear  # long: +ret; short: -ret when price drops is +linear
-                    rw = asymmetric_reward(side, realized, bars_held=1)
+                    rw = asymmetric_reward(side, realized, bars_held=1, position_pnl=True)
                     r = float(rw.reward)
                     if new_pos != prev_pos:
                         r -= float(os.getenv("RL_ACTION_SWITCH_FRICTION", "0.0001"))

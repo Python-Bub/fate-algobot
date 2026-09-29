@@ -12,6 +12,7 @@ import { AlpacaExecutor } from "../common/alpaca-exec.js";
 import { CFG, confidenceNotionalMult, effectiveConfidenceFloor } from "../common/config.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
+import { lossSizeMult } from "../common/loss-memory.js";
 import { nowNs, nsToMs } from "../common/latency.js";
 import { fileLogger, stdoutTag } from "../common/logger.js";
 import { hftExtendedHoursFlag, hftLimitTif, ordersAllowed, shouldTtlCancelWorking } from "../common/market-session.js";
@@ -29,7 +30,7 @@ import { TapeVelocity } from "./tape-velocity.js";
 import { flowIsSellToxic, microPriceDriftBps, microPriceSupportsLong } from "./micro-price.js";
 import { execDelayFeeBps, effectiveBudgetMs } from "./exec-delay.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
-import { fuseObiMicro, fuseObiTape, shouldEnterEv } from "./trade-ev.js";
+import { fuseObiMicro, fuseObiTape, shouldEnterEv, targetEdgeBps } from "./trade-ev.js";
 import { sizeHftClip } from "./firm-risk.js";
 import { resolveSignalMode, signalConfidence, wantsDirection } from "./signal-mode.js";
 
@@ -249,8 +250,8 @@ export class ObiTapeSignals {
       long = book.bestBid > 0 && book.bestAsk > 0 && book.bestAsk >= book.bestBid;
     }
     if (!long && !short) return false;
-    // Day-loss halt (shared with fortress): no new longs; shorts already gated by longOnly.
-    if (long && dayTradeBuysHalted()) return false;
+    // Day-loss halt: no new risk on either side. Shorts were still opening after the book was red.
+    if (dayTradeBuysHalted()) return false;
 
     const skipBudget = process.env.HFT_SKIP_LATENCY_BUDGET === "true";
     // Local proc is ~8–15ms; raw OBI_BUDGET_LATENCY_MS=8 false-missed every fire.
@@ -301,7 +302,7 @@ export class ObiTapeSignals {
     if (paceFill) conf = Math.max(conf, effectiveConfidenceFloor());
     const minObi = Number(process.env.HFT_MIN_OBI_STRENGTH ?? 0);
     if (minObi > 0 && obiStrength < minObi) return false;
-    const sizeMult = confidenceNotionalMult(conf);
+    const sizeMult = confidenceNotionalMult(conf) * lossSizeMult(book.ticker);
     if (sizeMult <= 0) return false;
 
     const newsTilt = tradeNewsSizingTilt(t);
@@ -314,7 +315,7 @@ export class ObiTapeSignals {
     const tpTicks = Number(process.env.HFT_TAKE_PROFIT_TICKS ?? 4);
     const mid = book.mid > 0 ? book.mid : (book.bestBid + book.bestAsk) / 2;
     if (!(mid > 0)) return false;
-    const edgeBps = ((tpTicks * tick) / mid) * 10_000;
+    const edgeBps = targetEdgeBps(mid, tpTicks, tick);
     const sBps = chargedSpreadBps(book);
     const feeBps = Number(process.env.HFT_FEE_BPS ?? 1) + execDelayFeeBps();
     const required = sBps + feeBps;
@@ -393,6 +394,7 @@ export class ObiTapeSignals {
     if (!this.kill.reserveOrderSlot(nowMs)) return false;
 
     this.pending.add(t);
+    this.kill.blockRepeat(t, nowMs);
     log("FIRE", {
       ticker: t,
       side,

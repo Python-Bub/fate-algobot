@@ -156,6 +156,22 @@ def thesis_death_confirmed(
     return False, f"votes={len(votes)}/{need} ({','.join(votes) or 'none'})"
 
 
+def _trade_row(symbol: str) -> dict[str, Any]:
+    """Last saved MFE / scale-out flag for an open name. Empty if we have not seen it."""
+    from pathlib import Path
+    import json
+
+    path = Path(os.getenv("TRADE_QUALITY_PATH", "data/ops/trade_quality.json"))
+    if not path.is_file():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    row = (doc.get("trades") or {}).get(str(symbol or "").upper())
+    return row if isinstance(row, dict) else {}
+
+
 def decide_exit(
     symbol: str,
     *,
@@ -169,6 +185,7 @@ def decide_exit(
     bars_held: float | None = None,
     session_gap: float | None = None,
     now_et=None,
+    session_pnl: float | None = None,
 ) -> ExitDecision:
     """Single decision for open long — priority: thesis death > stop > TP/rotate > signal."""
     # 1) Confirmed thesis death (not noise)
@@ -186,7 +203,47 @@ def decide_exit(
             trim_frac=1.0,
         )
 
-    # 3) Full take-profit
+    # Model already says this long is wrong and the loss is real — don't wait for the wide stop.
+    if float(gain) <= -_f("FORTRESS_EARLY_CUT_PCT", 0.012) and float(p_adj) < _f(
+        "FORTRESS_EARLY_CUT_MAX_P", 0.48
+    ):
+        return ExitDecision(
+            "stop_loss",
+            f"early_cut gain={gain:.4f} p={float(p_adj):.3f}",
+            trim_frac=1.0,
+        )
+
+    # Day is already red: cut open losers before they turn a small red into a large one.
+    # Past the daily-loss line, every loser goes. Winners stay on the trail.
+    if session_pnl is not None and float(session_pnl) <= -_f("FORTRESS_RED_DAY_SESSION_PCT", 0.005):
+        deep = float(session_pnl) <= -_f("FORTRESS_RED_DAY_FLATTEN_PCT", 0.008)
+        red_cut = 0.0 if deep else _f("FORTRESS_RED_DAY_CUT_PCT", 0.003)
+        if float(gain) < 0 and float(gain) <= -abs(red_cut):
+            return ExitDecision(
+                "stop_loss",
+                f"red_day_cut session={float(session_pnl):.4f} gain={gain:.4f}",
+                trim_frac=1.0,
+            )
+
+    row = _trade_row(symbol)
+    mfe = max(float(gain), float(row.get("mfe") or gain))
+    arm = _f("FORTRESS_TRAIL_ARM", 0.012)
+    # 3) Once a trade has been up, don't give it back into a loser, and don't
+    #    sit through a deep pullback from the high. Full target still wins below.
+    if mfe >= arm and float(gain) <= mfe - _f("FORTRESS_TRAIL_GIVEBACK", 0.007):
+        return ExitDecision(
+            "take_profit",
+            f"trail mfe={mfe:.4f} gain={gain:.4f}",
+            trim_frac=1.0,
+        )
+    if mfe >= arm and float(gain) <= _f("FORTRESS_BREAKEVEN_LOCK", 0.001):
+        return ExitDecision(
+            "take_profit",
+            f"breakeven_lock mfe={mfe:.4f} gain={gain:.4f}",
+            trim_frac=1.0,
+        )
+
+    # 4) Full take-profit
     if float(gain) >= abs(float(take_profit_pct)):
         return ExitDecision(
             "take_profit",
@@ -194,10 +251,14 @@ def decide_exit(
             trim_frac=1.0,
         )
 
-    # 4) Scale-out / rotate after enough profit so capital can move
+    # 5) Scale-out once. Repeating it every pass chopped winners at the first green tick.
     scale_pct = _f("FORTRESS_SCALE_OUT_PCT", 0.008)  # +0.8%
     rotate_pct = _f("FORTRESS_ROTATE_MIN_GAIN", 0.006)
-    if float(gain) >= scale_pct and _b("FORTRESS_SCALE_OUT_ENABLED", True):
+    if (
+        float(gain) >= scale_pct
+        and _b("FORTRESS_SCALE_OUT_ENABLED", True)
+        and not row.get("scaled")
+    ):
         frac = _f("FORTRESS_SCALE_OUT_FRAC", 0.50)
         return ExitDecision(
             "scale_out",
@@ -251,6 +312,7 @@ def update_trade_quality(
     action: str,
     reason: str,
     entry_p: float | None = None,
+    filled: bool = False,
 ) -> dict[str, Any]:
     """Persist rolling trade quality scorecard for open / recent names."""
     from pathlib import Path
@@ -286,6 +348,7 @@ def update_trade_quality(
             "quality": quality,
             "last_action": action,
             "last_reason": reason,
+            "scaled": bool(row.get("scaled") or (action == "scale_out" and filled)),
             "entry_p": entry_p if entry_p is not None else row.get("entry_p"),
             "updated_utc": doc["updated_utc"],
         }

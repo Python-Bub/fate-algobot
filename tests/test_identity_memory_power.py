@@ -85,9 +85,13 @@ def test_power_people_requires_speaker_ticker_and_direction(tmp_path, monkeypatc
 
     assert extract_mentions("The president talked about chips and cars and energy.") == []
     assert extract_mentions("Trump mentioned Tesla in passing.") == []  # no direction
+    # Boost decays and drops after POWER_PEOPLE_MAX_AGE_DAYS; a fixed date would silently
+    # age out, so stamp the mention "yesterday" relative to the run.
+    from datetime import date, timedelta
+
     hits = extract_mentions(
         "President Trump said wanna get rich? Buy this Tesla.",
-        ts="2026-08-01",
+        ts=(date.today() - timedelta(days=1)).isoformat(),
     )
     assert len(hits) == 1
     assert hits[0]["ticker"] == "TSLA"

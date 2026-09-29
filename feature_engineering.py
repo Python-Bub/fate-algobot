@@ -18,6 +18,8 @@ except ImportError:
 _ibkr_bars_enabled: bool = True
 _FEATURE_BUILD_CACHE: dict[tuple, tuple[float, pd.DataFrame]] = {}
 _SPY_BENCH_CACHE: dict[tuple[str, str], pd.DataFrame] = {}
+# One fortress pass: batch Alpaca bars land here so each tick does not open its own HTTP call.
+_PASS_BAR_CACHE: dict[str, pd.DataFrame] = {}
 
 
 def _disable_ibkr_bars_once(err: Exception) -> None:
@@ -57,6 +59,57 @@ def _naive_index(d: pd.DataFrame) -> pd.DataFrame:
     if getattr(idx, "tz", None) is not None:
         idx = idx.tz_localize(None)
     out.index = idx
+    return out
+
+
+def remember_pass_bars(symbol: str, df: pd.DataFrame) -> None:
+    """Keep a non-empty daily frame for this process. Empty frames are not stored."""
+    if df is None or df.empty:
+        return
+    _PASS_BAR_CACHE[str(symbol).strip().upper()] = df
+
+
+def clear_pass_bars() -> None:
+    _PASS_BAR_CACHE.clear()
+
+
+def _frame_from_alpaca_bars(bars: list) -> pd.DataFrame:
+    rows: list[dict] = []
+    idx: list = []
+    for b in bars or []:
+        try:
+            idx.append(pd.to_datetime(b["t"]))
+            close = float(b["c"])
+            rows.append(
+                {
+                    "Open": float(b["o"]),
+                    "High": float(b["h"]),
+                    "Low": float(b["l"]),
+                    "Close": close,
+                    "Adj Close": close,
+                    "Volume": float(b.get("v", 0) or 0),
+                }
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+    if not rows:
+        return pd.DataFrame()
+    return _naive_index(pd.DataFrame(rows, index=idx))
+
+
+def frames_from_alpaca_multi(payload: dict, key_map: dict[str, list[str]]) -> dict[str, pd.DataFrame]:
+    """Map an Alpaca multi-symbol bars payload onto the scan's logical tickers."""
+    raw = (payload or {}).get("bars") or {}
+    if not isinstance(raw, dict):
+        return {}
+    out: dict[str, pd.DataFrame] = {}
+    for api_sym, bars in raw.items():
+        frame = _frame_from_alpaca_bars(bars if isinstance(bars, list) else [])
+        if frame.empty:
+            continue
+        logicals = key_map.get(str(api_sym)) or key_map.get(str(api_sym).upper()) or [str(api_sym)]
+        for logical in logicals:
+            out[str(logical).strip().upper()] = frame
     return out
 
 
@@ -119,10 +172,14 @@ def _price_source() -> str:
 
 
 def _skip_yahoo_fallback() -> bool:
+    """Look up policy on the module so test monkeypatches of the functions win."""
     try:
-        from data_platform.price_fetch_policy import skip_yahoo_fallback
+        from data_platform import price_fetch_policy as _pfp
 
-        return skip_yahoo_fallback()
+        paper = os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes")
+        if paper:
+            return bool(_pfp.paper_sim_skip_yahoo_fallback())
+        return bool(_pfp.skip_yahoo_fallback())
     except ImportError:
         return False
 
@@ -499,6 +556,17 @@ def _load_price_data_once(ticker: str, logical: str, start_date: str, end_date: 
     api_sym = price_feed_symbol(ticker)
     if api_sym != logical:
         log.debug("[FEATURE] Price API symbol %s → %s", logical, api_sym)
+
+    cached = _PASS_BAR_CACHE.get(logical)
+    if cached is None or getattr(cached, "empty", True):
+        cached = _PASS_BAR_CACHE.get(str(ticker).strip().upper())
+    if cached is not None and not cached.empty:
+        try:
+            sliced = cached.loc[cached.index >= pd.Timestamp(start_date)]
+        except Exception:
+            sliced = cached
+        if sliced is not None and not sliced.empty:
+            return sliced
 
     try:
         from data_platform.network_data import use_replay_raw_first
@@ -897,6 +965,117 @@ def _build_features_uncached(ticker: str, start_date: str, end_date: str | None 
 
     log.info(f"[FEATURE] Built features for {ticker}, final shape: {df.shape}")
     return df
+
+
+def _merge_bar_frames(acc: dict[str, pd.DataFrame], new: dict[str, pd.DataFrame]) -> None:
+    for key, frame in new.items():
+        prev = acc.get(key)
+        if prev is None or prev.empty:
+            acc[key] = frame
+            continue
+        merged = pd.concat([prev, frame]).sort_index()
+        acc[key] = merged[~merged.index.duplicated(keep="last")]
+
+
+def _fetch_alpaca_multi_bars(
+    url: str,
+    api_symbols: list[str],
+    key_map: dict[str, list[str]],
+    start_iso: str,
+    end_iso: str,
+    *,
+    timeout: float,
+) -> dict[str, pd.DataFrame]:
+    import requests
+
+    key = os.getenv("ALPACA_API_KEY", "").strip()
+    sec = os.getenv("ALPACA_SECRET_KEY", "").strip()
+    if not key or not sec or not api_symbols:
+        return {}
+    headers = {"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": sec}
+    params: dict = {
+        "symbols": ",".join(api_symbols),
+        "timeframe": "1Day",
+        "start": start_iso,
+        "end": end_iso,
+        "limit": 1000,
+    }
+    if "/v2/stocks/" in url:
+        params["adjustment"] = "all"
+    out: dict[str, pd.DataFrame] = {}
+    page = None
+    for _ in range(12):
+        if page:
+            params["page_token"] = page
+        try:
+            resp = requests.get(url, params=params, headers=headers, timeout=timeout)
+        except Exception as exc:
+            log.warning("[FEATURE] batch bars failed: %s", exc)
+            break
+        if resp.status_code == 429:
+            log.warning("[FEATURE] batch bars 429 — stop prefetch, do not retry the storm")
+            break
+        if resp.status_code >= 400:
+            log.warning("[FEATURE] batch bars HTTP %s", resp.status_code)
+            break
+        try:
+            payload = resp.json()
+        except Exception:
+            break
+        _merge_bar_frames(out, frames_from_alpaca_multi(payload, key_map))
+        page = payload.get("next_page_token")
+        if not page:
+            break
+    return out
+
+
+def prefetch_scan_bars(symbols: list[str], *, lookback_days: int = 120) -> int:
+    """One Alpaca multi-bar pull for the whole scan. Returns how many names were cached.
+
+    A miss still falls through to the per-ticker loader. Empty responses are not cached,
+    so a bad chunk cannot pin a name to no price.
+    """
+    from crypto_universe import alpaca_symbol, is_crypto_symbol
+    from symbol_aliases import alpaca_equity_symbol
+
+    cap = max(1, int(os.getenv("FORTRESS_PREFETCH_MAX_SYMBOLS", "280") or 280))
+    names = [str(s).strip().upper() for s in symbols if str(s).strip()][:cap]
+    if "SPY" not in names:
+        names.append("SPY")
+    end = datetime.now(timezone.utc) + timedelta(days=1)
+    start = end - timedelta(days=max(30, int(lookback_days)))
+    start_iso = start.strftime("%Y-%m-%dT%H:%M:%SZ")
+    end_iso = end.strftime("%Y-%m-%dT%H:%M:%SZ")
+    base = os.getenv("ALPACA_DATA_URL", "https://data.alpaca.markets").rstrip("/")
+    timeout = float(os.getenv("FORTRESS_PREFETCH_TIMEOUT_SEC", "20") or 20)
+    chunk = max(10, int(os.getenv("FORTRESS_PREFETCH_CHUNK", "40") or 40))
+
+    equity_map: dict[str, list[str]] = {}
+    crypto_map: dict[str, list[str]] = {}
+    for sym in names:
+        if is_crypto_symbol(sym):
+            api = alpaca_symbol(sym)
+            crypto_map.setdefault(api, []).append(sym)
+        else:
+            api = alpaca_equity_symbol(sym)
+            equity_map.setdefault(api, []).append(sym)
+
+    found: dict[str, pd.DataFrame] = {}
+    for mapping, url in (
+        (equity_map, f"{base}/v2/stocks/bars"),
+        (crypto_map, f"{base}/v1beta3/crypto/us/bars"),
+    ):
+        apis = list(mapping)
+        for i in range(0, len(apis), chunk):
+            part = apis[i : i + chunk]
+            sub = {k: mapping[k] for k in part}
+            _merge_bar_frames(
+                found,
+                _fetch_alpaca_multi_bars(url, part, sub, start_iso, end_iso, timeout=timeout),
+            )
+    for sym, frame in found.items():
+        remember_pass_bars(sym, frame)
+    return len(found)
 
 
 def _expected_columns():

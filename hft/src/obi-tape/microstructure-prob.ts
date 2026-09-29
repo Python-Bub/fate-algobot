@@ -74,11 +74,10 @@ function microPriceProb(book: L2Book): number {
 
 function spreadProb(book: L2Book): number {
   const bps = spreadBps(book);
-  const tight = Number(process.env.HFT_TIGHT_SPREAD_BPS ?? 25);
   if (!Number.isFinite(bps)) return 0.5;
-  if (bps <= tight) return 0.62;
-  if (bps <= tight * 2) return 0.52;
-  return 0.38;
+  // 0 bps → ~0.60. 8 bps (a normal liquid touch) → 0.50. 40 bps → ~0.10.
+  // No flat 0.62 just because the book is "under 25".
+  return clamp01(0.5 + (8 - bps) / 80);
 }
 
 function tapeProb(tape: TapeVelocity, burst: boolean): number {
@@ -111,8 +110,9 @@ function newsProb(sentiment: number | undefined): number {
 
 function jpCandleProb(bias: -1 | 0 | 1 | undefined): number {
   if (bias == null) return 0.5;
-  if (bias > 0) return 0.66;
-  if (bias < 0) return 0.34;
+  // A real candle is a nudge, not a free 16 points of probability.
+  if (bias > 0) return 0.57;
+  if (bias < 0) return 0.43;
   return 0.5;
 }
 

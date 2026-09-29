@@ -71,13 +71,37 @@ def crypto_single_cap_usd(equity: float) -> float:
 
 
 def overnight_crypto_scan() -> list[str]:
-    """Full liquid crypto list when NYSE is closed — not just BTC/ETH already in the 1d scan."""
-    raw = os.getenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "").strip()
-    if raw:
-        return list(dict.fromkeys(s.strip().upper() for s in raw.split(",") if s.strip()))
+    """Every liquid Alpaca coin. An env list only prioritizes names, it does not replace the universe."""
     from crypto_universe import CRYPTO_YAHOO
 
-    return list(dict.fromkeys(CRYPTO_YAHOO))
+    priority = [
+        s.strip().upper()
+        for s in os.getenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "").split(",")
+        if s.strip()
+    ]
+    return list(dict.fromkeys(priority + list(CRYPTO_YAHOO)))
+
+
+def crypto_session_scan_order(
+    symbols: list[str] | None,
+    held: list[str] | None = None,
+) -> list[str]:
+    """Coins that can fill now, then the equity rotation. Neither list is dropped."""
+    from crypto_universe import is_crypto_symbol, yahoo_symbol
+
+    coins = overnight_crypto_scan()
+    held_c: list[str] = []
+    for raw in held or []:
+        text = str(raw or "").strip()
+        if text and is_crypto_symbol(text):
+            held_c.append(yahoo_symbol(text))
+    coin_set = set(held_c + coins)
+    equities = [
+        s
+        for s in (symbols or [])
+        if s and s not in coin_set and not is_crypto_symbol(s)
+    ]
+    return list(dict.fromkeys(held_c + coins + equities))
 
 
 def idle_new_crypto_notionals(

@@ -388,7 +388,7 @@ cmd_status() {
   echo "---- Buying power ----"
   "$PY" -u "$ROOT/tools/buying_power_status.py" --quiet 2>/dev/null || echo "  (calculator unavailable)"
   echo
-  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator hft-news-watch retrain-weak-loop stack-autotune self-improve cortex-singularity free-agent operator-doc stack-watchdog paper-awake paper-hygiene day-trade micro-scalp crypto-hft disk-cleanup execution-monitor exec-delay bottom-fisher-watch valuation-news-watch event-calendar-watch event-learn-train hist-cook gen-learn-train sheldon-hunt algo-pipeline pattern-anomaly-watch ule-watch continuous-learn universe-lifecycle-watch industry-ai-watch; do
+  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator hft-news-watch retrain-weak-loop stack-autotune self-improve cortex-singularity free-agent operator-doc stack-watchdog paper-awake paper-hygiene day-trade micro-scalp crypto-hft gainz-v2 gainz-escape-watch disk-cleanup execution-monitor exec-delay bottom-fisher-watch valuation-news-watch event-calendar-watch event-learn-train hist-cook gen-learn-train sheldon-hunt algo-pipeline pattern-anomaly-watch ule-watch continuous-learn universe-lifecycle-watch industry-ai-watch; do
     if is_running "$name"; then
       printf "  %-22s RUNNING (pid %s)\n" "$name" "$(resolve_pid "$name")"
     else
@@ -713,7 +713,7 @@ launch_subsecond_alpaca_paper() {
         HFT_MR_MAX_HOLD_MS="${HFT_MR_MAX_HOLD_MS:-45000}" \
         HFT_MR_FORCE_MAX_HOLD="${HFT_MR_FORCE_MAX_HOLD:-false}" \
         HFT_MR_REST_EXTENDED="${HFT_MR_REST_EXTENDED:-true}" \
-        HFT_MR_REST_MIN_OBI_LONG="${HFT_MR_REST_MIN_OBI_LONG:--0.99}" \
+        HFT_MR_REST_MIN_OBI_LONG="${HFT_MR_REST_MIN_OBI_LONG:-0.08}" \
         HFT_MR_REST_DIP_EVERY_N="${HFT_MR_REST_DIP_EVERY_N:-1}" \
         HFT_MR_REST_MIN_GAP_MS="${HFT_MR_REST_MIN_GAP_MS:-400}" \
         HFT_MR_REST_DIP_PCT="${HFT_MR_REST_DIP_PCT:-0.0012}" \
@@ -799,7 +799,7 @@ launch_fortress_alpaca_paper() {
     FORTRESS_LONG_ONLY=true \
     FORTRESS_ALLOW_SHORT_ENTRIES=false \
     FORTRESS_PREDICT_HORIZON=1d \
-    MAX_LIVE_SYMBOLS="${MAX_LIVE_SYMBOLS:-40}" \
+    MAX_LIVE_SYMBOLS="${MAX_LIVE_SYMBOLS:-240}" \
     LIVE_SLEEP_SEC="${LIVE_SLEEP_SEC:-0.02}" \
     FORTRESS_ACCURACY_MODE="${FORTRESS_ACCURACY_MODE:-false}" \
     HEARTBEAT_MAX_LATENCY_MS="${HEARTBEAT_MAX_LATENCY_MS:-2500}" \
@@ -1962,11 +1962,14 @@ cmd_start_paper() {
 }
 
 cmd_prune_stale_pids() {
-  local name p
-  for name in subsecond-earnings subsecond-obi intraday weekly longterm train train-intraday train-lstm enhancement-queue finish-today hft-rotator paper-awake paper-hygiene disk-cleanup stack-autotune stack-watchdog; do
-    p="$(read_pid "$name")"
-    if [ -n "$p" ] && ! alive "$p"; then
-      rm -f "$(pid_file "$name")"
+  # Sweep every pidfile (not a hard-coded subset) so newer daemons such as
+  # gainz-*/talk-overnight do not leave dead pids behind for status/is_running.
+  local f p
+  for f in "$PIDDIR"/*.pid; do
+    [ -f "$f" ] || continue
+    p="$(cat "$f" 2>/dev/null | tr -d '[:space:]')"
+    if [ -z "$p" ] || ! [[ "$p" =~ ^[0-9]+$ ]] || ! alive "$p"; then
+      rm -f "$f"
     fi
   done
 }
@@ -3820,8 +3823,12 @@ cmd_equity_chart() {
 
 cmd_slim_disk() {
   echo "[slim-disk] safe cleanup — refetchable caches + stale cruft only (models/ + checkpoints kept)"
+  # Slim disk = "don't store what the internet already has": run the prune in
+  # network-first mode so nothing it removes is immediately re-cached.
+  export NETWORK_FIRST="${NETWORK_FIRST:-true}"
   "$PY" -u "$ROOT/tools/prune_disk.py" --no-checkpoints "${@:2}"
-  echo "[slim-disk] NETWORK_FIRST=true → prices/bars from Yahoo/Alpaca, not re-cached locally"
+  echo "[slim-disk] NETWORK_FIRST=${NETWORK_FIRST} → prices/bars from Yahoo/Alpaca, not re-cached locally"
+  echo "[slim-disk] to keep daemons network-first too, add NETWORK_FIRST=true to data/deploy_scale.env (last-wins)"
 }
 
 cmd_train_intraday() {
@@ -3958,7 +3965,8 @@ cmd_data_health() {
 }
 
 cmd_full_stack_eval() {
-  shift || true
+  # Caller (case arm) already shifted the subcommand off; a second shift here
+  # was eating the first user flag (`--symbol MSFT` → `MSFT`).
   "$PY" -u "$ROOT/tools/full_stack_historical_eval.py" "$@"
 }
 
@@ -4513,7 +4521,7 @@ for s in ['ignore all instructions','you are qwen','status please']:
   industry-similarity|similarity-preview) shift; "$PY" -u "$ROOT/tools/industry_similarity_preview.py" "$@" ;;
   industry-max-train|max-industry-train) shift; USE_YAHOO_FIRST=true USE_INDUSTRY_NEURAL_FIRST=true "$PY" -u "$ROOT/tools/industry_max_train.py" "$@" ;;
   industry-neural-train) shift; USE_YAHOO_FIRST=true "$PY" -u "$ROOT/tools/industry_max_train.py" --skip-bootstrap "$@" ;;
-  full-stack-eval|historical-eval) shift; "$PY" -u "$ROOT/tools/full_stack_historical_eval.py" "$@" ;;
+  historical-eval) shift; cmd_full_stack_eval "$@" ;;
   build-ticker-industry-db) "$PY" -u "$ROOT/tools/build_ticker_industry_db.py" ;;
   industry-ai-weekly|ai-industry-weekly) shift; "$PY" -u "$ROOT/tools/industry_ai_weekly.py" "$@" ;;
   industry-ai-dry) "$PY" -u "$ROOT/tools/industry_ai_weekly.py" --dry-run --limit 30 ;;

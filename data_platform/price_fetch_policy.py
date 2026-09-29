@@ -38,8 +38,14 @@ def force_yahoo_prices(*, training: bool = False) -> bool:
 
 
 def apply_price_env_defaults(*, training: bool = False) -> None:
-    """Yahoo-first by default (reliable, uncapped). Set USE_POLYGON_FIRST=true for Polygon."""
+    """Yahoo-first by default (reliable, uncapped). Set USE_POLYGON_FIRST=true for Polygon.
+
+    An explicit ``FORCE_YAHOO_PRICES=false`` pin (GCP paper, pytest) is never
+    rewritten back to true by the Yahoo-first default.
+    """
     os.environ.setdefault("USE_PRICE_CACHE", "true")
+    explicit = os.getenv("FORCE_YAHOO_PRICES")
+    pinned_off = explicit is not None and explicit.strip().lower() not in ("1", "true", "yes")
     if use_polygon_first() and not force_yahoo_prices(training=training):
         os.environ["PRICE_DATA_SOURCE"] = "hybrid_polygon"
         os.environ["FORCE_YAHOO_PRICES"] = "false"
@@ -47,6 +53,17 @@ def apply_price_env_defaults(*, training: bool = False) -> None:
         os.environ["PAPER_SIM_FORCE_YAHOO"] = "false"
         if training:
             os.environ["TRAIN_FORCE_YAHOO"] = "false"
+        return
+    if pinned_off:
+        os.environ["FORCE_YAHOO_PRICES"] = "false"
+        os.environ["PAPER_SIM_FORCE_YAHOO"] = "false"
+        if training:
+            os.environ["TRAIN_FORCE_YAHOO"] = "false"
+        src = os.getenv("PRICE_DATA_SOURCE", "").strip().lower()
+        if polygon_configured() or src in ("hybrid_polygon", "hybrid_alpaca"):
+            os.environ.setdefault("SKIP_YAHOO_FALLBACK", "true")
+            if not src:
+                os.environ["PRICE_DATA_SOURCE"] = "hybrid_polygon"
         return
     if use_yahoo_first() or force_yahoo_prices(training=training):
         os.environ["PRICE_DATA_SOURCE"] = "yfinance"
@@ -76,7 +93,13 @@ def price_fetch_blocking() -> bool:
 def skip_yahoo_fallback() -> bool:
     if force_yahoo_prices():
         return False
-    if os.getenv("SKIP_YAHOO_FALLBACK", "true").lower() not in ("1", "true", "yes"):
+    skip_flag = os.getenv("SKIP_YAHOO_FALLBACK", "true").lower() in ("1", "true", "yes")
+    paper_skip = (
+        os.getenv("PAPER_SIM_ACTIVE_RUN", "false").lower() in ("1", "true", "yes")
+        and os.getenv("PAPER_SIM_SKIP_YAHOO_FALLBACK", "true").lower() in ("1", "true", "yes")
+        and os.getenv("PAPER_SIM_FORCE_YAHOO", "false").lower() not in ("1", "true", "yes")
+    )
+    if not skip_flag and not paper_skip:
         return False
     if use_polygon_first():
         return True
@@ -85,7 +108,9 @@ def skip_yahoo_fallback() -> bool:
 
 
 def paper_sim_skip_yahoo_fallback() -> bool:
-    """Back-compat alias."""
+    """Skip Yahoo during paper-sim unless Yahoo is explicitly forced."""
+    if force_yahoo_prices():
+        return False
     if os.getenv("PAPER_SIM_FORCE_YAHOO", "false").lower() in ("1", "true", "yes"):
         return False
     if os.getenv("PAPER_SIM_SKIP_YAHOO_FALLBACK", "true").lower() not in ("1", "true", "yes"):

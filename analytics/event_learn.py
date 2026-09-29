@@ -368,6 +368,13 @@ def predict_from_feats(
     skill = _clip01(float(st.get("skill") or 0.0))
     if not enabled():
         skill = 0.0
+    # A high magnitude IC with sub-50% direction accuracy was pushing the book
+    # the wrong way. Do not boost rank unless the walk-forward actually won.
+    acc = st.get("oos_acc")
+    if acc is not None and float(acc) < 0.52:
+        skill = 0.0
+    elif st.get("beat_baseline") is False and (acc is None or float(acc) < 0.53):
+        skill = 0.0
     # Rank boost: skill * direction * size-vs-typical (typical ~ 2%)
     typical = max(0.012, mag if mag > 0 else 0.02)
     boost = skill * (p_up - 0.5) * 2.0 * min(2.0, mag / 0.02)
@@ -492,6 +499,8 @@ def event_learn_rank_boost(
         boost *= max(0.15, fit)
     except Exception:
         fit = 1.0
+    if boost != boost or boost in (float("inf"), float("-inf")):
+        boost = 0.0
     boost = max(-1.0, min(1.0, boost))
     meta.update(
         {
@@ -687,9 +696,11 @@ def redesign_until_best(
     beat = bool(met.get("beat_baseline"))
     # Skill: only deploy when OOS IC is positive *and* we beat naive |move| MAE.
     skill = 0.0
-    if ic > 0.02 and (beat or ic > 0.08):
+    # Direction has to be better than a coin flip, and the size forecast has to
+    # beat the naive average. A big IC alone is not a reason to size up.
+    if ic > 0.02 and beat and acc >= 0.52:
         skill = _clip01((ic - 0.02) / 0.23)
-        skill = max(skill, 0.15 if beat else 0.0)
+        skill = max(skill, 0.15)
         if acc >= 0.53:
             skill = min(1.0, skill + 0.08)
     st = default_state()

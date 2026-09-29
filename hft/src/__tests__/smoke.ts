@@ -24,6 +24,8 @@ import {
   shouldReleasePending,
 } from "../common/order-lifecycle.js";
 import { CircuitBreaker } from "../common/circuit-breaker.js";
+import { lossSizeMult, rememberRealized } from "../common/loss-memory.js";
+import { hftMayEnter } from "../obi-tape/profit-cushion-gate.js";
 import { L2Book, L2_LEVELS } from "../obi-tape/l2-book.js";
 import {
   bestLevelObi,
@@ -54,7 +56,7 @@ import { assessQuoteHealth } from "../obi-tape/quote-health.js";
 import { AlpacaExecutor } from "../common/alpaca-exec.js";
 import { execDelayFeeBps, effectiveBudgetMs, loadExecDelayMs } from "../obi-tape/exec-delay.js";
 
-import { fuseObiMicro, fuseObiTape, expectedBps, shouldEnterEv } from "../obi-tape/trade-ev.js";
+import { fuseObiMicro, fuseObiTape, expectedBps, shouldEnterEv, targetEdgeBps } from "../obi-tape/trade-ev.js";
 import { plumbingHitsTarget, rollingCount, tpmTarget } from "../obi-tape/pace-governor.js";
 import { clipNotional, combinedHaircut, inventoryHaircut, lagHaircut, sizeHftClip } from "../obi-tape/firm-risk.js";
 import { resolveSignalMode, wantsDirection } from "../obi-tape/signal-mode.js";
@@ -148,6 +150,22 @@ ok("KillSwitch spaces burst submits to max-per-sec", () => {
   assert.equal(k.reserveOrderSlot(1250), true);
 });
 
+ok("a short fill lock does not erase the repeat block", () => {
+  const prev = process.env.HFT_REPEAT_ORDER_MS;
+  process.env.HFT_REPEAT_ORDER_MS = "60000";
+  try {
+    const k = new KillSwitch(["AAPL"], 120, 200);
+    k.blockRepeat("AAPL", 1_000);
+    assert.equal(k.isLocked("AAPL", 51_000), true);
+    k.lock("AAPL", 2_000);
+    assert.equal(k.isLocked("AAPL", 51_000), true);
+    assert.equal(k.isLocked("AAPL", 62_000), false);
+  } finally {
+    if (prev === undefined) delete process.env.HFT_REPEAT_ORDER_MS;
+    else process.env.HFT_REPEAT_ORDER_MS = prev;
+  }
+});
+
 ok("KillSwitch allows 200 submits inside a rolling minute", () => {
   process.env.HFT_GLOBAL_MAX_ORDERS_PER_MIN = "0";
   process.env.HFT_MAX_ORDERS_PER_SEC = "0";
@@ -220,20 +238,20 @@ ok("fill persist forces DAY and refuses cancel-unfilled", () => {
   process.env.HFT_FILL_PERSIST = "true";
 });
 
-ok("RTH spread cap is tight; charged spread is capped for edge gate", () => {
+ok("charged spread is the real bid-ask, not a flat 12 bps discount", () => {
   const b = new L2Book("MSFT");
   b.applySnapshot([[393.02, 100]], [[435.08, 100]], Date.now());
   assert.ok(spreadBps(b) > 500);
   assert.equal(spreadOk(b), false);
   assert.equal(spreadOkForSession(b, "regular"), false);
   assert.equal(flattenQuoteOk(b), false);
-  process.env.HFT_EDGE_SPREAD_CAP_BPS = "12";
-  assert.equal(chargedSpreadBps(b), 12);
+  assert.ok(chargedSpreadBps(b) > 500);
   const tight = new L2Book("KO");
   tight.applySnapshot([[70.00, 100]], [[70.02, 100]], Date.now());
   assert.ok(spreadOkForSession(tight, "regular"));
   assert.ok(flattenQuoteOk(tight));
-  assert.ok(chargedSpreadBps(tight) < 12);
+  const tightBps = chargedSpreadBps(tight);
+  assert.ok(tightBps > 2 && tightBps < 4);
 });
 
 ok("185/min buffer leaves headroom under 200 cap", () => {
@@ -688,6 +706,22 @@ ok("trade-ev logit fuse prefers aligned OBI+tape", () => {
   assert.ok(strong > 0.7);
 });
 
+ok("bps scalp clears a tight book that 12 cents cannot", () => {
+  const prev = process.env.HFT_TARGET_EDGE_BPS;
+  delete process.env.HFT_TARGET_EDGE_BPS;
+  const cents = targetEdgeBps(200, 12, 0.01);
+  assert.ok(cents < 8, "12 cents on $200 is under an 8 bps spread");
+  process.env.HFT_TARGET_EDGE_BPS = "8";
+  const bps = targetEdgeBps(200, 12, 0.01);
+  assert.equal(bps, 8);
+  const wide = shouldEnterEv(0.55, bps, 12, 0.6, 0.52);
+  const tight = shouldEnterEv(0.55, bps, 3, 0.6, 0.52);
+  assert.equal(wide.ok, false);
+  assert.equal(tight.ok, true);
+  if (prev === undefined) delete process.env.HFT_TARGET_EDGE_BPS;
+  else process.env.HFT_TARGET_EDGE_BPS = prev;
+});
+
 ok("trade-ev skips when cost eats the edge", () => {
   const bad = shouldEnterEv(0.55, 2.0, 8.0, 0.4, 0.52);
   const good = shouldEnterEv(0.62, 12.0, 3.0, 0.4, 0.52);
@@ -895,6 +929,58 @@ ok("TapeVelocity records lastPx", () => {
   const tape = new TapeVelocity("UBER", 100, 5000);
   tape.onTrade(Date.now(), 91.25, 10);
   assert.equal(tape.lastPx, 91.25);
+});
+
+ok("fresh names trade; only a green hold can be added to", () => {
+  const file = path.join("/tmp", `cushion-${process.pid}.json`);
+  const prevPath = process.env.PROFIT_CUSHION_GATE_PATH;
+  const prevReq = process.env.HFT_REQUIRE_PROFIT_CUSHION;
+  process.env.PROFIT_CUSHION_GATE_PATH = file;
+  process.env.HFT_REQUIRE_PROFIT_CUSHION = "true";
+  fs.writeFileSync(file, JSON.stringify({ earned: { AAPL: 0.01 }, require_cushion: true }));
+  try {
+    assert.equal(hftMayEnter("NVDA", 0), true);
+    assert.equal(hftMayEnter("AAPL", 10), true);
+    assert.equal(hftMayEnter("TSLA", 10), false);
+    assert.equal(hftMayEnter("NVDA", Number.NaN), false);
+  } finally {
+    if (prevPath === undefined) delete process.env.PROFIT_CUSHION_GATE_PATH;
+    else process.env.PROFIT_CUSHION_GATE_PATH = prevPath;
+    if (prevReq === undefined) delete process.env.HFT_REQUIRE_PROFIT_CUSHION;
+    else process.env.HFT_REQUIRE_PROFIT_CUSHION = prevReq;
+    fs.rmSync(file, { force: true });
+  }
+});
+
+ok("same-day HFT loss skips the next fire", () => {
+  const file = path.join("/tmp", `loss-mem-${process.pid}.json`);
+  const prev = process.env.LOSS_MEMORY_PATH;
+  process.env.LOSS_MEMORY_PATH = file;
+  try {
+    fs.writeFileSync(
+      file,
+      JSON.stringify({
+        symbols: {
+          ZZZ: { trades: [{ ret: -0.02, ts: new Date().toISOString(), source: "test" }] },
+        },
+      }),
+    );
+    assert.equal(lossSizeMult("ZZZ"), 0);
+    const yesterday = new Date(Date.now() - 3 * 86400_000).toISOString();
+    fs.writeFileSync(
+      file,
+      JSON.stringify({
+        symbols: { ZZZ: { trades: [{ ret: -0.02, ts: yesterday, source: "test" }] } },
+      }),
+    );
+    assert.equal(lossSizeMult("ZZZ"), 0.45);
+    rememberRealized("QQQ", -0.01, "test");
+    assert.equal(lossSizeMult("QQQ"), 0);
+  } finally {
+    if (prev === undefined) delete process.env.LOSS_MEMORY_PATH;
+    else process.env.LOSS_MEMORY_PATH = prev;
+    fs.rmSync(file, { force: true });
+  }
 });
 
 if (failed > 0) {

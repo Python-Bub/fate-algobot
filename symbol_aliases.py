@@ -109,6 +109,49 @@ def canonical_symbol(ticker: str) -> str:
     return price_feed_symbol(ticker)
 
 
+def _is_class_share_suffix(suffix: str) -> bool:
+    # BRK-B / BF-B / LGF-A style share classes: exactly one letter after the separator.
+    return len(suffix) == 1 and suffix.isalpha()
+
+
+def alpaca_equity_symbol(ticker: str) -> str:
+    """Internal (Yahoo-style) equity ticker → Alpaca trading/data symbol.
+
+    Alpaca uses a dot for share classes (``BRK.B``, ``BF.B``) and rejects the
+    hyphenated Yahoo form (``/v2/assets/BRK-B`` → 404). Legacy aliases still apply
+    (``SQ`` → ``XYZ``). Crypto is handled by ``crypto_universe.alpaca_symbol``.
+    """
+    s = price_feed_symbol(ticker)
+    if "-" in s:
+        head, _, tail = s.rpartition("-")
+        if head and _is_class_share_suffix(tail):
+            return f"{head}.{tail}"
+    return s
+
+
+def internal_symbol(broker_symbol: str) -> str:
+    """Alpaca position/order symbol → internal canonical ticker.
+
+    ``BRK.B`` → ``BRK-B`` (matches ``models/BRK-B_model.pkl`` and the universe files);
+    ``BTCUSD`` / ``BTC/USD`` → ``BTC-USD``. Anything else is passed through upper-cased.
+    """
+    s = str(broker_symbol or "").strip().upper()
+    if not s:
+        return s
+    try:
+        from crypto_universe import is_crypto_symbol, yahoo_symbol
+
+        if is_crypto_symbol(s):
+            return yahoo_symbol(s)
+    except Exception:
+        pass
+    if "." in s:
+        head, _, tail = s.rpartition(".")
+        if head and _is_class_share_suffix(tail):
+            return f"{head}-{tail}"
+    return s
+
+
 def price_data_fallback_symbols(ticker: str) -> list[str]:
     """Ordered symbols to try when the primary listing returns no OHLCV."""
     logical = ticker.strip().upper()

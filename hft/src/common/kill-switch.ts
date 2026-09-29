@@ -136,7 +136,16 @@ export class KillSwitch {
     const byte = idx >>> 3;
     const mask = 1 << (idx & 7);
     this.bits[byte] |= mask;
-    this.unlockAt[idx] = nowMs + this.cooldownMs;
+    const until = nowMs + this.cooldownMs;
+    // A later short lock (fill cooldown 120ms) must not erase a repeat block.
+    if (!(this.unlockAt[idx] > until)) this.unlockAt[idx] = until;
+  }
+
+  /** One entry per name per window. Stops IOC-cancel → same ticket again. */
+  blockRepeat(ticker: string, nowMs = Date.now()): void {
+    const ms = Number(process.env.HFT_REPEAT_ORDER_MS ?? 60_000);
+    const hold = Number.isFinite(ms) && ms > 0 ? ms : 60_000;
+    this.lock(ticker, nowMs + Math.max(0, hold - this.cooldownMs));
   }
 
   /** Returns true if you may submit an order (local + shared global budget). Rolling 60s. */

@@ -76,7 +76,7 @@ def test_quote_yahoo_fallback_when_iex_empty(monkeypatch):
     import alpaca_broker as ab
 
     monkeypatch.setattr(ab, "_keys", lambda: ("k", "s"))
-    monkeypatch.setattr(ab, "price_feed_symbol", lambda s: s)
+    monkeypatch.setattr(ab, "alpaca_equity_symbol", lambda s: s)
     monkeypatch.setattr(
         "analytics.alpaca_limits.quote_cache_get",
         lambda *_a, **_k: None,

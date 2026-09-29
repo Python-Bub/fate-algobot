@@ -16,12 +16,22 @@ TOP100_CACHE = Path(__file__).resolve().parent / "data" / "top100_market_cap.jso
 TOP50_CACHE = Path(__file__).resolve().parent / "data" / "top50pct_market_cap.json"
 _TOP100_SET: frozenset[str] | None = None
 _TOP100_RANK: dict[str, int] | None = None
+_TOP100_LIST: list[str] | None = None
 _TOP50_SET: frozenset[str] | None = None
+
+
+def _remember_top100(syms: list[str]) -> list[str]:
+    global _TOP100_SET, _TOP100_RANK, _TOP100_LIST
+    clean = list(dict.fromkeys(syms))
+    _TOP100_LIST = clean
+    _TOP100_SET = frozenset(clean)
+    _TOP100_RANK = {s: i + 1 for i, s in enumerate(clean)}
+    return clean
 
 
 def load_top100_symbols(refresh: bool = False) -> list[str]:
     """Top N US names by market cap (cached JSON). Default 100."""
-    global _TOP100_SET, _TOP100_RANK
+    global _TOP100_SET, _TOP100_RANK, _TOP100_LIST
     if refresh or not TOP100_CACHE.is_file():
         try:
             import subprocess
@@ -42,12 +52,13 @@ def load_top100_symbols(refresh: bool = False) -> list[str]:
             syms = [str(s).upper() for s in doc.get("symbols", []) if s]
         except Exception:
             syms = []
+    if not syms and _TOP100_LIST:
+        # A mid-write or EMFILE read must not wipe a good in-process universe.
+        return list(_TOP100_LIST)
     if not syms:
         log.warning("[TOP100] cache empty — run ./run_all.sh refresh-top100 (no static ticker fallback)")
-    syms = list(dict.fromkeys(syms))
-    _TOP100_SET = frozenset(syms)
-    _TOP100_RANK = {s: i + 1 for i, s in enumerate(syms)}
-    return syms
+        return []
+    return _remember_top100(syms)
 
 
 def is_top100_equity(symbol: str) -> bool:
@@ -305,6 +316,13 @@ def symbols_paper_active_universe() -> list[str]:
         pool = sorted(s for s in (intra & daily) if is_core_trainable_equity(s))
     else:
         pool = sorted(s for s in intra if is_core_trainable_equity(s))
+
+    # Fresh clone / no pickles yet: still rotate the liquid top-100 cache
+    # (never return an empty paper universe).
+    if not pool:
+        cached = [s for s in load_top100_symbols() if is_core_trainable_equity(s)]
+        if cached:
+            return apply_scan_order(cached)
 
     mode = os.getenv("PAPER_SIM_ACTIVE_MODE", "top100_rotate").strip().lower()
     if mode in ("all", "full", "whole", "database"):

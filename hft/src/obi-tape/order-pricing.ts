@@ -86,12 +86,14 @@ export function bookSpreadOk(book: L2Book): boolean {
   return spreadOkForSession(book, currentSession());
 }
 
-/** Cap charged spread so sanitized REST books (~30–120 bps) don't auto-fail TP edge. */
+/**
+ * What a round trip actually pays. Lifting the offer costs the full bid-ask,
+ * in bps. A flat cap (the old 12) made a 40 bps book look cheap enough to trade.
+ */
 export function chargedSpreadBps(book: L2Book): number {
   const raw = spreadBps(book);
-  const cap = Number(process.env.HFT_EDGE_SPREAD_CAP_BPS ?? 12);
-  if (!(Number.isFinite(cap) && cap > 0)) return raw;
-  return Math.min(raw, cap);
+  if (!Number.isFinite(raw) || raw < 0) return Number.POSITIVE_INFINITY;
+  return raw;
 }
 
 /** Don't flatten on garbage IEX/REST NBBOs (was MAX-HOLD at ask $168 / bid $160). */

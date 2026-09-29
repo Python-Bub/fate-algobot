@@ -48,7 +48,16 @@ def test_skip_chase_needs_live_binary(monkeypatch):
     assert skip2 is False
 
 
-def test_new_cash_is_fifty_fifty_until_crypto_target():
+def _fifty_fifty(monkeypatch):
+    # Deploy knobs (data/deploy_scale.env) legitimately move these; pin the 50/50 defaults
+    # this test documents so it checks the math, not the operator's current tilt.
+    monkeypatch.setenv("FORTRESS_CRYPTO_BOOK_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_NEW_CASH_CRYPTO_FRAC", "0.50")
+    monkeypatch.setenv("FORTRESS_CRYPTO_MAX_SINGLE_FRAC", "0.18")
+
+
+def test_new_cash_is_fifty_fifty_until_crypto_target(monkeypatch):
+    _fifty_fifty(monkeypatch)
     # $71k book, $2.6k crypto, $38k cash → half of cash toward crypto, capped by gap to 50%.
     c, s = new_cash_split(38_000, equity=71_000, crypto_mv=2_600)
     assert abs(c - 19_000) < 1.0
@@ -60,7 +69,8 @@ def test_new_cash_is_fifty_fifty_until_crypto_target():
     assert crypto_gap_usd(71_000, 2_600) > 30_000
 
 
-def test_crypto_clip_uses_idle_half_and_single_cap():
+def test_crypto_clip_uses_idle_half_and_single_cap(monkeypatch):
+    _fifty_fifty(monkeypatch)
     n = size_crypto_notional(400, equity=71_000, cash=38_000, crypto_mv=2_600)
     # 18% of 71k = 12,780; 50% of cash = 19k; gap ~33k → 12,780
     assert 12_000 < n < 13_000
@@ -89,6 +99,7 @@ def test_idle_new_crypto_opens_sol_when_majors_capped(monkeypatch):
 
 
 def test_crypto_single_cap_is_wider_than_equity_10pct(monkeypatch):
+    _fifty_fifty(monkeypatch)
     monkeypatch.delenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", raising=False)
     from analytics.crypto_alloc import crypto_single_cap_usd, overnight_crypto_scan
     from analytics.crypto_math import overlay_equity_p
@@ -97,6 +108,19 @@ def test_crypto_single_cap_is_wider_than_equity_10pct(monkeypatch):
     assert 12_000 < cap < 13_000
     scan = overnight_crypto_scan()
     assert "BTC-USD" in scan and "SOL-USD" in scan and len(scan) >= 10
+    monkeypatch.setenv("FORTRESS_CRYPTO_OVERNIGHT_SCAN", "BTC-USD,ETH-USD,SOL-USD")
+    pinned = overnight_crypto_scan()
+    assert pinned[0] == "BTC-USD" and "DOGE-USD" in pinned and len(pinned) >= 10
+    from analytics.crypto_alloc import crypto_session_scan_order
+
+    ordered = crypto_session_scan_order(
+        ["AAPL", "MSFT", "BTC-USD", "NVDA"],
+        ["ETHUSD"],
+    )
+    assert ordered[0] == "ETH-USD"
+    assert "DOGE-USD" in ordered and "AAPL" in ordered and "NVDA" in ordered
+    assert ordered.index("DOGE-USD") < ordered.index("AAPL")
+    assert len(ordered) >= 21
     # Equity XGB 0.35 must not keep the coin at a no-buy after overlay.
     assert overlay_equity_p(0.35, 0.62, 0.80) > 0.55
     assert overlay_equity_p(0.70, 0.40, 0.80) < 0.50

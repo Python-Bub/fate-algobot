@@ -32,6 +32,17 @@ def _b(name: str, default: bool = True) -> bool:
     return v.strip().lower() in ("1", "true", "yes")
 
 
+def _finite(v: Any, default: float = 0.0) -> float:
+    """Drop NaN/Inf from a learner component so one bad boost cannot poison rank."""
+    try:
+        x = float(v)
+    except (TypeError, ValueError):
+        return default
+    if x != x or x == float("inf") or x == float("-inf"):
+        return default
+    return x
+
+
 @dataclass
 class RankInputs:
     ticker: str
@@ -201,7 +212,7 @@ def fortress_learner_delta(
                 row=r,
                 sleeve="fortress",
             )
-            extra += _f("RANK_W_PROVEN_ONLINE", 0.28) * float(po_b)
+            extra += _f("RANK_W_PROVEN_ONLINE", 0.28) * _finite(po_b)
         except Exception:
             pass
     if _b("USE_EVENT_LEARN", True):
@@ -230,7 +241,7 @@ def fortress_learner_delta(
                 vol_20=vol_el,
                 sleeve="fortress",
             )
-            extra += _f("RANK_W_EVENT_LEARN", 0.10) * float(el_b)
+            extra += _f("RANK_W_EVENT_LEARN", 0.10) * _finite(el_b)
         except Exception:
             pass
     if _b("USE_INDUSTRY_PIPELINE", True):
@@ -238,13 +249,13 @@ def fortress_learner_delta(
             from analytics.industries.pipeline import run_industry_pipeline
 
             pipe = run_industry_pipeline(ticker, row)
-            delta = float(pipe.get("score_delta") or 0.0)
+            delta = _finite(pipe.get("score_delta") or 0.0)
             if pipe.get("block_long"):
                 delta = min(delta, -0.15)
             extra += _f("RANK_W_INDUSTRY_PIPELINE", 0.06) * delta
         except Exception:
             pass
-    return float(extra)
+    return _finite(extra)
 
 
 def curriculum_soft_boosts(
