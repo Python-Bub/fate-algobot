@@ -13,61 +13,166 @@ from analytics.trade_kernel import one_bar_ev
 
 
 _WEIGHT = {
-    "treasury": 1.4,
+    "treasury": 1.6,
+    "sizing": 1.3,
     "interior": 1.2,
     "defense": 1.1,
+    "horizon": 1.1,
     "commerce": 1.0,
+    "liquidity": 1.0,
+    "regime": 1.0,
+    "book": 1.0,
     "tape": 1.0,
     "intelligence": 1.0,
-    "justice": 0.8,
+    "execution": 0.9,
+    "earnings": 0.9,
     "census": 0.9,
+    "justice": 0.8,
     "opposition": 0.45,
 }
 
+_ROSTER: list[tuple] | None = None
 
-def roster() -> list[tuple]:
-    """One row per desk: (section, desk_id, kind, params)."""
+
+def _build_roster() -> list[tuple]:
+    """One row per desk: (section, desk_id, kind, params).
+
+    Each desk is a different number: a cost, a hold, a Kelly fraction, a stop,
+    a spread, a heat cap. They are not copies of one vote.
+    """
     desks: list[tuple] = []
-    costs = (0.0004, 0.0008, 0.001, 0.0015, 0.002, 0.003, 0.004, 0.006, 0.008, 0.01)
-    hairs = (0.0, 0.02, 0.04, 0.06, 0.08, 0.10)
+    costs = tuple(0.0002 * (i + 1) for i in range(12))  # 2 bps .. 24 bps
+    hairs = tuple(i * 0.01 for i in range(8))
+    holds = (1, 2, 3, 5, 8, 10, 15, 20, 40, 60)
     for cost in costs:
         for hair in hairs:
-            desks.append(("treasury", f"treasury-{cost:.4f}-{hair:.2f}", "ev", (cost, hair)))
-    for floor in (0.52, 0.54, 0.55, 0.57, 0.58, 0.60, 0.62, 0.65, 0.68, 0.70, 0.72, 0.75):
+            for days in holds:
+                desks.append(
+                    ("treasury", f"treasury-{days}d-{cost:.4f}-{hair:.2f}", "ev", (cost, hair, days))
+                )
+    for scale in (0.05, 0.1, 0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1.0):
+        for cap in (0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.10):
+            desks.append(("sizing", f"sizing-{scale:.2f}-cap{cap:.2f}", "kelly", (scale, cap)))
+    for days in range(1, 61):
+        for cost in (0.0005, 0.001, 0.002, 0.004):
+            desks.append(("horizon", f"horizon-{days}d-{cost:.4f}", "ev", (cost, 0.0, days)))
+    for bps in range(1, 41):
+        desks.append(("liquidity", f"liquidity-{bps}bps", "spread", (bps / 10_000.0,)))
+        desks.append(("commerce", f"commerce-{bps}bps", "spread", (bps / 10_000.0,)))
+    for i in range(48):
+        ratio = 0.6 + i * 0.03
+        desks.append(("regime", f"regime-{ratio:.2f}", "regime", (ratio,)))
+    for heat in (0.40, 0.50, 0.60, 0.70, 0.80, 0.88, 0.95):
+        for room in (0.02, 0.05, 0.08, 0.10):
+            desks.append(("book", f"book-heat{heat:.2f}-room{room:.2f}", "heat", (heat, room)))
+    for i in range(80):
+        stop = 0.008 + i * 0.001
+        desks.append(("defense", f"defense-{stop:.3f}", "stop", (stop,)))
+    for i in range(40):
+        floor = 0.50 + i * 0.01
         desks.append(("tape", f"tape-{floor:.2f}", "tape", (floor,)))
         desks.append(("intelligence", f"intel-{floor:.2f}", "intel", (floor,)))
-    for tol in (0.0, 0.005, 0.01, 0.015, 0.02, 0.03, 0.04, 0.05):
+        desks.append(("census", f"census-{i}", "tape", (0.50 + (i % 25) * 0.01,)))
+        desks.append(("justice", f"justice-{floor:.2f}", "agree", (floor,)))
+    for i in range(36):
+        tol = i * 0.002
         desks.append(("interior", f"interior-{tol:.3f}", "risk", (tol,)))
-        desks.append(("defense", f"defense-{tol:.3f}", "stop", (max(tol, 0.01),)))
-        desks.append(("commerce", f"commerce-{tol:.3f}", "spread", (max(tol, 0.0005),)))
-        desks.append(("justice", f"justice-{tol:.3f}", "agree", (0.5 + tol,)))
-    for k in range(40):
-        desks.append(("census", f"census-{k}", "tape", (0.50 + (k % 20) * 0.01,)))
-    for k in range(30):
-        desks.append(("defense", f"defense-wide-{k}", "stop", (0.008 + k * 0.001,)))
-    for i in range(24):
+        desks.append(("earnings", f"earnings-{i + 1}d", "earnings", (i + 1,)))
+        desks.append(("execution", f"execution-{i + 1}bps", "spread", ((i + 1) / 10_000.0,)))
+    for i in range(400):
+        desks.append(("census", f"census-wide-{i}", "tape", (0.50 + (i % 30) * 0.01,)))
+    for i in range(200):
+        desks.append(("intelligence", f"intel-wide-{i}", "intel", (0.50 + (i % 40) * 0.01,)))
+    for i in range(240):
         desks.append(("opposition", f"opposition-{i}", "dissent", (i,)))
     return desks
 
 
-def _vote(kind: str, params: tuple, case: dict) -> int:
+def roster() -> list[tuple]:
+    global _ROSTER
+    if _ROSTER is None:
+        _ROSTER = _build_roster()
+    return _ROSTER
+
+
+def _moves(case: dict) -> tuple[float, float, float]:
     p = float(case.get("p_up") or 0.5)
     avg_up = case.get("avg_up")
     avg_down = case.get("avg_down")
     if avg_up is None or avg_down is None:
         avg_up = float(case.get("fallback_up") or 0.015)
         avg_down = float(case.get("fallback_down") or 0.025)
+    return p, max(0.0, float(avg_up)), max(0.0, float(avg_down))
+
+
+def _kelly(p: float, avg_up: float, avg_down: float) -> float:
+    """Fraction of equity a one-shot bet can take. Capped later by the desk."""
+    if avg_up <= 0:
+        return 0.0
+    payoff = avg_up / avg_down if avg_down > 0 else 8.0
+    return max(0.0, p - (1.0 - p) / payoff)
+
+
+def _hold_ev(p: float, avg_up: float, avg_down: float, cost: float, hair: float, days: int) -> float:
+    """Drift over ``days`` bars, spread paid once."""
+    daily = one_bar_ev(max(0.0, p - hair), avg_up, avg_down, 0.0)
+    return daily * max(1, int(days)) - max(0.0, cost)
+
+
+def _vote(kind: str, params: tuple, case: dict) -> int:
+    p, avg_up, avg_down = _moves(case)
     held = bool(case.get("held"))
     gain = case.get("gain")
     exec_c = case.get("exec_conf")
     if kind == "ev":
-        cost, hair = params
-        ev = one_bar_ev(max(0.0, p - hair), float(avg_up), float(avg_down), float(cost))
+        cost, hair, days = params
+        ev = _hold_ev(p, avg_up, avg_down, float(cost), float(hair), int(days))
         if ev > 0.001:
             return 1
         if ev < -0.0005:
             return -1
         return 0
+    if kind == "kelly":
+        scale, cap = params
+        full = _kelly(p, avg_up, avg_down)
+        sized = min(float(cap), float(scale) * full)
+        if full <= 0.0:
+            return -1
+        if sized + 1e-12 < float(cap) * 0.25:
+            return 0
+        return 1
+    if kind == "regime":
+        (ratio,) = params
+        if avg_down <= 0:
+            return 1 if p >= 0.55 else 0
+        if avg_up / avg_down >= float(ratio) and p >= 0.55:
+            return 1
+        if avg_up / avg_down < 1.0 and p < 0.55:
+            return -1
+        return 0
+    if kind == "heat":
+        heat, room = params
+        deployed = case.get("deployed_frac")
+        if deployed is None:
+            return 1 if p >= 0.6 and avg_up > avg_down else 0
+        if float(deployed) > float(heat):
+            return -1
+        held_frac = case.get("name_frac")
+        if held_frac is not None and float(held_frac) > float(room):
+            return -1
+        return 1 if p >= 0.55 else 0
+    if kind == "earnings":
+        (window,) = params
+        dte = case.get("days_to_earnings")
+        if dte is None:
+            return 0
+        try:
+            dte_f = float(dte)
+        except (TypeError, ValueError):
+            return 0
+        if 0 <= dte_f <= float(window):
+            return -1
+        return 1
     if kind == "tape":
         (floor,) = params
         if p >= floor and float(avg_up) >= float(avg_down):
@@ -152,15 +257,19 @@ def convene(case: dict) -> dict:
 
     round1: list[dict] = []
     sec1: dict[str, float] = {}
+    plan = _blank_plan()
     for section, members in by_section.items():
         votes = []
         for section_name, desk_id, kind, params in members:
             if kind == "dissent":
                 vote = 0
                 reason = "listening"
+                work = 0.0
             else:
                 vote = _vote(kind, params, case)
                 reason = kind
+                work = _work_value(kind, params, case, vote)
+            _note_plan(plan, kind, params, vote, work)
             votes.append(vote)
             round1.append(
                 {
@@ -223,10 +332,11 @@ def convene(case: dict) -> dict:
         sec1=sec1,
         sec2=sec2,
         transcript=round2,
+        plan=_orders_from_plan(case, plan),
     )
 
 
-def _order(*, action, score, veto, desks, edges, by_section, sec1, sec2, transcript) -> dict:
+def _order(*, action, score, veto, desks, edges, by_section, sec1, sec2, transcript, plan) -> dict:
     return {
         "action": action,
         "score": score,
@@ -239,21 +349,68 @@ def _order(*, action, score, veto, desks, edges, by_section, sec1, sec2, transcr
             for name, members in by_section.items()
         },
         "transcript": transcript,
+        "size_mult": float(plan["size_mult"]),
+        "stop": float(plan["stop"]),
+        "horizon_days": int(plan["horizon_days"]),
+    }
+
+
+def _blank_plan() -> dict:
+    return {"horizon_ev": {}, "kelly_full": 0.0, "kelly_yes": 0, "stops": []}
+
+
+def _note_plan(plan: dict, kind: str, params: tuple, vote: int, work: float) -> None:
+    if kind == "kelly":
+        plan["kelly_full"] = float(work)
+        if vote == 1:
+            plan["kelly_yes"] += 1
+        return
+    if vote != 1:
+        return
+    if kind == "ev":
+        days = int(params[2])
+        if work > float(plan["horizon_ev"].get(days, -1e9)):
+            plan["horizon_ev"][days] = work
+    elif kind == "stop":
+        plan["stops"].append(float(params[0]))
+
+
+def _orders_from_plan(case: dict, plan: dict) -> dict:
+    """What the yes-votes actually picked: size, stop, hold.
+
+    Size is Kelly versus the 10% name cap. A fat edge keeps a full ticket.
+    A thin edge is cut. The government does not lever past the cap.
+    """
+    _, avg_up, avg_down = _moves(case)
+    if plan["kelly_yes"]:
+        size_mult = min(1.0, max(0.25, float(plan["kelly_full"]) / 0.10))
+    else:
+        size_mult = 0.25
+    target = max(avg_down * 1.5, 0.01)
+    if plan["stops"]:
+        stop = min(plan["stops"], key=lambda s: abs(s - target))
+    else:
+        stop = target
+    if plan["horizon_ev"]:
+        horizon_days = max(plan["horizon_ev"], key=plan["horizon_ev"].get)
+    else:
+        horizon_days = 1
+    return {
+        "size_mult": float(size_mult),
+        "stop": float(stop),
+        "horizon_days": int(horizon_days),
     }
 
 
 def _work_value(kind: str, params: tuple, case: dict, vote: int) -> float:
     """The number the desk actually computed, not just its yes/no."""
-    if kind != "ev":
-        return float(vote)
-    cost, hair = params
-    p = float(case.get("p_up") or 0.5)
-    avg_up = case.get("avg_up")
-    avg_down = case.get("avg_down")
-    if avg_up is None or avg_down is None:
-        avg_up = float(case.get("fallback_up") or 0.015)
-        avg_down = float(case.get("fallback_down") or 0.025)
-    return one_bar_ev(max(0.0, p - float(hair)), float(avg_up), float(avg_down), float(cost))
+    p, avg_up, avg_down = _moves(case)
+    if kind == "ev":
+        cost, hair, days = params
+        return _hold_ev(p, avg_up, avg_down, float(cost), float(hair), int(days))
+    if kind == "kelly":
+        return _kelly(p, avg_up, avg_down)
+    return float(vote)
 
 
 def act(case: dict):
@@ -268,6 +425,7 @@ def act(case: dict):
 
     round1: list[dict] = []
     sec1: dict[str, float] = {}
+    plan = _blank_plan()
     for section, members in by_section.items():
         votes: list[int] = []
         for section_name, desk_id, kind, params in members:
@@ -282,6 +440,7 @@ def act(case: dict):
             else:
                 vote = _vote(kind, params, case)
             work = _work_value(kind, params, case, vote)
+            _note_plan(plan, kind, params, vote, work)
             votes.append(vote)
             round1.append(
                 {
@@ -352,4 +511,5 @@ def act(case: dict):
         "veto": veto,
         "n_desks": len(desks),
         "sections": {name: sec2[name] for name in sec2},
+        **_orders_from_plan(case, plan),
     }

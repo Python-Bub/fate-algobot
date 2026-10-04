@@ -5,15 +5,22 @@ from analytics.ai_government import convene, roster
 
 def test_hundreds_of_desks_each_speak_twice():
     desks = roster()
-    assert len(desks) >= 200
+    assert len(desks) >= 2500
     sections = {d[0] for d in desks}
     assert sections >= {
         "treasury",
+        "sizing",
+        "horizon",
+        "liquidity",
+        "regime",
+        "book",
         "interior",
         "defense",
         "commerce",
         "tape",
         "intelligence",
+        "execution",
+        "earnings",
         "justice",
         "census",
         "opposition",
@@ -34,6 +41,9 @@ def test_round_two_is_a_reply_to_the_room():
     assert opp and all(m["vote"] == -1 for m in opp)
     assert order["action"] == "LONG"
     assert order["veto"] is None
+    assert order["size_mult"] == 1.0
+    assert order["horizon_days"] > 1
+    assert order["stop"] > 0
 
 
 def test_treasury_vetoes_a_ticket_that_does_not_pay():
@@ -76,9 +86,11 @@ def test_desks_work_and_the_chair_speaks_last():
     computes = [s for s in steps if s["phase"] == "compute"]
     delivers = [s for s in steps if s["phase"] == "deliver"]
     debates = [s for s in steps if s["phase"] == "debate"]
-    assert len(computes) >= 200
-    assert len(delivers) == 9
+    assert len(computes) >= 2500
+    assert len(delivers) >= 15
     assert len(debates) == len(computes)
+    assert steps[-1]["size_mult"] == 1.0
+    assert steps[-1]["horizon_days"] > 1
     assert all("work" in s for s in computes)
     assert any(isinstance(s["work"], float) and s["work"] != 0 for s in computes)
 

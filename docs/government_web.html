@@ -17,7 +17,7 @@
   <header>
     <div>
       <h1 id="title">Chair order</h1>
-      <p>Demir Ege Genc · 210 desks · 9 sections · two rounds, then one order</p>
+      <p>Demir Ege Genc · 2,616 desks · 16 sections · size, stop, and hold, then one order</p>
     </div>
     <div>
       <button id="pay" class="on" type="button">Ticket that pays</button>
@@ -27,12 +27,14 @@
   <svg id="web" viewBox="0 0 1000 560" role="img" aria-label="Desks linked through section hubs to the chair"></svg>
   <script>
     const sections = [
-      ["treasury", 60], ["tape", 12], ["intelligence", 12], ["interior", 8],
-      ["defense", 38], ["commerce", 8], ["justice", 8], ["census", 40], ["opposition", 24]
+      ["treasury", 960], ["sizing", 72], ["horizon", 240], ["liquidity", 40],
+      ["commerce", 40], ["regime", 48], ["book", 28], ["defense", 80],
+      ["tape", 40], ["intelligence", 240], ["census", 440], ["justice", 40],
+      ["interior", 36], ["earnings", 36], ["execution", 36], ["opposition", 240]
     ];
     const orders = {
-      pay: { action: "LONG", score: 0.757 },
-      lose: { action: "FLAT", score: 0.096, veto: "treasury" }
+      pay: { action: "LONG", score: 0.889 },
+      lose: { action: "FLAT", score: -0.245, veto: "treasury" }
     };
     let book = "pay";
     let frame = 0;
@@ -44,13 +46,14 @@
       const hy = 250 + Math.sin(ang) * 168;
       hubs.push({ id: s[0], x: hx, y: hy, n: s[1] });
       const cols = Math.ceil(Math.sqrt(s[1]));
+      const spread = Math.max(1.6, Math.min(4.2, 70 / cols));
       for (let d = 0; d < s[1]; d++) {
         const col = d % cols;
         const row = Math.floor(d / cols);
         desks.push({
           section: s[0],
-          x: hx + (col - (cols - 1) / 2) * 7.2,
-          y: hy + 18 + row * 7.2
+          x: hx + (col - (cols - 1) / 2) * spread,
+          y: hy + 18 + row * spread
         });
       }
     });

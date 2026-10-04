@@ -3058,6 +3058,8 @@ def run_fortress_pass(args) -> None:
                                 "gain": existing_gain,
                                 "fallback_up": float(os.getenv("FORTRESS_TAKE_PROFIT_PCT", "0.015")),
                                 "fallback_down": float(os.getenv("FORTRESS_STOP_LOSS_PCT", "0.025")),
+                                "days_to_earnings": row.get("days_to_earnings") if row is not None else None,
+                                "deployed_frac": locals().get("deployed_frac"),
                             }
                         )
                         log.info(
@@ -3105,6 +3107,9 @@ def run_fortress_pass(args) -> None:
                             "veto": gov["veto"],
                             "n_desks": gov["n_desks"],
                             "edges": gov["edges"],
+                            "size_mult": gov.get("size_mult"),
+                            "stop": gov.get("stop"),
+                            "horizon_days": gov.get("horizon_days"),
                         },
                     }
                 )
@@ -3404,6 +3409,9 @@ def run_fortress_pass(args) -> None:
             for j, idx in enumerate(eligible_idx):
                 c = ranked[idx]
                 n = float(raw[j]) * risk_scale if j < len(raw) else 0.0
+                gov_size = (c.get("government") or {}).get("size_mult")
+                if gov_size is not None:
+                    n *= max(0.25, min(1.0, float(gov_size)))
                 if os.getenv("USE_UNIQUE_PLAYBOOK", "true").lower() in ("1", "true", "yes"):
                     try:
                         from intel.unique_style_playbook import fortress_size_mult_from_playbook
