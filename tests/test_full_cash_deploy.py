@@ -103,10 +103,10 @@ def test_idle_split_reserves_crypto_gap_before_stocks(monkeypatch):
         positions=[
             {"symbol": "BTCUSD", "qty": "0.1", "market_value": "12755", "unrealized_plpc": "0.01"},
             {"symbol": "ETHUSD", "qty": "5", "market_value": "12673", "unrealized_plpc": "-0.001"},
-            {"symbol": "AAPL", "qty": "10", "market_value": "5564", "unrealized_plpc": "1.4"},
-            {"symbol": "MSFT", "qty": "10", "market_value": "6820", "unrealized_plpc": "1.7"},
-            {"symbol": "GOOGL", "qty": "10", "market_value": "2530", "unrealized_plpc": "1.2"},
-            {"symbol": "AMZN", "qty": "10", "market_value": "2518", "unrealized_plpc": "1.1"},
+            {"symbol": "AAPL", "qty": "10", "market_value": "5564", "unrealized_plpc": "0.02"},
+            {"symbol": "MSFT", "qty": "10", "market_value": "6820", "avg_entry_price": "-600", "unrealized_plpc": "1.7"},
+            {"symbol": "GOOGL", "qty": "10", "market_value": "2530", "unrealized_plpc": "0.02"},
+            {"symbol": "AMZN", "qty": "10", "market_value": "2518", "unrealized_plpc": "0.02"},
         ],
         equity=71_394.0,
         max_single_usd=7_139.0,
@@ -116,6 +116,7 @@ def test_idle_split_reserves_crypto_gap_before_stocks(monkeypatch):
     )
     assert extra.get("SOL-USD", 0) > 9_000
     assert extra.get("AAPL", 0) + extra.get("GOOGL", 0) + extra.get("AMZN", 0) > 5_000
+    assert "MSFT" not in extra  # negative entry + 170% plpc is not a winner
     assert "BTCUSD" not in extra  # already at 18% cap
 
 

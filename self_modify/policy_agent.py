@@ -27,6 +27,31 @@ def _load_json(path: Path, default):
         return default
 
 
+def clamp_loss_chasing(
+    change: dict,
+    *,
+    equity_delta: float,
+    cur_buy: float,
+    cur_notional: float,
+) -> dict:
+    """Do not lower the buy bar or raise size while equity is falling.
+
+    Self-modify hooks were doing both ("grow_equity — deploy idle capital")
+    and the book bought more as it lost money.
+    """
+    out = dict(change)
+    if float(equity_delta) >= 0:
+        return out
+    cap = float(os.getenv("POLICY_BUY_THRESHOLD_CAP", "0.72"))
+    bt = out.get("BUY_THRESHOLD")
+    if bt is not None and float(bt) < float(cur_buy):
+        out["BUY_THRESHOLD"] = min(cap, max(float(cur_buy), 0.55) + 0.01)
+    nt = out.get("ORDER_NOTIONAL")
+    if nt is not None and float(nt) > float(cur_notional):
+        out["ORDER_NOTIONAL"] = float(cur_notional)
+    return out
+
+
 def _save_json(path: Path, payload: dict):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -98,6 +123,16 @@ class GuardedPolicyAgent:
                 max_notional = 10_000.0
         cur_notional = float(get_runtime_param("ORDER_NOTIONAL", float(os.getenv("ORDER_NOTIONAL", "500"))))
         change = {}
+        eq_delta = float(metrics.get("equity_delta") or 0.0)
+
+        def _finish(ch: dict) -> dict:
+            return clamp_loss_chasing(
+                ch,
+                equity_delta=eq_delta,
+                cur_buy=cur_buy,
+                cur_notional=cur_notional,
+            )
+
         try:
             from self_modify.strategy_overlay import policy_hints
 
@@ -115,12 +150,13 @@ class GuardedPolicyAgent:
                 float(os.getenv("MIN_ORDER_NOTIONAL", "500")),
                 min(cur_notional * 0.85, max_notional),
             )
-            return change
+            return _finish(change)
         # Under-invested book: size up and ease gates — do not tighten on small drawdowns.
+        # A falling account is not "idle cash to deploy"; clamp_loss_chasing undoes the ease.
         if deployed < target_deploy - 0.15:
             change.setdefault("BUY_THRESHOLD", max(0.52, cur_buy - 0.01))
             change.setdefault("ORDER_NOTIONAL", min(cur_notional * 1.08, max_notional))
-            return change
+            return _finish(change)
         if hit > 0.58 and sharpe > 0.2 and drawdown > -0.04:
             change.setdefault("BUY_THRESHOLD", max(0.52, cur_buy - 0.01))
             change.setdefault("ORDER_NOTIONAL", min(cur_notional * 1.05, max_notional))
@@ -130,7 +166,7 @@ class GuardedPolicyAgent:
             change.setdefault("ORDER_NOTIONAL", max(cur_notional * 0.90, 100.0))
         if "ORDER_NOTIONAL" in change:
             change["ORDER_NOTIONAL"] = min(float(change["ORDER_NOTIONAL"]), max_notional)
-        return change
+        return _finish(change)
 
     def apply_if_valid(self, changes: dict, metrics: dict) -> dict:
         if not self.enabled:

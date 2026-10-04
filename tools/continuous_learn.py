@@ -197,12 +197,16 @@ def _soft_mark_open() -> int:
         return 0
     if not enabled():
         return 0
+    from analytics.position_gain import sane_unrealized_gain
+
     n = 0
     scale = float(os.getenv("CONTINUOUS_LEARN_MARK_SCALE", "0.15"))
     for p in pos if isinstance(pos, list) else []:
         try:
-            uplpc = float(p.get("unrealized_plpc") or 0.0)
+            uplpc = sane_unrealized_gain(p)
         except (TypeError, ValueError):
+            continue
+        if uplpc is None:
             continue
         if abs(uplpc) < 1e-6:
             continue

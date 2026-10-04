@@ -379,26 +379,9 @@ def _share_price_ok(price: float) -> bool:
 
 def _position_unrealized_gain(pos: dict, price: float) -> float | None:
     """Refuse garbage cost basis (Alpaca has reported entry<0 and 175%+ 'gains')."""
-    entry = float(pos.get("avg_entry_price") or 0)
-    if entry <= 0:
-        return None
-    px = float(price or 0)
-    from_px = ((px - entry) / entry) if px > 0 else None
-    uplpc = pos.get("unrealized_plpc")
-    if uplpc is None:
-        return from_px
-    try:
-        g = float(uplpc)
-    except (TypeError, ValueError):
-        return from_px
-    # Phantom 100%+ TPs on flipped shorts / bad avg cost — prefer price/entry, else skip.
-    if abs(g) > 0.50:
-        if from_px is not None and abs(from_px) <= 0.50:
-            return from_px
-        if from_px is not None and abs(from_px) + 1e-9 < abs(g):
-            return from_px
-        return None
-    return g
+    from analytics.position_gain import sane_unrealized_gain
+
+    return sane_unrealized_gain(pos, price)
 
 
 def _position_age_minutes(ticker: str) -> float | None:
@@ -789,7 +772,7 @@ def _apply_earnings_gap_guard() -> list[str]:
         gap = session_gap_from_pos(p)
         mv = abs(float(p.get("market_value") or 0))
         try:
-            gain = float(p.get("unrealized_plpc")) if p.get("unrealized_plpc") is not None else None
+            gain = _position_unrealized_gain(p, float(p.get("current_price") or 0))
         except (TypeError, ValueError):
             gain = None
         dec = decide(
@@ -919,7 +902,10 @@ def _scan_alpaca_exits(*, use_real: bool, broker: str, rm: RiskManager) -> None:
                         continue
                 except Exception:
                     continue
-            px = float(pos.get("current_price") or pos.get("avg_entry_price") or 0)
+            px = float(pos.get("current_price") or 0)
+            if px <= 0:
+                entry_px = float(pos.get("avg_entry_price") or 0)
+                px = entry_px if entry_px > 0 else 0.0
             if px > 0:
                 try:
                     from alpaca_broker import reprice_working_sells
@@ -936,8 +922,19 @@ def _scan_alpaca_exits(*, use_real: bool, broker: str, rm: RiskManager) -> None:
                 log.info("[FORTRESS] cancelled %d stale/unfillable buy(s)", n_buy)
         except Exception:
             pass
-        # Only run hygiene liquidates when aggressive — overnight holds must not be
-        # wiped by a soft loser cut that always ran regardless of the flag.
+        # Structural stops and phantom dust always run. The soft −0.25% hygiene
+        # cut stays behind PAPER_HYGIENE_AGGRESSIVE so overnight holds survive noise.
+        try:
+            from fortress_portfolio import enforce_hard_stops, flatten_phantom_dust
+
+            n_hard = enforce_hard_stops()
+            if n_hard:
+                log.warning("[FORTRESS] hard stop cut %d position(s)", n_hard)
+            n_dust = flatten_phantom_dust()
+            if n_dust:
+                log.warning("[FORTRESS] phantom dust closed %d lot(s)", n_dust)
+        except Exception as e:
+            log.debug("[FORTRESS] structural exit: %s", e)
         if os.getenv("PAPER_HYGIENE_AGGRESSIVE", "false").lower() in ("1", "true", "yes"):
             from fortress_portfolio import liquidate_losing_positions
 
@@ -1683,14 +1680,15 @@ def run_fortress_pass(args) -> None:
                 for t, n_add in extra.items():
                     tu = str(t).replace("/", "-").upper()
                     p = by_sym.get(tu) or {}
-                    px = float(p.get("current_price") or p.get("avg_entry_price") or 0)
+                    px = float(p.get("current_price") or 0)
+                    if px <= 0:
+                        entry = float(p.get("avg_entry_price") or 0)
+                        px = entry if entry > 0 else 0.0
                     if px <= 0 or float(n_add) < min_n:
                         continue
-                    gain = p.get("unrealized_plpc")
-                    try:
-                        gain_f = float(gain) if gain is not None else 0.0
-                    except (TypeError, ValueError):
-                        gain_f = 0.0
+                    from analytics.position_gain import sane_unrealized_gain
+
+                    gain_f = sane_unrealized_gain(p, px)
                     buy_candidates.append(
                         {
                             "ticker": tu,
@@ -3024,7 +3022,57 @@ def run_fortress_pass(args) -> None:
                         base_score += float(c_boost or 0.0)
                     except Exception:
                         pass
-                buy_candidates.append(
+                avg_up = None
+                avg_down = None
+                try:
+                    from analytics.trade_kernel import move_sizes
+
+                    if "Close" in df.columns and len(df) >= 2:
+                        closes = [float(x) for x in df["Close"].tolist()]
+                        t_i = len(closes) - 1
+                        name = getattr(row, "name", None)
+                        if name is not None and name in df.index:
+                            loc = df.index.get_loc(name)
+                            if isinstance(loc, slice):
+                                t_i = max(0, (loc.stop or 1) - 1)
+                            elif isinstance(loc, int):
+                                t_i = loc
+                        sizes = move_sizes(closes, t_i)
+                        if sizes is not None:
+                            avg_up, avg_down = sizes
+                except Exception:
+                    avg_up = None
+                    avg_down = None
+                gov = None
+                if os.getenv("USE_AI_GOVERNMENT", "true").lower() in ("1", "true", "yes"):
+                    try:
+                        from analytics.ai_government import convene
+
+                        gov = convene(
+                            {
+                                "p_up": float(p_entry if p_entry is not None else p_up),
+                                "avg_up": avg_up,
+                                "avg_down": avg_down,
+                                "exec_conf": float(exec_c),
+                                "held": float(existing_mv) > 0,
+                                "gain": existing_gain,
+                                "fallback_up": float(os.getenv("FORTRESS_TAKE_PROFIT_PCT", "0.015")),
+                                "fallback_down": float(os.getenv("FORTRESS_STOP_LOSS_PCT", "0.025")),
+                            }
+                        )
+                        log.info(
+                            "[GOV] %s %s score=%.2f desks=%d veto=%s",
+                            t,
+                            gov["action"],
+                            gov["score"],
+                            gov["n_desks"],
+                            gov.get("veto"),
+                        )
+                    except Exception as e:
+                        log.debug("[GOV] %s skipped: %s", t, e)
+                        gov = None
+                if gov is None or gov.get("action") == "LONG":
+                    buy_candidates.append(
                     {
                         "ticker": t,
                         "p_up": float(p_up),
@@ -3047,6 +3095,17 @@ def run_fortress_pass(args) -> None:
                         "force_priority": bool(force_priority),
                         "earnings_meta": _ep_meta,
                         "conviction": float(abs(float(p_adj) - 0.5) * 2.0),
+                        "avg_up": avg_up,
+                        "avg_down": avg_down,
+                        "government": None
+                        if gov is None
+                        else {
+                            "action": gov["action"],
+                            "score": gov["score"],
+                            "veto": gov["veto"],
+                            "n_desks": gov["n_desks"],
+                            "edges": gov["edges"],
+                        },
                     }
                 )
             # Signal sells are handled only by _maybe_exit_alpaca (conviction noise_hold
@@ -3280,13 +3339,41 @@ def run_fortress_pass(args) -> None:
                 if held_mv > 0 and not (allow_addon or allow_dca or fill_idle):
                     room = 0.0
                 try:
-                    gain = c.get("existing_gain")
-                    from analytics.buying_power import hold_is_green
+                    from analytics.buying_power import may_add_to_hold
 
-                    if held_mv > 0 and not hold_is_green(None if gain is None else float(gain)):
+                    if not may_add_to_hold(c.get("existing_gain"), held=held_mv > 0):
                         continue
                 except (TypeError, ValueError):
                     pass
+                if os.getenv("FORTRESS_REQUIRE_POSITIVE_EV", "true").lower() in (
+                    "1",
+                    "true",
+                    "yes",
+                ):
+                    try:
+                        from analytics.trade_kernel import one_bar_ev
+
+                        au = c.get("avg_up")
+                        ad = c.get("avg_down")
+                        if au is None or ad is None:
+                            au = float(os.getenv("FORTRESS_TAKE_PROFIT_PCT", "0.015"))
+                            ad = float(os.getenv("FORTRESS_STOP_LOSS_PCT", "0.025"))
+                        cost = float(os.getenv("FORTRESS_ROUND_TRIP_COST", "0.001"))
+                        p_ev = float(c.get("p_entry") if c.get("p_entry") is not None else c.get("p_up") or 0.5)
+                        ev = one_bar_ev(p_ev, float(au), float(ad), cost)
+                        if ev <= 0.0:
+                            log.info(
+                                "[FORTRESS] skip %s — ev %.3f%% p=%.2f up=%.2f%% down=%.2f%% cost=%.2f%%",
+                                c.get("ticker"),
+                                100.0 * ev,
+                                p_ev,
+                                100.0 * float(au),
+                                100.0 * float(ad),
+                                100.0 * cost,
+                            )
+                            continue
+                    except (TypeError, ValueError):
+                        continue
                 if room < min_n:
                     continue
                 eligible_idx.append(i)
@@ -3531,11 +3618,10 @@ def run_fortress_pass(args) -> None:
         except (TypeError, ValueError):
             continue
         try:
-            from analytics.buying_power import hold_is_green as _hold_green
+            from analytics.buying_power import may_add_to_hold as _may_add
 
-            _g_hold = cand.get("existing_gain")
-            if existing_mv > 0 and not _hold_green(None if _g_hold is None else float(_g_hold)):
-                log.info("[FORTRESS] skip BUY %s — not green (cut, do not add)", t)
+            if not _may_add(cand.get("existing_gain"), held=existing_mv > 0):
+                log.info("[FORTRESS] skip BUY %s — not a verified winner (cut, do not add)", t)
                 continue
         except (TypeError, ValueError):
             pass

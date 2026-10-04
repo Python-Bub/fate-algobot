@@ -220,6 +220,19 @@ def hold_is_green(gain: float | None, *, min_gain: float | None = None) -> bool:
     return float(gain) >= -1e-12
 
 
+def may_add_to_hold(gain: float | None, *, held: bool) -> bool:
+    """Open a new name freely. A live hold needs a verified green gain.
+
+    ``gain is None`` on a position we already hold means the cost basis is
+    garbage (negative avg entry, +100% phantom plpc). That is not a winner.
+    """
+    if not held:
+        return True
+    if gain is None:
+        return False
+    return hold_is_green(float(gain))
+
+
 def long_market_value(positions: list[dict] | None) -> float:
     total = 0.0
     for p in positions or []:

@@ -112,11 +112,19 @@ def _auto_invert() -> bool:
                 return bool(st.get("invert"))
         except Exception:
             return False
-    n = len(pos)
+    from analytics.position_gain import sane_unrealized_gain
+
+    judged = []
+    for p in pos:
+        g = sane_unrealized_gain(p)
+        if g is None:
+            continue
+        judged.append(g)
+    n = len(judged)
     if n < min_n:
         _write_state({"invert": False, "n": n, "red": 0, "red_frac": 0.0, "reason": "too_few"})
         return False
-    red = sum(1 for p in pos if float(p.get("unrealized_plpc") or 0) < 0)
+    red = sum(1 for g in judged if g < 0)
     invert = (red / n) >= red_frac
     _write_state(
         {

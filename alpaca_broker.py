@@ -1415,6 +1415,26 @@ def close_position_alpaca(
     if close_qty <= 1e-8:
         log.info("[ALPACA] sleeve-scoped close %s head=%s — nothing sellable (protected)", sym, head)
         return False
+    try:
+        from analytics.position_gain import dust_close_qty
+
+        mv = abs(float(pos.get("market_value") or 0)) if pos else 0.0
+        if mv <= 0 and pos:
+            px = float(pos.get("current_price") or 0)
+            mv = abs(close_qty * px) if px > 0 else 0.0
+        dust_usd = float(os.getenv("ALPACA_DUST_FULL_CLOSE_USD", "25") or 25)
+        full = dust_close_qty(broker_qty, close_qty, mv, dust_usd=dust_usd)
+        if full > close_qty + 1e-8:
+            log.warning(
+                "[ALPACA] dust full-close %s mv=$%.2f partial=%.6f -> %.6f",
+                sym,
+                mv,
+                close_qty,
+                full,
+            )
+            close_qty = full
+    except Exception as e:
+        log.debug("[ALPACA] dust close qty %s: %s", sym, e)
     qty = close_qty
     # Sell-high exit routing. The raw DELETE /v2/positions below is a MARKET close
     # → sells at the bid (sell low). During extended hours Alpaca requires a limit;

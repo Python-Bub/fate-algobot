@@ -24,17 +24,9 @@ def _f(name: str, default: float) -> float:
 
 
 def _position_gain_frac(pos: dict) -> float | None:
-    uplpc = pos.get("unrealized_plpc")
-    if uplpc is not None:
-        return float(uplpc)
-    try:
-        entry = float(pos.get("avg_entry_price") or 0)
-        cur = float(pos.get("current_price") or 0)
-        if entry > 0 and cur > 0:
-            return (cur - entry) / entry
-    except (TypeError, ValueError):
-        pass
-    return None
+    from analytics.position_gain import sane_unrealized_gain
+
+    return sane_unrealized_gain(pos)
 
 
 def maybe_trim_index_etfs_for_force(
@@ -130,7 +122,10 @@ def liquidate_losing_positions() -> int:
             if not _hygiene_min_hold_ok(p):
                 continue
             q = get_quote_bid_ask(sym)
-            if q and not quote_is_sane(q[0], q[1]):
+            hard = _f("FORTRESS_HARD_STOP_PCT", 0.04)
+            # Wide paper NBBOs must not block a real structural loss (BCH −8% sat
+            # for days because every crypto quote looked "too wide" to stop).
+            if q and not quote_is_sane(q[0], q[1]) and gain > -hard:
                 if os.getenv("PAPER_HYGIENE_AGGRESSIVE", "false").lower() not in (
                     "1",
                     "true",
@@ -162,6 +157,82 @@ def liquidate_losing_positions() -> int:
                     pass
     except Exception as e:
         log.debug("[PORTFOLIO] liquidate losers: %s", e)
+    return closed
+
+
+def enforce_hard_stops() -> int:
+    """Cut longs past FORTRESS_HARD_STOP_PCT even when soft hygiene is off.
+
+    Crypto bought by the idle-cash sleeve was skipped by the HFT daemon
+    (fortress already held it) and never reached the aggressive liquidator,
+    so BCH −8% and LTC −5% just sat in the book.
+    """
+    closed = 0
+    hard = _f("FORTRESS_HARD_STOP_PCT", 0.04)
+    if hard <= 0:
+        return 0
+    try:
+        from alpaca_broker import close_position_alpaca, list_positions
+
+        for p in list_positions() or []:
+            qty = float(p.get("qty") or 0)
+            if qty <= 0 or str(p.get("side") or "").lower() == "short":
+                continue
+            gain = _position_gain_frac(p)
+            if gain is None or gain > -hard:
+                continue
+            sym = str(p.get("symbol", "")).replace("/", "-").upper()
+            if not sym or _hygiene_protected(sym) or _hygiene_close_skip(sym):
+                continue
+            if close_position_alpaca(sym, force=True):
+                closed += 1
+                log.warning(
+                    "[PORTFOLIO] hard stop %s gain=%.2f%% (cut %.2f%%)",
+                    sym,
+                    100 * gain,
+                    100 * hard,
+                )
+                try:
+                    from online_learning.trade_feedback import learn_from_realized_trade
+
+                    learn_from_realized_trade(sym, "LONG", float(gain), source="hard_stop")
+                except Exception:
+                    pass
+    except Exception as e:
+        log.debug("[PORTFOLIO] hard stop: %s", e)
+    return closed
+
+
+def flatten_phantom_dust() -> int:
+    """One full close for sub-$25 lots whose cost basis is not real.
+
+    Partial trims of those lots were a geometric 25% sell every few minutes.
+    """
+    closed = 0
+    dust = _f("ALPACA_DUST_FULL_CLOSE_USD", 25.0)
+    if dust <= 0:
+        return 0
+    try:
+        from alpaca_broker import close_position_alpaca, list_positions
+        from analytics.position_gain import is_phantom_cost_basis
+
+        for p in list_positions() or []:
+            qty = float(p.get("qty") or 0)
+            if qty <= 0:
+                continue
+            mv = abs(float(p.get("market_value") or 0))
+            if mv <= 0 or mv > dust:
+                continue
+            if not is_phantom_cost_basis(p):
+                continue
+            sym = str(p.get("symbol", "")).replace("/", "-").upper()
+            if not sym or _hygiene_protected(sym) or _hygiene_close_skip(sym):
+                continue
+            if close_position_alpaca(sym, force=True):
+                closed += 1
+                log.warning("[PORTFOLIO] phantom dust close %s mv=$%.2f", sym, mv)
+    except Exception as e:
+        log.debug("[PORTFOLIO] phantom dust: %s", e)
     return closed
 
 
@@ -556,16 +627,10 @@ def position_snapshot(ticker: str) -> tuple[float, float | None]:
         if not pos or float(pos.get("qty") or 0) <= 0:
             return 0.0, None
         mv = abs(float(pos.get("market_value") or 0))
-        px = float(pos.get("current_price") or pos.get("avg_entry_price") or 0)
-        uplpc = pos.get("unrealized_plpc")
-        if uplpc is not None:
-            gain = float(uplpc)
-        elif px > 0:
-            entry = float(pos.get("avg_entry_price") or 0)
-            gain = (px - entry) / entry if entry > 0 else None
-        else:
-            gain = None
-        return mv, gain
+        from analytics.position_gain import sane_unrealized_gain
+
+        px = float(pos.get("current_price") or 0)
+        return mv, sane_unrealized_gain(pos, px if px > 0 else None)
     except Exception:
         return 0.0, None
 
@@ -739,10 +804,15 @@ def allocate_idle_cash_to_holds(
             qty = 0.0
         if qty <= 0:
             continue
-        # Idle cash goes into winners / flat — never average into a loser.
+        # Idle cash goes into winners / flat — never average into a loser
+        # or a phantom +100% cost basis (negative avg entry).
         try:
-            gain = p.get("unrealized_plpc")
-            if gain is not None and float(gain) < -1e-9:
+            from analytics.position_gain import is_phantom_cost_basis
+
+            if is_phantom_cost_basis(p):
+                continue
+            gain = _position_gain_frac(p)
+            if gain is not None and gain < -1e-9:
                 continue
         except (TypeError, ValueError):
             pass
@@ -1173,6 +1243,10 @@ def can_add_position(
 
         pos = get_position(symbol)
         if pos:
+            from analytics.position_gain import is_phantom_cost_basis
+
+            if is_phantom_cost_basis(pos):
+                return False
             gain = _position_gain_frac(pos)
     except Exception:
         gain = None

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from utils import log
 
 
@@ -76,7 +78,12 @@ def learn_from_realized_trade(
                 realized_return=float(realized_return),
                 reward=float(rw.reward),
             )
-            train_neural_ensemble_for_ticker(sym)
+            # A fill records the row. Fitting the LSTM/CNN stack here retrains
+            # on the global replay (24 epochs) and stalls the stop that just
+            # fired. The online trainer and paper-sim fit that replay on their
+            # own loop. Set LEARN_FIT_NEURAL_ON_FILL=true only off the order path.
+            if os.getenv("LEARN_FIT_NEURAL_ON_FILL", "false").lower() in ("1", "true", "yes"):
+                train_neural_ensemble_for_ticker(sym)
         try:
             from analytics.industries.industry_rl import update_from_trade
             from analytics.industries.integration import get_industry_profile

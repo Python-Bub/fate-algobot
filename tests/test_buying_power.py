@@ -105,6 +105,11 @@ def test_hold_is_green_skips_red_and_allows_new(monkeypatch):
     assert hold_is_green(0.04) is True
     assert hold_is_green(0.0) is False
     assert hold_is_green(-0.08) is False
+    from analytics.buying_power import may_add_to_hold
+
+    assert may_add_to_hold(None, held=False) is True
+    assert may_add_to_hold(None, held=True) is False
+    assert may_add_to_hold(0.02, held=True) is True
 
 
 def test_plan_infers_cash_when_alpaca_omits_it():
