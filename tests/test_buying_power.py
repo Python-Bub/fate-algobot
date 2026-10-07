@@ -123,6 +123,59 @@ def test_plan_infers_cash_when_alpaca_omits_it():
     assert abs(plan.overnight_budget - 19_000.0) < 1.0
 
 
+def test_deploy_budget_uses_regt_when_the_account_has_it(monkeypatch):
+    monkeypatch.setenv("FORTRESS_DEPLOY_REGT", "true")
+    monkeypatch.setenv("FORTRESS_REGT_TARGET_FRAC", "2.0")
+    monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
+    bud = deploy_budget_usd(
+        {
+            "equity": 72_000.0,
+            "cash": 19_000.0,
+            "buying_power": 224_000.0,
+            "regt_buying_power": 144_000.0,
+            "gross_mv": 53_000.0,
+            "multiplier": 4.0,
+        }
+    )
+    assert abs(bud["budget"] - 91_000.0) < 1.0
+    assert abs(bud["overnight_target"] - 144_000.0) < 1.0
+    assert bud["budget"] < bud["buying_power"]
+
+
+def test_ticket_can_spend_regt_when_cash_is_gone(monkeypatch):
+    monkeypatch.setenv("FORTRESS_MAX_POSITIONS", "24")
+    monkeypatch.setenv("MAX_LIVE_SYMBOLS", "40")
+    monkeypatch.setenv("FORTRESS_TOP_BUYS_PER_PASS", "24")
+    monkeypatch.setenv("FORTRESS_ALLOW_DCA", "false")
+    monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_FRAC", "1.0")
+    monkeypatch.setenv("FORTRESS_MAX_GROSS_FRAC", "1.0")
+    monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
+    monkeypatch.setenv("FORTRESS_SINGLE_CAP_USE_EQUITY", "true")
+    monkeypatch.setenv("TOP100_NOTIONAL_MULT", "1.0")
+    monkeypatch.setattr("intel.downward_pressure.exit_adjustments", lambda *_a, **_k: {"pressure_score": 0.0})
+    monkeypatch.setattr("analytics.conviction_exit.conviction_size_mult", lambda *_a, **_k: 1.0)
+    monkeypatch.setattr("analytics.catalyst_horizon.max_equity_size_mult", lambda *_a, **_k: 1.0)
+    monkeypatch.setattr("fortress_universe.is_top100_equity", lambda *_a, **_k: False)
+    n = fortress_order_notional(
+        ticker="ZZZZ",
+        p_adj=0.72,
+        scale=1.0,
+        portfolio={
+            "equity": 72_000.0,
+            "cash": 500.0,
+            "buying_power": 224_000.0,
+            "regt_buying_power": 144_000.0,
+            "overnight_target": 144_000.0,
+            "gross_mv": 53_000.0,
+            "multiplier": 4.0,
+        },
+        existing_mv=0.0,
+        existing_gain=None,
+    )
+    assert n >= 2_500
+    assert n <= 7_300
+
+
 def test_deploy_budget_still_19k(monkeypatch):
     monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
     monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_FRAC", "1.0")

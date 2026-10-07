@@ -522,6 +522,8 @@ def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
             plan = plan_from_account(acct or {}, pos, persist=True)
             ctx["overnight_budget"] = plan.overnight_budget
             ctx["overnight_clip"] = plan.overnight_clip
+            ctx["overnight_target"] = plan.overnight_target
+            ctx["regt_buying_power"] = plan.regt_buying_power
             log.info(
                 "[FORTRESS] portfolio equity=$%.0f cash=$%.0f deployed=%.1f%% gap=$%.0f "
                 "clip=$%.0f positions=%d bp=$%.0f dtbp=$%.0f",
@@ -949,14 +951,21 @@ def deploy_budget_usd(portfolio: dict) -> dict:
     use_eq_target = _truthy("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
     target_frac = overnight_target_frac()
     target_base = equity if use_eq_target else (total_capacity if use_bp else equity)
+    _acct_plan = {
+        "equity": equity,
+        "cash": cash if cash > 0 else max(0.0, equity - gross_mv),
+        "buying_power": buying_power,
+        "daytrading_buying_power": float(portfolio.get("daytrading_buying_power") or buying_power),
+        "long_market_value": gross_mv,
+    }
+    try:
+        _regt = float(portfolio.get("regt_buying_power") or 0.0)
+    except (TypeError, ValueError):
+        _regt = 0.0
+    if _regt > 0:
+        _acct_plan["regt_buying_power"] = _regt
     plan = plan_from_account(
-        {
-            "equity": equity,
-            "cash": cash if cash > 0 else max(0.0, equity - gross_mv),
-            "buying_power": buying_power,
-            "daytrading_buying_power": float(portfolio.get("daytrading_buying_power") or buying_power),
-            "long_market_value": gross_mv,
-        },
+        _acct_plan,
         portfolio.get("positions") or [],
         persist=False,
     )
@@ -972,6 +981,7 @@ def deploy_budget_usd(portfolio: dict) -> dict:
         "target_frac": target_frac,
         "target_usd": target_base * target_frac,
         "budget": budget,
+        "overnight_target": float(plan.overnight_target),
         "max_single_usd": max_single,
         "overnight_clip": float(plan.overnight_clip),
         "sizing_slots": sizing_slots(),
@@ -1011,6 +1021,13 @@ def fortress_order_notional(
         _f("FORTRESS_MAX_GROSS_FRAC", _f("HF_MAX_GROSS_FRAC", 1.0)),
     )
     target_base = equity if use_eq_target else (total_capacity if use_bp else equity)
+    # Reg T can hold up to 2× equity. The 4× intraday figure stays with same-day HFT.
+    try:
+        _ovn_target = float(portfolio.get("overnight_target") or 0.0)
+    except (TypeError, ValueError):
+        _ovn_target = 0.0
+    if _ovn_target > equity * 1.01:
+        target_base = min(_ovn_target, equity * 2.0)
     cap_base = total_capacity if use_bp else equity
     deployed = gross_mv / max(target_base, 1e-9)
 
@@ -1125,7 +1142,13 @@ def fortress_order_notional(
     cash_room = float(portfolio.get("cash") or 0.0)
     if cash_room <= 1.0:
         cash_room = max(0.0, equity - gross_mv)
-    # Overnight tickets spend cash / the 1.0× gap — leftover 4× buying_power is HFT's pool.
+    try:
+        _regt_room = float(portfolio.get("regt_buying_power") or 0.0)
+    except (TypeError, ValueError):
+        _regt_room = 0.0
+    # Cash alone left Reg T idle. Still never spend the 4× intraday number here.
+    if _regt_room > cash_room:
+        cash_room = _regt_room
     n = min(n, cash_room * _f("FORTRESS_BP_USE_FRAC", 1.0))
     # Strong JP candle + under-deploy → use more of the book
     jp_mult = float(os.getenv("FORTRESS_JP_NOTIONAL_MULT", "1.0"))

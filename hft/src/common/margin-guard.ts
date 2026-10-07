@@ -116,6 +116,10 @@ export function resolveHftNotionalUsd(baseNotional: number): number {
   const floor = numEnv("HFT_MIN_ORDER_NOTIONAL", 200);
   const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", 0) || numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 0);
   const plan = loadPythonPlan();
+  // A red day writes hft_day_budget 0. Do not fall through and spend the 4× figure anyway.
+  if (plan && plan.hft_day_budget != null && !(Number(plan.hft_day_budget) > 0)) {
+    return 0;
+  }
   if (plan && Number(plan.hft_clip) > 0) {
     const clip = Number(plan.hft_clip);
     const hi = cap > 0 ? Math.min(cap, clip) : clip;
