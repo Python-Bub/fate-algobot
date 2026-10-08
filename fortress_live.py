@@ -516,15 +516,30 @@ def _min_hold_minutes() -> float:
 _PASS_SESSION_PNL: float | None = None
 
 
-def _remember_session_pnl(equity: float | None) -> float | None:
-    """Cache today's session return from equity already in hand. No account GET."""
+def _remember_session_pnl(equity: float | None, last_equity: float | None = None) -> float | None:
+    """Cache today's session return from equity already in hand. No account GET.
+
+    A missing session file used to leave session_pnl empty, so the red-day cut
+    never ran and every loser waited for the wide hard stop.
+    """
     global _PASS_SESSION_PNL
+    pnl = None
     try:
         from analytics.day_trade_risk import session_pnl_frac
 
         pnl = session_pnl_frac(float(equity or 0))
     except Exception:
         pnl = None
+    if pnl is None:
+        try:
+            from analytics.day_trade_risk import _is_weekend_et
+
+            eq = float(equity or 0)
+            last = float(last_equity or 0)
+            if not _is_weekend_et() and eq > 0 and last > 0:
+                pnl = (eq - last) / last
+        except Exception:
+            pnl = None
     if pnl is not None:
         _PASS_SESSION_PNL = float(pnl)
     return _PASS_SESSION_PNL
@@ -1021,7 +1036,10 @@ def _scan_alpaca_exits(*, use_real: bool, broker: str, rm: RiskManager) -> None:
             from alpaca_broker import get_account
 
             acct = get_account() or {}
-            session_pnl = _remember_session_pnl(float(acct.get("equity") or 0))
+            session_pnl = _remember_session_pnl(
+                float(acct.get("equity") or 0),
+                float(acct.get("last_equity") or 0),
+            )
         except Exception:
             session_pnl = _PASS_SESSION_PNL
         for pos in list_positions():
@@ -1681,7 +1699,10 @@ def run_fortress_pass(args) -> None:
             live_eq = float(_acct_halt.get("equity") or rm.equity or 0)
             last_eq = float(_acct_halt.get("last_equity") or 0)
             check_daily_limits(live_eq if live_eq >= 100.0 else float(rm.equity), last_equity=last_eq)
-            _remember_session_pnl(live_eq if live_eq >= 100.0 else float(rm.equity))
+            _remember_session_pnl(
+                live_eq if live_eq >= 100.0 else float(rm.equity),
+                last_eq,
+            )
             halted, halt_why = trading_halted()
             if halted:
                 log.warning("[FORTRESS] BUY HALT — %s (exits/hygiene still allowed)", halt_why)
@@ -3140,7 +3161,7 @@ def run_fortress_pass(args) -> None:
             if _eq_pre >= 100.0:
                 _limits_prebuy(_eq_pre, last_equity=_last_pre)
                 halted, halt_why = _halt_prebuy()
-                _remember_session_pnl(_eq_pre)
+                _remember_session_pnl(_eq_pre, _last_pre)
         except Exception as e:
             log.debug("[FORTRESS] pre-buy halt refresh: %s", e)
 

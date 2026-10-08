@@ -350,6 +350,10 @@ def plan_from_account(
         day_trade_budget = 0.0
         micro_scalp_clip = 0.0
         micro_scalp_budget = 0.0
+        # Do not spend the unused Reg T into a day that is already red.
+        overnight_budget = 0.0
+        overnight_clip = 0.0
+        notes.append("red_day_no_new_overnight")
     plan = BuyingPowerPlan(
         ts_utc=datetime.now(timezone.utc).isoformat(),
         equity=equity,

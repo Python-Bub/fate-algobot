@@ -87,6 +87,26 @@ def test_red_can_resume_when_mark_recovers():
     assert is_trading_halted() is False
 
 
+def test_red_day_does_not_spend_idle_regt(monkeypatch):
+    monkeypatch.setenv("DAILY_RED_NO_NEW_ENTRIES", "true")
+    monkeypatch.setenv("DAILY_RED_EPS_PCT", "0.005")
+    monkeypatch.setenv("FORTRESS_DEPLOY_REGT", "true")
+    plan = plan_from_account(
+        {
+            "equity": 69_000.0,
+            "last_equity": 70_000.0,
+            "cash": 20_000.0,
+            "buying_power": 140_000.0,
+            "regt_buying_power": 60_000.0,
+            "long_market_value": 49_000.0,
+        },
+        [{"symbol": "AAPL", "qty": "10", "market_value": "49000"}],
+    )
+    assert plan.overnight_budget == 0.0
+    assert plan.hft_clip == 0.0
+    assert any("red_day_no_new_overnight" in n for n in plan.notes)
+
+
 def test_plan_zeros_day_clips_when_account_is_red(monkeypatch):
     monkeypatch.setenv("DAILY_RED_NO_NEW_ENTRIES", "true")
     monkeypatch.setenv("DAY_TRADE_DAILY_PROFIT_PCT", "0.015")

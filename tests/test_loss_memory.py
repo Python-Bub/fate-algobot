@@ -58,6 +58,17 @@ def test_red_day_cuts_loser_and_keeps_winner(monkeypatch, tmp_path):
         session_pnl=-0.006,
     )
     assert mild.action == "stop_loss"
+    # A book of -0.2% losers was the "down so much" day. The old -0.3% gate kept them.
+    small = decide_exit(
+        "AMZN",
+        p_adj=0.70,
+        gain=-0.002,
+        take_profit_pct=0.035,
+        stop_loss_pct=0.028,
+        session_pnl=-0.006,
+    )
+    assert small.action == "stop_loss"
+    assert "red_day_cut" in small.reason
 
 
 def test_loss_then_win_clears_penalty(monkeypatch, tmp_path):
@@ -88,6 +99,15 @@ def test_same_day_loss_is_not_reopened(monkeypatch, tmp_path):
     assert hit["size_mult"] == 0.0
     assert hit["extra_conviction"] == 1.0
     assert "today" in hit["reason"]
+
+
+def test_down_day_uses_last_equity_when_the_session_file_is_empty(monkeypatch, tmp_path):
+    monkeypatch.setenv("DAY_TRADE_SESSION_PATH", str(tmp_path / "missing.json"))
+    import fortress_live as fl
+
+    fl._PASS_SESSION_PNL = None
+    pnl = fl._remember_session_pnl(69_000.0, 70_000.0)
+    assert pnl is not None and pnl < -0.01
 
 
 def test_session_pnl_frac_uses_today_anchor(monkeypatch, tmp_path):

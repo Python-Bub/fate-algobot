@@ -217,7 +217,8 @@ def decide_exit(
     # Past the daily-loss line, every loser goes. Winners stay on the trail.
     if session_pnl is not None and float(session_pnl) <= -_f("FORTRESS_RED_DAY_SESSION_PCT", 0.005):
         deep = float(session_pnl) <= -_f("FORTRESS_RED_DAY_FLATTEN_PCT", 0.008)
-        red_cut = 0.0 if deep else _f("FORTRESS_RED_DAY_CUT_PCT", 0.003)
+        # A -0.3% gate left a book of -1% names unsold. That is the large day.
+        red_cut = 0.0 if deep else _f("FORTRESS_RED_DAY_CUT_PCT", 0.0015)
         if float(gain) < 0 and float(gain) <= -abs(red_cut):
             return ExitDecision(
                 "stop_loss",
