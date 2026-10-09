@@ -1091,11 +1091,16 @@ def reprice_working_sells(symbol: str) -> int:
     from analytics.limit_pricing import exit_limit_px, quote_is_sane
 
     entry = float(pos.get("avg_entry_price") or 0)
-    lp = exit_limit_px("sell", bid, ask, entry, forced_loss=False)
+    try:
+        _cut = float(os.getenv("FORTRESS_RED_DAY_CUT_PCT", "0.0015"))
+    except (TypeError, ValueError):
+        _cut = 0.0015
+    losing = entry > 0 and bid > 0 and (entry - bid) / entry >= _cut
+    lp = exit_limit_px("sell", bid, ask, entry, forced_loss=losing)
     if lp is None or lp <= 0:
         log.warning("[ALPACA] reprice %s — no fillable limit (bid=%.2f ask=%.2f)", symbol, bid, ask)
         return n
-    if entry > 0 and float(lp) + 1e-12 < entry:
+    if not losing and entry > 0 and float(lp) + 1e-12 < entry:
         log.warning(
             "[ALPACA] skip reprice place %s — would sell below entry (lp=%s entry=%.2f)",
             symbol,
@@ -1357,6 +1362,13 @@ def close_position_alpaca(
                 sym,
             )
             return True
+    if force:
+        # A resting sell-high above the market locks the shares and never fills.
+        # Cancel it before the stop so the cross can use the quantity.
+        try:
+            cancel_open_orders(sym, keep_sells=False, skip_hft=True)
+        except Exception as e:
+            log.debug("[ALPACA] force-close cancel sells %s: %s", sym, e)
     cancel_duplicate_sell_orders(symbol)
     queued = pending_close_order(symbol)
     if queued and not force:

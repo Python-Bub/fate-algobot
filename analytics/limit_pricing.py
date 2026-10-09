@@ -259,10 +259,22 @@ def working_sell_needs_reprice(
         lim = float(limit_px)
     except (TypeError, ValueError):
         lim = 0.0
-    # A sell already at/above cost is sell-high. Only chase the ask if the ask
-    # itself is still >= cost (winner). Never pull a red ticket down through entry.
+    # A sell already at/above cost is sell-high while the ask is still at cost.
+    # Once the ask is through the red-day cut, that ticket will never fill and
+    # the position just keeps falling. Replace it with a cross.
     if cost > 0 and lim + 1e-12 >= cost:
         if ask + 1e-12 >= cost and sell_limit_unfillable(lim, bid, ask) and age_sec >= min_unfillable_age_sec:
+            return True
+        try:
+            cut = float(os.getenv("FORTRESS_RED_DAY_CUT_PCT", "0.0015"))
+        except (TypeError, ValueError):
+            cut = 0.0015
+        if (
+            ask > 0
+            and (cost - ask) / cost >= cut
+            and sell_limit_unfillable(lim, bid, ask)
+            and age_sec >= min_unfillable_age_sec
+        ):
             return True
         return False
     # Fillable (or any) sell below cost is the TSLA dump — pull it up immediately.

@@ -18,8 +18,10 @@ def test_tsla_style_sell_above_ask_is_unfillable():
     assert sell_limit_at_touch(339.46, 335.94, 335.99) is False
     # Unknown cost: still reprice an unfillable ticket.
     assert working_sell_needs_reprice(339.46, 335.94, 335.99, 90.0) is True
-    # Known cost: never pull a sell-high ticket down through a red ask (TSLA 336.99 vs 336.64).
+    # A few cents under cost is noise. Do not cross.
     assert working_sell_needs_reprice(336.99, 336.60, 336.64, 47.0, entry_px=336.94) is False
+    # A full percent under cost, with the sell sitting above the ask, never fills.
+    assert working_sell_needs_reprice(100.30, 98.90, 99.00, 60.0, entry_px=100.0) is True
 
 
 def test_dump_below_cost_reprices_up_immediately():
