@@ -1,8 +1,8 @@
 """Short-horizon model probability on the holdout tail only.
 
 The bundles were fit on the earlier rows. Those rows are not traded here.
-A date is kept when its probability is at least the 80th percentile of the
-fit period. That is the model's own confident band, not a target return.
+A date is kept when its probability is at least the fit-period bar. The
+holdout that beat the old 1.2% five-day baseline used the 95th percentile.
 """
 
 from __future__ import annotations
@@ -11,22 +11,49 @@ import os
 from pathlib import Path
 
 
+def fit_percentile() -> float:
+    """Confidence bar. The confirm half kept 95 and dropped 70, 80, 90, and 0.62."""
+    return float(os.getenv("FATE_FIT_BAR_PERCENTILE", "95"))
+
+
+def _fit_cut(n: int, holdout_frac: float = 0.2) -> int | None:
+    if n < 80:
+        return None
+    cut = int(n * (1.0 - holdout_frac))
+    return min(max(cut, 40), n - 15)
+
+
+def fit_probability_bar(
+    probs: list[float],
+    *,
+    holdout_frac: float = 0.2,
+    percentile: float | None = None,
+) -> float | None:
+    """Percentile of fit-period probabilities. Later rows do not move the bar."""
+    cut = _fit_cut(len(probs), holdout_frac)
+    if cut is None:
+        return None
+    import numpy as np
+
+    pct = fit_percentile() if percentile is None else float(percentile)
+    return float(np.percentile(np.asarray(probs[:cut], dtype=float), pct))
+
+
 def confident_tail(
     probs: list[float],
     dates: list[str],
     *,
     holdout_frac: float = 0.2,
-    percentile: float = 80.0,
+    percentile: float | None = None,
 ) -> dict[str, float]:
     """Map holdout dates to P(up). Fit-period dates are left out."""
     n = len(probs)
-    if n != len(dates) or n < 80:
+    cut = _fit_cut(n, holdout_frac)
+    if n != len(dates) or cut is None:
         return {}
-    cut = int(n * (1.0 - holdout_frac))
-    cut = min(max(cut, 40), n - 15)
-    import numpy as np
-
-    thr = float(np.percentile(np.asarray(probs[:cut], dtype=float), percentile))
+    thr = fit_probability_bar(probs, holdout_frac=holdout_frac, percentile=percentile)
+    if thr is None:
+        return {}
     out: dict[str, float] = {}
     for i in range(cut, n):
         p = float(probs[i])
@@ -94,4 +121,43 @@ def holdout_confident_p(symbol: str, model_path: Path, price_path: Path | None =
     if not probs:
         return {}
     dates = [str(x)[:10] for x in feat.index]
-    return confident_tail(probs, dates)
+    return confident_tail(probs, dates, percentile=fit_percentile())
+
+
+def short_head_bar(model_path: Path, frame, *, at=None, percentile: float | None = None) -> tuple[float | None, float | None]:
+    """Latest 5-day probability and the fit-period bar, from a frame already in memory.
+
+    The bar is the percentile of predictions on the earlier rows. The row at
+    ``at`` (or the last row) is the live probability and is not part of the bar.
+    """
+    if frame is None or getattr(frame, "empty", True):
+        return None, None
+    if not Path(model_path).is_file():
+        return None, None
+    from ml_model import load_raw_bundle
+
+    try:
+        raw = load_raw_bundle(str(model_path))
+    except Exception:
+        return None, None
+    model = raw.get("model_short") or raw.get("model")
+    feats = list(raw.get("features") or [])
+    if model is None or not feats:
+        return None, None
+    probs = _batch_p_up(model, frame, feats)
+    if not probs:
+        return None, None
+    bar = fit_probability_bar(probs, percentile=percentile)
+    idx = len(probs) - 1
+    if at is not None:
+        try:
+            loc = frame.index.get_loc(at)
+        except Exception:
+            loc = None
+        if isinstance(loc, slice):
+            idx = max(0, (loc.stop or 1) - 1)
+        elif isinstance(loc, int):
+            idx = loc
+    if idx < 0 or idx >= len(probs):
+        return None, bar
+    return float(probs[idx]), bar

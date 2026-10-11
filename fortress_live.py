@@ -3065,6 +3065,20 @@ def run_fortress_pass(args) -> None:
                             "days_to_earnings": row.get("days_to_earnings") if row is not None else None,
                             "deployed_frac": locals().get("deployed_frac"),
                         }
+                        try:
+                            if not _fortress_lite_intel() and df is not None and not df.empty:
+                                from analytics.model_edge import short_head_bar
+
+                                p_model, fit_bar = short_head_bar(
+                                    path,
+                                    df,
+                                    at=getattr(row, "name", None) if row is not None else None,
+                                )
+                                if p_model is not None and fit_bar is not None:
+                                    case["p_model"] = p_model
+                                    case["fit_bar"] = fit_bar
+                        except Exception:
+                            pass
                         if tf:
                             case.update(
                                 {
