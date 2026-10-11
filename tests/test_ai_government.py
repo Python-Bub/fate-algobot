@@ -32,6 +32,20 @@ def test_hundreds_of_desks_each_speak_twice():
     assert order["edges"] == len(desks)
 
 
+def test_quiet_convene_matches_the_chair():
+    case = {"p_up": 0.78, "avg_up": 0.018, "avg_down": 0.006, "exec_conf": 0.74}
+    full = convene(case)
+    quiet = convene(case, record=False)
+    assert quiet["action"] == full["action"]
+    assert quiet["score"] == full["score"]
+    assert quiet["size_mult"] == full["size_mult"]
+    assert quiet["stop"] == full["stop"]
+    assert quiet["horizon_days"] == full["horizon_days"]
+    assert quiet["n_desks"] == full["n_desks"]
+    assert quiet["edges"] == full["n_desks"]
+    assert quiet["transcript"] == []
+
+
 def test_round_two_is_a_reply_to_the_room():
     order = convene({"p_up": 0.8, "avg_up": 0.02, "avg_down": 0.005, "exec_conf": 0.8})
     replies = [m for m in order["transcript"] if m["round"] == 2]

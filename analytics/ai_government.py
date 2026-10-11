@@ -32,6 +32,7 @@ _WEIGHT = {
 }
 
 _ROSTER: list[tuple] | None = None
+_GROUPS: dict[str, list[tuple]] | None = None
 
 
 def _build_roster() -> list[tuple]:
@@ -117,6 +118,26 @@ def _hold_ev(p: float, avg_up: float, avg_down: float, cost: float, hair: float,
     """Drift over ``days`` bars, spread paid once."""
     daily = one_bar_ev(max(0.0, p - hair), avg_up, avg_down, 0.0)
     return daily * max(1, int(days)) - max(0.0, cost)
+
+
+def _with_timeframes(case: dict) -> dict:
+    """Blend 1/5/20/60-day probabilities into the one number every desk reads.
+
+    Three horizons at or above 0.55 keep a long on the table. Fewer than that
+    pulls the probability down so the chair cannot buy the disagreement.
+    """
+    keys = ("p_1", "p_5", "p_20", "p_60")
+    if any(case.get(k) is None for k in keys):
+        return case
+    probs = [float(case[k]) for k in keys]
+    up = [p for p in probs if p >= 0.55]
+    blended = dict(case)
+    blended["tf_agree"] = len(up)
+    if len(up) >= 3:
+        blended["p_up"] = sum(up) / len(up)
+    else:
+        blended["p_up"] = min(float(case.get("p_up") or 0.5), sum(probs) / len(probs), 0.52)
+    return blended
 
 
 def _vote(kind: str, params: tuple, case: dict) -> int:
@@ -248,15 +269,29 @@ def _mean(votes: list[int]) -> float:
     return sum(votes) / len(votes)
 
 
-def convene(case: dict) -> dict:
-    """Run two rounds and return the chair's single order."""
+def _groups() -> dict[str, list[tuple]]:
+    global _GROUPS
+    if _GROUPS is None:
+        grouped: dict[str, list[tuple]] = {}
+        for desk in roster():
+            grouped.setdefault(desk[0], []).append(desk)
+        _GROUPS = grouped
+    return _GROUPS
+
+
+def convene(case: dict, weights: dict | None = None, *, record: bool = True) -> dict:
+    """Run two rounds and return the chair's single order.
+
+    ``record=False`` still lets every desk vote. It skips the transcript,
+    which is how a full-market pass stays fast enough to keep working.
+    """
+    case = _with_timeframes(case)
+    by_section = _groups()
     desks = roster()
-    by_section: dict[str, list[tuple]] = {}
-    for desk in desks:
-        by_section.setdefault(desk[0], []).append(desk)
 
     round1: list[dict] = []
     sec1: dict[str, float] = {}
+    held_votes: dict[str, list[int]] = {}
     plan = _blank_plan()
     for section, members in by_section.items():
         votes = []
@@ -271,17 +306,19 @@ def convene(case: dict) -> dict:
                 work = _work_value(kind, params, case, vote)
             _note_plan(plan, kind, params, vote, work)
             votes.append(vote)
-            round1.append(
-                {
-                    "section": section_name,
-                    "desk": desk_id,
-                    "round": 1,
-                    "vote": vote,
-                    "reason": reason,
-                    "heard": None,
-                }
-            )
+            if record:
+                round1.append(
+                    {
+                        "section": section_name,
+                        "desk": desk_id,
+                        "round": 1,
+                        "vote": vote,
+                        "reason": reason,
+                        "heard": None,
+                    }
+                )
         sec1[section] = _mean(votes)
+        held_votes[section] = votes
 
     # Opposition round 1 listens to the other ministries, not to itself.
     others = [v for name, v in sec1.items() if name != "opposition"]
@@ -289,18 +326,24 @@ def convene(case: dict) -> dict:
 
     round2: list[dict] = []
     sec2: dict[str, float] = {}
-    for memo in round1:
-        section = memo["section"]
+    for section, votes in held_votes.items():
         heard = room if section == "opposition" else sec1[section]
-        vote = _revise(int(memo["vote"]), heard, dissent=section == "opposition")
-        round2.append({**memo, "round": 2, "vote": vote, "heard": heard, "reason": "reply"})
-    for section in by_section:
-        sec2[section] = _mean([m["vote"] for m in round2 if m["section"] == section])
+        revised = [
+            _revise(int(vote), heard, dissent=section == "opposition") for vote in votes
+        ]
+        sec2[section] = _mean(revised)
+        if record:
+            for memo, vote in zip(
+                (m for m in round1 if m["section"] == section),
+                revised,
+            ):
+                round2.append({**memo, "round": 2, "vote": vote, "heard": heard, "reason": "reply"})
 
     num = 0.0
     den = 0.0
+    table = weights or _WEIGHT
     for section, score in sec2.items():
-        w = _WEIGHT.get(section, 1.0)
+        w = float(table.get(section, _WEIGHT.get(section, 1.0)))
         num += w * score
         den += w
     score = num / den if den else 0.0
@@ -314,6 +357,9 @@ def convene(case: dict) -> dict:
         veto = "interior"
     if veto:
         action = "FLAT"
+    elif case.get("tf_agree") is not None and int(case["tf_agree"]) < 3:
+        action = "FLAT"
+        veto = "timeframe"
     elif score > 0.12:
         action = "LONG"
     elif score < -0.12:
@@ -321,8 +367,10 @@ def convene(case: dict) -> dict:
     else:
         action = "FLAT"
 
-    edges = sum(1 for m in round2 if m["heard"] is not None)
-    return _order(
+    edges = (
+        sum(1 for m in round2 if m["heard"] is not None) if record else len(desks)
+    )
+    order = _order(
         action=action,
         score=score,
         veto=veto,
@@ -334,6 +382,9 @@ def convene(case: dict) -> dict:
         transcript=round2,
         plan=_orders_from_plan(case, plan),
     )
+    if case.get("tf_agree") is not None:
+        order["tf_agree"] = int(case["tf_agree"])
+    return order
 
 
 def _order(*, action, score, veto, desks, edges, by_section, sec1, sec2, transcript, plan) -> dict:

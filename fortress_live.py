@@ -3024,6 +3024,7 @@ def run_fortress_pass(args) -> None:
                         pass
                 avg_up = None
                 avg_down = None
+                tf = None
                 try:
                     from analytics.trade_kernel import move_sizes
 
@@ -3040,35 +3041,48 @@ def run_fortress_pass(args) -> None:
                         sizes = move_sizes(closes, t_i)
                         if sizes is not None:
                             avg_up, avg_down = sizes
+                        from analytics.timeframe_learner import latest_timeframes
+
+                        tf = latest_timeframes(closes)
                 except Exception:
                     avg_up = None
                     avg_down = None
+                    tf = None
                 gov = None
                 if os.getenv("USE_AI_GOVERNMENT", "true").lower() in ("1", "true", "yes"):
                     try:
                         from analytics.ai_government import convene
 
-                        gov = convene(
-                            {
-                                "p_up": float(p_entry if p_entry is not None else p_up),
-                                "avg_up": avg_up,
-                                "avg_down": avg_down,
-                                "exec_conf": float(exec_c),
-                                "held": float(existing_mv) > 0,
-                                "gain": existing_gain,
-                                "fallback_up": float(os.getenv("FORTRESS_TAKE_PROFIT_PCT", "0.015")),
-                                "fallback_down": float(os.getenv("FORTRESS_STOP_LOSS_PCT", "0.025")),
-                                "days_to_earnings": row.get("days_to_earnings") if row is not None else None,
-                                "deployed_frac": locals().get("deployed_frac"),
-                            }
-                        )
+                        case = {
+                            "p_up": float(p_entry if p_entry is not None else p_up),
+                            "avg_up": avg_up,
+                            "avg_down": avg_down,
+                            "exec_conf": float(exec_c),
+                            "held": float(existing_mv) > 0,
+                            "gain": existing_gain,
+                            "fallback_up": float(os.getenv("FORTRESS_TAKE_PROFIT_PCT", "0.015")),
+                            "fallback_down": float(os.getenv("FORTRESS_STOP_LOSS_PCT", "0.025")),
+                            "days_to_earnings": row.get("days_to_earnings") if row is not None else None,
+                            "deployed_frac": locals().get("deployed_frac"),
+                        }
+                        if tf:
+                            case.update(
+                                {
+                                    "p_1": tf["p_1"],
+                                    "p_5": tf["p_5"],
+                                    "p_20": tf["p_20"],
+                                    "p_60": tf["p_60"],
+                                }
+                            )
+                        gov = convene(case, record=False)
                         log.info(
-                            "[GOV] %s %s score=%.2f desks=%d veto=%s",
+                            "[GOV] %s %s score=%.2f desks=%d veto=%s tf=%s",
                             t,
                             gov["action"],
                             gov["score"],
                             gov["n_desks"],
                             gov.get("veto"),
+                            gov.get("tf_agree"),
                         )
                     except Exception as e:
                         log.debug("[GOV] %s skipped: %s", t, e)
