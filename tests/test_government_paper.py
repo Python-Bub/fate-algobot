@@ -144,7 +144,7 @@ def test_a_loss_is_denied_and_a_win_is_granted():
     assert abs(loss.reward) > win.reward
 
 
-def test_three_timeframes_are_required_for_a_long():
+def test_timeframe_disagreement_does_not_veto_a_long():
     from analytics.ai_government import convene
     agreed = convene(
         {
@@ -161,6 +161,7 @@ def test_three_timeframes_are_required_for_a_long():
     )
     assert agreed["tf_agree"] == 3
     assert agreed["action"] == "LONG"
+    assert agreed["veto"] is None
     split = convene(
         {
             "p_up": 0.8,
@@ -175,8 +176,8 @@ def test_three_timeframes_are_required_for_a_long():
         record=False,
     )
     assert split["tf_agree"] == 1
-    assert split["action"] == "FLAT"
-    assert split["veto"] == "timeframe"
+    assert split["action"] == "LONG"
+    assert split["veto"] is None
 
 
 def test_stopped_trades_are_replayed_into_the_learners():

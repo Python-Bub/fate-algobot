@@ -1,8 +1,8 @@
 """Four horizons, trained one bar at a time from local closes.
 
 Horizons are 1, 5, 20, and 60 sessions. A weight is updated only once that
-horizon's future close has already printed. A buy needs three of the four
-to agree. Nothing here reads the network.
+horizon's future close has already printed. Disagreement is recorded and
+does not veto a paper buy. Nothing here reads the network.
 """
 
 from __future__ import annotations
