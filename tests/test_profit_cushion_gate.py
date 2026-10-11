@@ -57,3 +57,28 @@ def test_fortress_take_profit_uses_earned_target(gate_path, monkeypatch):
     gate._LAST = None
     assert gate.fortress_take_profit_pct("COST", 0.015) == pytest.approx(0.010)
     assert gate.fortress_take_profit_pct("XYZ", 0.015) == pytest.approx(0.015)
+    assert gate.fortress_take_profit_pct("COST", 0.0) == pytest.approx(0.010)
+    assert gate.fortress_take_profit_pct("XYZ", 0.0) == pytest.approx(0.0)
+
+
+def test_a_non_positive_take_profit_does_not_sell(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setenv("FORTRESS_SCALE_OUT_ENABLED", "false")
+    monkeypatch.setenv("FORTRESS_ROTATE_ON_PROFIT", "false")
+    off = decide_exit(
+        "KO",
+        p_adj=0.8,
+        gain=0.04,
+        take_profit_pct=0.0,
+        stop_loss_pct=0.08,
+    )
+    on = decide_exit(
+        "KO",
+        p_adj=0.8,
+        gain=0.04,
+        take_profit_pct=0.035,
+        stop_loss_pct=0.08,
+    )
+    assert off.action == "hold"
+    assert on.action == "take_profit"
