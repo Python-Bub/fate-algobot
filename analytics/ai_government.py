@@ -121,27 +121,19 @@ def _hold_ev(p: float, avg_up: float, avg_down: float, cost: float, hair: float,
 
 
 def _with_timeframes(case: dict) -> dict:
-    """Blend 1/5/20/60-day probabilities into the one number every desk reads.
+    """Record how many of the 1/5/20/60-day horizons are at least 0.55.
 
-    Three horizons at or above 0.55 keep a long on the table. Fewer than that
-    pulls the probability down so the chair cannot buy the disagreement.
+    The count stays on the case for the log. It does not change the
+    probability, and it does not veto. When the case carries a fit-period
+    bar, that bar is the buy rule.
     """
     keys = ("p_1", "p_5", "p_20", "p_60")
     if any(case.get(k) is None for k in keys):
         return case
     probs = [float(case[k]) for k in keys]
-    up = [p for p in probs if p >= 0.55]
-    blended = dict(case)
-    blended["tf_agree"] = len(up)
-    # A fit-period bar is the entry rule that beat the extra horizon filters.
-    # Those filters stay in force only when the case has no model bar.
-    if case.get("fit_bar") is not None and case.get("p_model") is not None:
-        return blended
-    if len(up) >= 3:
-        blended["p_up"] = sum(up) / len(up)
-    else:
-        blended["p_up"] = min(float(case.get("p_up") or 0.5), sum(probs) / len(probs), 0.52)
-    return blended
+    recorded = dict(case)
+    recorded["tf_agree"] = sum(1 for p in probs if p >= 0.55)
+    return recorded
 
 
 def _vote(kind: str, params: tuple, case: dict) -> int:
@@ -368,9 +360,6 @@ def convene(case: dict, weights: dict | None = None, *, record: bool = True) -> 
     elif not held and below_bar:
         action = "FLAT"
         veto = "confidence"
-    elif not has_bar and case.get("tf_agree") is not None and int(case["tf_agree"]) < 3:
-        action = "FLAT"
-        veto = "timeframe"
     elif score > 0.12:
         action = "LONG"
     elif score < -0.12:

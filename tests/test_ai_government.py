@@ -124,6 +124,27 @@ def test_a_model_below_its_fit_bar_is_not_a_long():
     assert order["veto"] == "confidence"
 
 
+def test_a_model_below_its_fit_bar_stays_flat_when_timeframes_agree():
+    order = convene(
+        {
+            "p_up": 0.8,
+            "p_1": 0.80,
+            "p_5": 0.80,
+            "p_20": 0.80,
+            "p_60": 0.80,
+            "avg_up": 0.02,
+            "avg_down": 0.005,
+            "exec_conf": 0.8,
+            "p_model": 0.40,
+            "fit_bar": 0.70,
+        },
+        record=False,
+    )
+    assert order["action"] == "FLAT"
+    assert order["veto"] == "confidence"
+    assert order["tf_agree"] == 4
+
+
 def test_a_confident_model_is_not_flat_just_because_timeframes_split():
     order = convene(
         {
