@@ -133,6 +133,10 @@ def _with_timeframes(case: dict) -> dict:
     up = [p for p in probs if p >= 0.55]
     blended = dict(case)
     blended["tf_agree"] = len(up)
+    # A fit-period bar is the entry rule that beat the extra horizon filters.
+    # Those filters stay in force only when the case has no model bar.
+    if case.get("fit_bar") is not None and case.get("p_model") is not None:
+        return blended
     if len(up) >= 3:
         blended["p_up"] = sum(up) / len(up)
     else:
@@ -355,9 +359,16 @@ def convene(case: dict, weights: dict | None = None, *, record: bool = True) -> 
         veto = "treasury"
     elif held and (gain is None or float(gain) < 0.0):
         veto = "interior"
+    p_model = case.get("p_model")
+    fit_bar = case.get("fit_bar")
+    has_bar = p_model is not None and fit_bar is not None
+    below_bar = has_bar and float(p_model) < float(fit_bar)
     if veto:
         action = "FLAT"
-    elif case.get("tf_agree") is not None and int(case["tf_agree"]) < 3:
+    elif not held and below_bar:
+        action = "FLAT"
+        veto = "confidence"
+    elif not has_bar and case.get("tf_agree") is not None and int(case["tf_agree"]) < 3:
         action = "FLAT"
         veto = "timeframe"
     elif score > 0.12:
@@ -547,8 +558,18 @@ def act(case: dict):
         veto = "treasury"
     elif held and (gain is None or float(gain) < 0.0):
         veto = "interior"
+    p_model = case.get("p_model")
+    fit_bar = case.get("fit_bar")
+    below_bar = (
+        p_model is not None
+        and fit_bar is not None
+        and float(p_model) < float(fit_bar)
+    )
     if veto:
         action = "FLAT"
+    elif not held and below_bar:
+        action = "FLAT"
+        veto = "confidence"
     elif score > 0.12:
         action = "LONG"
     elif score < -0.12:

@@ -109,6 +109,51 @@ def test_desks_work_and_the_chair_speaks_last():
     assert any(isinstance(s["work"], float) and s["work"] != 0 for s in computes)
 
 
+def test_a_model_below_its_fit_bar_is_not_a_long():
+    order = convene(
+        {
+            "p_up": 0.8,
+            "avg_up": 0.02,
+            "avg_down": 0.005,
+            "exec_conf": 0.8,
+            "p_model": 0.40,
+            "fit_bar": 0.70,
+        }
+    )
+    assert order["action"] == "FLAT"
+    assert order["veto"] == "confidence"
+
+
+def test_a_confident_model_is_not_flat_just_because_timeframes_split():
+    order = convene(
+        {
+            "p_up": 0.8,
+            "p_1": 0.80,
+            "p_5": 0.42,
+            "p_20": 0.42,
+            "p_60": 0.42,
+            "avg_up": 0.02,
+            "avg_down": 0.005,
+            "exec_conf": 0.8,
+            "p_model": 0.80,
+            "fit_bar": 0.55,
+        },
+        record=False,
+    )
+    assert order["action"] == "LONG"
+    assert order["veto"] is None
+
+
+def test_the_fit_bar_ignores_the_holdout_tail():
+    from analytics.model_edge import fit_probability_bar
+
+    fit = [float(i) for i in range(80)]
+    bar = fit_probability_bar(fit + [1000.0] * 20, percentile=95)
+    again = fit_probability_bar(fit + [0.0] * 20, percentile=95)
+    assert bar == again
+    assert bar < 100
+
+
 def test_a_new_name_with_a_real_edge_is_a_long():
     order = convene(
         {
