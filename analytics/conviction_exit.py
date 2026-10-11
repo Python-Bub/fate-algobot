@@ -186,11 +186,13 @@ def decide_exit(
             trim_frac=1.0,
         )
 
-    # 3) Full take-profit
-    if float(gain) >= abs(float(take_profit_pct)):
+    # 3) Full take-profit. A non-positive target is off: the 3.5% cap
+    # closed winners early and the confirm mean fell under +3%.
+    tp_pct = float(take_profit_pct)
+    if tp_pct > 0 and float(gain) >= tp_pct:
         return ExitDecision(
             "take_profit",
-            f"gain={gain:.4f}>=tp={take_profit_pct:.4f}",
+            f"gain={gain:.4f}>=tp={tp_pct:.4f}",
             trim_frac=1.0,
         )
 

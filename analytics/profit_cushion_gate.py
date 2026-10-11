@@ -117,5 +117,7 @@ def fortress_take_profit_pct(symbol: str, default: float) -> float:
     earned_sell = _env_f("FORTRESS_EARNED_SELL_PCT", 0.012)
     gain = earned_gain(symbol)
     if gain is not None and gain >= min_pct:
+        if float(default) <= 0:
+            return earned_sell
         return min(float(default), earned_sell)
     return float(default)
