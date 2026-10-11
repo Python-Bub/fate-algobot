@@ -78,6 +78,32 @@ def test_auto_inverts_when_book_mostly_red(monkeypatch):
     assert exit_p_up(0.70) == 0.70
 
 
+def test_phantom_plpc_does_not_paint_the_book_green(monkeypatch):
+    monkeypatch.setenv("FORTRESS_INVERT_P_UP", "auto")
+    monkeypatch.setenv("FORTRESS_INVERT_CACHE_SEC", "0")
+    monkeypatch.setenv("FORTRESS_INVERT_MIN_NAMES", "4")
+    monkeypatch.setenv("FORTRESS_INVERT_RED_FRAC", "0.55")
+    monkeypatch.delenv("DOWNPRESS_SOFT_OK_WHEN_UNDERDEPLOY", raising=False)
+    reset_invert_cache()
+    # Four real losers plus four +170% phantoms. Counting the phantoms as
+    # green used to keep the sign unflipped while the account was falling.
+    book = [
+        {"qty": 10, "unrealized_plpc": -0.02, "avg_entry_price": 100, "current_price": 98},
+        {"qty": 10, "unrealized_plpc": -0.03, "avg_entry_price": 50, "current_price": 48.5},
+        {"qty": 10, "unrealized_plpc": -0.01, "avg_entry_price": 20, "current_price": 19.8},
+        {"qty": 10, "unrealized_plpc": -0.04, "avg_entry_price": 10, "current_price": 9.6},
+        {"qty": 0.01, "unrealized_plpc": 1.76, "avg_entry_price": -3280, "current_price": 337},
+        {"qty": 0.01, "unrealized_plpc": 2.36, "avg_entry_price": -400, "current_price": 170},
+        {"qty": 10, "unrealized_plpc": 1.7, "avg_entry_price": -600, "current_price": 420},
+        {"qty": 5, "unrealized_plpc": 1.1, "avg_entry_price": -90, "current_price": 140},
+    ]
+    monkeypatch.setattr("alpaca_broker.list_positions", lambda: book)
+    from analytics import market_session as ms
+
+    monkeypatch.setattr(ms, "now_et", lambda: datetime(2026, 8, 14, 8, 0, tzinfo=ET))
+    assert invert_p_up_enabled() is True
+
+
 def test_auto_stays_when_book_mostly_green(monkeypatch):
     monkeypatch.setenv("FORTRESS_INVERT_P_UP", "auto")
     monkeypatch.setenv("FORTRESS_INVERT_CACHE_SEC", "0")

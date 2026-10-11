@@ -147,6 +147,10 @@ export class KillSwitch {
     if (maxPerSec > 0) {
       const inSec = this.orderTs.filter((t) => nowMs - t < 1000).length;
       if (inSec >= maxPerSec) return false;
+      // Same-tick WS/REST bursts used to pass 8 POSTs in one ms and 429 Alpaca.
+      const last = this.orderTs.length ? this.orderTs[this.orderTs.length - 1] : undefined;
+      const minGap = Math.max(1, Math.floor(1000 / maxPerSec));
+      if (last != null && nowMs - last < minGap) return false;
     }
     if (!tryReserveGlobal(nowMs)) return false;
     this.orderTs.push(nowMs);

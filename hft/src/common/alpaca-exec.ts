@@ -83,6 +83,7 @@ export interface AccountSnapshot {
   longMarketValue: number;
   maintenanceMargin: number;
   regtBuyingPower: number;
+  daytradingBuyingPower: number;
 }
 
 export class AlpacaExecutor {
@@ -455,16 +456,17 @@ export class AlpacaExecutor {
     await this.refreshPositionCache();
   }
 
-  /** TTL refresh only — do not zero posCacheAt (that 429'd GET /v2/positions every 2s). */
+  /** TTL refresh only — do not hammer GET /v2/positions (that 429s and starves FIRE). */
   async keepPositionsWarm(): Promise<void> {
     if (this.dryRun) return;
     await this.refreshPositionCache();
   }
 
-  /** One positions snapshot / ~2s. Failed/partial fetches keep last longs (never fake flat). */
+  /** One positions snapshot per HFT_POSITION_REFRESH_MS (default 15s). */
   private async refreshPositionCache(): Promise<void> {
     const now = Date.now();
-    if (this.posOk && now - this.posCacheAt < 2000) return;
+    const ttl = Math.max(5_000, Number(process.env.HFT_POSITION_REFRESH_MS ?? 15_000));
+    if (this.posOk && now - this.posCacheAt < ttl) return;
     if (this.posInflight) {
       await this.posInflight;
       return;
@@ -828,6 +830,7 @@ export class AlpacaExecutor {
         longMarketValue: 0,
         maintenanceMargin: 0,
         regtBuyingPower: 1_000_000,
+        daytradingBuyingPower: 1_000_000,
       };
     }
     try {
@@ -840,13 +843,17 @@ export class AlpacaExecutor {
         const n = Number(v);
         return Number.isFinite(n) ? n : 0;
       };
+      const overnight = f("buying_power");
+      const dtbp = f("daytrading_buying_power");
+      const useDtbp = process.env.HFT_USE_DTBP !== "false";
       return {
-        buyingPower: f("buying_power") || f("daytrading_buying_power"),
+        buyingPower: useDtbp ? dtbp || overnight : overnight || dtbp,
         equity: f("equity"),
         cash: f("cash"),
         longMarketValue: f("long_market_value"),
         maintenanceMargin: f("maintenance_margin"),
         regtBuyingPower: f("regt_buying_power"),
+        daytradingBuyingPower: dtbp,
       };
     } catch {
       return null;

@@ -28,17 +28,9 @@ def _require_cushion() -> bool:
 
 
 def _position_gain_frac(pos: dict) -> float | None:
-    uplpc = pos.get("unrealized_plpc")
-    if uplpc is not None:
-        return float(uplpc)
-    try:
-        entry = float(pos.get("avg_entry_price") or 0)
-        cur = float(pos.get("current_price") or 0)
-        if entry > 0 and cur > 0:
-            return (cur - entry) / entry
-    except (TypeError, ValueError):
-        pass
-    return None
+    from analytics.position_gain import sane_unrealized_gain
+
+    return sane_unrealized_gain(pos)
 
 
 def refresh_profit_gate() -> dict:

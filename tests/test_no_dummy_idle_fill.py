@@ -27,7 +27,8 @@ def test_last_wins_refuses_dummy_idle_dump():
     from pathlib import Path
 
     text = (Path(__file__).resolve().parents[1] / "data" / "deploy_scale.env").read_text()
-    last = text.rsplit("stop dummy idle-cash dumps", 1)[-1]
-    assert "FORTRESS_RELAX_GATES_ON_FILL=false" in last
-    assert "FORTRESS_VEC_MIN_SCORE=0.02" in last
-    assert "FORTRESS_OVERNIGHT_CASH_DEPLOY=false" in last
+    dummy = text.rsplit("stop dummy idle-cash dumps", 1)[-1]
+    assert "FORTRESS_RELAX_GATES_ON_FILL=false" in dummy
+    halt = text.rsplit("stop false halt", 1)[-1]
+    assert "FORTRESS_RELAX_GATES_ON_FILL=false" in halt
+    assert "FORTRESS_OVERNIGHT_CASH_DEPLOY=true" in halt

@@ -95,18 +95,70 @@ def _note_order(st: dict[str, Any]) -> None:
     st["order_ts"] = ts[-40:]
 
 
-def _live_qty(symbol: str) -> float:
+_POS_CACHE: dict[str, Any] = {"t": 0.0, "rows": None}
+
+
+def _cached_positions() -> list[dict]:
+    now = time.time()
+    rows = _POS_CACHE.get("rows")
+    if isinstance(rows, list) and now - float(_POS_CACHE.get("t") or 0) < 2.0:
+        return rows
     try:
         from alpaca_broker import list_positions
+
+        rows = list(list_positions() or [])
+    except Exception:
+        rows = []
+    _POS_CACHE["t"] = now
+    _POS_CACHE["rows"] = rows
+    return rows
+
+
+def _live_qty(symbol: str) -> float:
+    try:
         from crypto_universe import same_crypto
 
-        for p in list_positions() or []:
+        for p in _cached_positions():
             sym = str(p.get("symbol") or "")
             if same_crypto(sym, symbol):
                 return float(p.get("qty") or p.get("qty_available") or 0)
     except Exception:
         return 0.0
     return 0.0
+
+
+def _stop_held_long(symbol: str, mid: float, stp_bps: float, st: dict[str, Any]) -> bool:
+    """Cut a fortress-held coin past the crypto stop.
+
+    skip_held used to return before any stop, so BCH −8% and LTC −5% were
+    never sold: the equity scan thought crypto was someone else's book.
+    """
+    if mid <= 0 or not _pace_ok(st):
+        return False
+    if not _env_bool("CRYPTO_HFT_STOP_HELD", "true"):
+        return False
+    try:
+        from crypto_universe import same_crypto
+        from analytics.position_gain import sane_unrealized_gain
+        from alpaca_broker import close_position_alpaca
+    except Exception:
+        return False
+    pos = None
+    for p in _cached_positions():
+        if same_crypto(str(p.get("symbol") or ""), symbol):
+            pos = p
+            break
+    if not pos:
+        return False
+    gain = sane_unrealized_gain(pos, mid)
+    stop = -abs(float(stp_bps)) / 10_000.0
+    if gain is None or gain > stop:
+        return False
+    if not close_position_alpaca(symbol, force=True):
+        return False
+    _note_order(st)
+    log.warning("[CRYPTO-HFT] held stop %s gain=%.2f%%", symbol, 100.0 * gain)
+    return True
 
 
 def _quote(symbol: str) -> tuple[float, float] | None:
@@ -219,7 +271,10 @@ def tick(state: dict[str, Any] | None = None) -> dict[str, Any]:
             continue
 
         if fortress:
-            out["actions"].append({"sym": sym, "why": "fortress_held"})
+            if _stop_held_long(sym, mid, stp_bps, st):
+                out["actions"].append({"sym": sym, "why": "held_hard_stop"})
+            else:
+                out["actions"].append({"sym": sym, "why": "fortress_held"})
             continue
 
         open_n = sum(1 for v in opens.values() if isinstance(v, dict) and float(v.get("qty") or 0) > 0)

@@ -80,6 +80,25 @@ def test_midday_allows_fortress_fade_buys(monkeypatch):
     assert "fade_midday" in why or "buy_mode" in why
 
 
+def test_overnight_cash_does_not_bypass_midday_hft_only(monkeypatch):
+    from analytics import market_session as ms
+
+    dt = datetime(2026, 8, 14, 14, 0, tzinfo=ET)
+    monkeypatch.setenv("MIDDAY_HFT_ONLY", "true")
+    monkeypatch.setenv("FORTRESS_INVERT_P_UP", "false")
+    monkeypatch.setenv("FORTRESS_FADE_DURING_MIDDAY", "false")
+    monkeypatch.setenv("FORTRESS_OVERNIGHT_CASH_DEPLOY", "true")
+    monkeypatch.setenv("TRADE_SESSION_MODE", "extended")
+    monkeypatch.setenv("TRADE_WEEKDAY_24X5", "true")
+    monkeypatch.setenv("ALPACA_CLOCK_GATE", "false")
+    monkeypatch.setenv("MORNING_SWEET_SPOT", "false")
+    monkeypatch.setattr(ms, "now_et", lambda: dt)
+    monkeypatch.setattr(ms, "exchange_is_open", lambda **_k: (True, "clock_gate_off"))
+    ok, why = ms.orders_allowed("buy", for_hft=False)
+    assert ok is False
+    assert "midday_hft_only" in why
+
+
 def test_overnight_cash_deploy_allows_closed_session_stock_buys(monkeypatch):
     from analytics import market_session as ms
 

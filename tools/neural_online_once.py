@@ -21,6 +21,7 @@ def main() -> int:
         from dotenv import load_dotenv
 
         load_dotenv(ROOT / ".env", override=False)
+        load_dotenv(ROOT / "data" / "deploy_scale.env", override=True)
     except Exception:
         pass
 

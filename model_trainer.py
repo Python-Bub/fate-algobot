@@ -533,7 +533,7 @@ def training_saved_model(ticker: str, *, min_bytes: int = 1000) -> bool:
 
 def build_training_frame_for_lstm(ticker: str) -> tuple[pd.DataFrame, list[str]] | None:
     """Build feature matrix + targets for LSTM head training (no daily model retrain)."""
-    start_train = os.getenv("TRAIN_DATA_START", "2023-01-01")
+    start_train = os.getenv("TRAIN_DATA_START", "2010-01-01")
     df = build_features(ticker, start_train, None)
     if df.empty or "returns" not in df.columns:
         return None

@@ -92,20 +92,26 @@ def policy_priority_hints(metrics: dict) -> dict:
 
 _HOOK_RECIPES: list[dict[str, Any]] = [
     {
-        "rationale": "grow_equity — deploy idle capital",
+        "rationale": "grow_equity — add only while the account is up",
         "equity_rules": [
-            "if float(metrics.get('deployed_frac') or 0.0) < 0.60:",
-            "    boost += 0.025",
-            "if float(metrics.get('equity_delta') or 0.0) <= 0:",
-            "    boost += 0.02",
+            "if float(metrics.get('equity_delta') or 0.0) > 0 and float(metrics.get('deployed_frac') or 0.0) < 0.60:",
+            "    boost += 0.015",
         ],
         "size_rules": [
-            "if float(metrics.get('deployed_frac') or 0.0) < 0.65:",
-            "    mult += 0.08",
+            "if float(metrics.get('equity_delta') or 0.0) < 0:",
+            "    mult -= 0.08",
+            "elif float(metrics.get('deployed_frac') or 0.0) < 0.65:",
+            "    mult += 0.05",
         ],
         "policy_lines": [
-            'hints["ORDER_NOTIONAL"] = min(float(metrics.get("cur_notional", 8000)) * 1.08, 48000.0)',
-            'hints["BUY_THRESHOLD"] = max(0.52, float(metrics.get("cur_buy", 0.55)) - 0.012)',
+            'cur_n = float(metrics.get("cur_notional", 8000) or 8000)',
+            'cur_buy = float(metrics.get("cur_buy", 0.55) or 0.55)',
+            'if float(metrics.get("equity_delta") or 0.0) <= 0:',
+            '    hints["ORDER_NOTIONAL"] = max(500.0, cur_n * 0.90)',
+            '    hints["BUY_THRESHOLD"] = min(0.72, cur_buy + 0.01)',
+            'else:',
+            '    hints["ORDER_NOTIONAL"] = min(cur_n * 1.04, 12000.0)',
+            '    hints["BUY_THRESHOLD"] = max(0.55, cur_buy)',
         ],
     },
     {
@@ -116,7 +122,12 @@ _HOOK_RECIPES: list[dict[str, Any]] = [
             "    boost += 0.03",
         ],
         "size_rules": ["if float(metrics.get('equity_delta') or 0.0) > 0:", "    mult += 0.04"],
-        "policy_lines": ['hints["BUY_THRESHOLD"] = max(0.52, float(metrics.get("cur_buy", 0.55)) - 0.008)'],
+        "policy_lines": [
+            'if float(metrics.get("equity_delta") or 0.0) <= 0:',
+            '    hints["BUY_THRESHOLD"] = min(0.72, float(metrics.get("cur_buy", 0.55)) + 0.01)',
+            'else:',
+            '    hints["BUY_THRESHOLD"] = max(0.55, float(metrics.get("cur_buy", 0.55)))',
+        ],
     },
 ]
 

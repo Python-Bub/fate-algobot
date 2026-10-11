@@ -31,6 +31,25 @@ def test_refresh_writes_earned_symbols(gate_path):
     assert saved["earned"]["NVDA"] == pytest.approx(0.005)
 
 
+def test_phantom_cost_basis_is_not_earned(gate_path):
+    positions = [
+        {
+            "symbol": "AAPL",
+            "qty": 0.01,
+            "avg_entry_price": -3280.0,
+            "unrealized_plpc": 1.76,
+            "current_price": 337.0,
+        },
+        {"symbol": "NVDA", "qty": 10, "unrealized_plpc": 0.005},
+    ]
+    with patch("alpaca_broker.list_positions", return_value=positions), patch(
+        "alpaca_broker.get_account", return_value={"equity": 71_000}
+    ):
+        out = gate.refresh_profit_gate()
+    assert "AAPL" not in out["earned"]
+    assert "NVDA" in out["earned"]
+
+
 def test_fortress_take_profit_uses_earned_target(gate_path, monkeypatch):
     monkeypatch.setenv("HFT_PROFIT_CUSHION_MIN_PCT", "0.003")
     monkeypatch.setenv("FORTRESS_EARNED_SELL_PCT", "0.010")

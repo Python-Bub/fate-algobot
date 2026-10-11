@@ -17,8 +17,8 @@ import pandas as pd
 
 from utils import log
 
-_CHRONOS_PIPELINE = None
-_CHRONOS_TRIED = False
+_CHRONOS_PIPELINES: dict[str, Any] = {}
+_CHRONOS_TRIED: set[str] = set()
 
 
 def use_foundation_forecast() -> bool:
@@ -26,7 +26,7 @@ def use_foundation_forecast() -> bool:
 
 
 def _context_len() -> int:
-    return int(os.getenv("FOUNDATION_CONTEXT_LEN", "128"))
+    return int(os.getenv("FOUNDATION_CONTEXT_LEN", "160"))
 
 
 def _horizon() -> int:
@@ -38,17 +38,30 @@ def _chronos_model_id() -> str:
     return os.getenv("FOUNDATION_CHRONOS_MODEL", "amazon/chronos-bolt-mini")
 
 
-def _load_chronos():
-    global _CHRONOS_PIPELINE, _CHRONOS_TRIED
-    if _CHRONOS_TRIED:
-        return _CHRONOS_PIPELINE
-    _CHRONOS_TRIED = True
+def _chronos_infer_ids() -> list[str]:
+    primary = _chronos_model_id().strip()
+    extra = os.getenv("FOUNDATION_CHRONOS_INFER_EXTRA", "amazon/chronos-bolt-small").strip()
+    out: list[str] = []
+    seen: set[str] = set()
+    for mid in [primary, *[p.strip() for p in extra.replace(";", ",").split(",")]]:
+        if not mid or mid in seen:
+            continue
+        seen.add(mid)
+        out.append(mid)
+    return out
+
+
+def _load_chronos_id(model_id: str):
+    if model_id in _CHRONOS_PIPELINES:
+        return _CHRONOS_PIPELINES[model_id]
+    if model_id in _CHRONOS_TRIED:
+        return None
+    _CHRONOS_TRIED.add(model_id)
     if os.getenv("FOUNDATION_DISABLE_CHRONOS", "false").lower() in ("1", "true", "yes"):
         return None
     try:
         import torch
 
-        model_id = _chronos_model_id()
         pipe = None
         for importer in (
             lambda: __import__("chronos", fromlist=["ChronosBoltPipeline"]).ChronosBoltPipeline,
@@ -63,12 +76,16 @@ def _load_chronos():
                 continue
         if pipe is None:
             raise RuntimeError("no Chronos pipeline class")
-        _CHRONOS_PIPELINE = pipe
+        _CHRONOS_PIPELINES[model_id] = pipe
         log.info("[FOUNDATION] loaded %s", model_id)
+        return pipe
     except Exception as e:
-        log.warning("[FOUNDATION] Chronos unavailable (%s) — statistical fallback only", e)
-        _CHRONOS_PIPELINE = None
-    return _CHRONOS_PIPELINE
+        log.warning("[FOUNDATION] Chronos %s unavailable (%s)", model_id, e)
+        return None
+
+
+def _load_chronos():
+    return _load_chronos_id(_chronos_model_id())
 
 
 def _closes_from_df(df: pd.DataFrame) -> np.ndarray:
@@ -99,19 +116,18 @@ def _statistical_p_up(closes: np.ndarray, horizon: int) -> tuple[float, dict[str
     }
 
 
-def _chronos_p_up(closes: np.ndarray, horizon: int) -> tuple[float | None, dict[str, Any]]:
-    pipe = _load_chronos()
+def _chronos_p_up_one(model_id: str, closes: np.ndarray, horizon: int) -> tuple[float | None, dict[str, Any]]:
+    pipe = _load_chronos_id(model_id)
     if pipe is None or len(closes) < 32:
-        return None, {"source": "chronos", "reason": "unavailable"}
+        return None, {"source": model_id, "reason": "unavailable"}
     try:
         import torch
 
         ctx = closes[-_context_len() :].astype(np.float32)
         if np.any(ctx <= 0):
-            return None, {"source": "chronos", "reason": "bad_prices"}
+            return None, {"source": model_id, "reason": "bad_prices"}
         t = torch.tensor(ctx, dtype=torch.float32).unsqueeze(0)
         t0 = time.perf_counter()
-        # Chronos-Bolt: median quantile forecast
         out = pipe.predict(t, prediction_length=horizon)
         if hasattr(out, "detach"):
             fc = out.detach().cpu().numpy()
@@ -124,13 +140,26 @@ def _chronos_p_up(closes: np.ndarray, horizon: int) -> tuple[float | None, dict[
         med = float(np.median(path))
         last = float(ctx[-1])
         fwd_ret = (med / last - 1.0) if last > 0 else 0.0
-        # Map forecast return to p_up — capped so it cannot dominate GBDT
         p = float(np.clip(0.5 + 8.0 * fwd_ret, 0.38, 0.62))
         ms = int((time.perf_counter() - t0) * 1000)
-        return p, {"source": "chronos", "fwd_ret": fwd_ret, "latency_ms": ms}
+        return p, {"source": model_id, "fwd_ret": fwd_ret, "latency_ms": ms}
     except Exception as e:
-        log.debug("[FOUNDATION] chronos infer failed: %s", e)
-        return None, {"source": "chronos", "reason": str(e)[:120]}
+        log.debug("[FOUNDATION] %s infer failed: %s", model_id, e)
+        return None, {"source": model_id, "reason": str(e)[:120]}
+
+
+def _chronos_p_up(closes: np.ndarray, horizon: int) -> tuple[float | None, dict[str, Any]]:
+    votes: list[float] = []
+    diags: list[dict[str, Any]] = []
+    for mid in _chronos_infer_ids():
+        p, d = _chronos_p_up_one(mid, closes, horizon)
+        diags.append(d)
+        if p is not None:
+            votes.append(p)
+    if not votes:
+        return None, {"source": "chronos", "reason": "unavailable", "diag": diags}
+    p = float(np.clip(float(np.mean(votes)), 0.38, 0.62))
+    return p, {"source": "chronos-ensemble" if len(votes) > 1 else "chronos", "n": len(votes), "votes": votes, "diag": diags}
 
 
 def foundation_forecast_p(

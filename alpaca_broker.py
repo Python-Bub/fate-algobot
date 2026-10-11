@@ -18,6 +18,13 @@ import requests
 from utils import log
 
 from symbol_aliases import price_feed_symbol
+
+
+def _require_order_host() -> None:
+    from order_role import orders_allowed_here
+
+    if not orders_allowed_here():
+        raise RuntimeError("order blocked (FATE_ORDER_ROLE — only GCP paper VM posts)")
 from crypto_universe import is_crypto_symbol, alpaca_symbol
 
 # Set False after HTTP 401/403 on data API (trading keys often lack Market Data subscription).
@@ -1408,6 +1415,26 @@ def close_position_alpaca(
     if close_qty <= 1e-8:
         log.info("[ALPACA] sleeve-scoped close %s head=%s — nothing sellable (protected)", sym, head)
         return False
+    try:
+        from analytics.position_gain import dust_close_qty
+
+        mv = abs(float(pos.get("market_value") or 0)) if pos else 0.0
+        if mv <= 0 and pos:
+            px = float(pos.get("current_price") or 0)
+            mv = abs(close_qty * px) if px > 0 else 0.0
+        dust_usd = float(os.getenv("ALPACA_DUST_FULL_CLOSE_USD", "25") or 25)
+        full = dust_close_qty(broker_qty, close_qty, mv, dust_usd=dust_usd)
+        if full > close_qty + 1e-8:
+            log.warning(
+                "[ALPACA] dust full-close %s mv=$%.2f partial=%.6f -> %.6f",
+                sym,
+                mv,
+                close_qty,
+                full,
+            )
+            close_qty = full
+    except Exception as e:
+        log.debug("[ALPACA] dust close qty %s: %s", sym, e)
     qty = close_qty
     # Sell-high exit routing. The raw DELETE /v2/positions below is a MARKET close
     # → sells at the bid (sell low). During extended hours Alpaca requires a limit;
@@ -1566,7 +1593,12 @@ def close_position_alpaca(
 
 
 def get_account() -> dict | None:
-    """Returns Alpaca account JSON (cash, buying_power, equity, ...)."""
+    """GET /v2/account — cash, equity, buying_power (Alpaca live JSON).
+
+    Fields we size from: cash, equity, last_equity, buying_power,
+    regt_buying_power, non_marginable_buying_power, long_market_value.
+    PDT aliases (daytrading_buying_power) were removed 2026-07-06.
+    """
     global _ACCT_CACHE
     k, _ = _keys()
     if not k:
@@ -1836,6 +1868,7 @@ def submit_market_order(
     """
     from analytics.market_session import log_session_block, orders_allowed
 
+    _require_order_host()
     side_l = side.lower()
     order_side = "sell" if side_l == "sell" else "buy"
     sess_side = _session_order_side(symbol, order_side)
@@ -1968,6 +2001,7 @@ def submit_limit_order(
 ) -> dict:
     from analytics.market_session import log_session_block, orders_allowed
 
+    _require_order_host()
     side_l = side.lower()
     order_side = "sell" if side_l == "sell" else "buy"
     sess_side = _session_order_side(symbol, order_side)
@@ -2179,7 +2213,7 @@ def place_notional_alpaca(
     if side == "buy":
         hard_max = float(os.getenv("HARD_MAX_ORDER_NOTIONAL", "0") or 0)
         if hard_max <= 0:
-            hard_max = float(os.getenv("MAX_ORDER_NOTIONAL", "0") or 0)
+            hard_max = 0.0
         if hard_max > 0 and dollars > hard_max:
             log.warning(
                 "[ALPACA] clamp BUY %s $%.0f → $%.0f (HARD_MAX_ORDER_NOTIONAL)",

@@ -95,6 +95,8 @@ def in_overnight_buy_block_window() -> bool:
 
 def rank_trim_candidates(positions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Worst first: losers, then smallest conviction / largest absolute risk."""
+    from analytics.position_gain import is_phantom_cost_basis, sane_unrealized_gain
+
     scored: list[tuple[float, dict[str, Any]]] = []
     for p in positions:
         try:
@@ -102,8 +104,15 @@ def rank_trim_candidates(positions: list[dict[str, Any]]) -> list[dict[str, Any]
             if qty <= 0:
                 continue
             mv = abs(float(p.get("market_value") or 0))
-            upl = float(p.get("unrealized_pl") or 0)
-            upl_pct = float(p.get("unrealized_plpc") or 0)
+            if is_phantom_cost_basis(p):
+                # Dollar P&L is the same fiction as +100% plpc. Rank by size
+                # so a fake winner is not the last name we would ever trim.
+                upl = 0.0
+                upl_pct = 0.0
+            else:
+                upl = float(p.get("unrealized_pl") or 0)
+                g = sane_unrealized_gain(p)
+                upl_pct = float(g if g is not None else (p.get("unrealized_plpc") or 0))
             # Prefer trimming losers and large legs.
             score = (-upl_pct * 1000.0) + (mv * 0.0001) - (upl * 0.01)
             scored.append((score, p))

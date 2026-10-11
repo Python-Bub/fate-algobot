@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -47,7 +48,17 @@ def _thermal_cool() -> bool:
         return False
 
 
+def _paper_order_host() -> bool:
+    """GCP paper box posts orders; heavy cooks belong on fate-algobot-trainer."""
+    role = (os.getenv("FATE_ORDER_ROLE") or "").strip().lower()
+    hn = (os.getenv("HOSTNAME") or socket.gethostname() or "").lower()
+    return role in ("gcp-paper", "order", "paper-vm") or "algobot-paper" in hn
+
+
 def _autopilot_paused() -> bool:
+    # GCP paper must keep trading even if a Mac pause file was rsynced.
+    if _paper_order_host():
+        return False
     if not AUTOPILOT_STATE.is_file():
         return False
     try:
@@ -130,6 +141,8 @@ def _run_trading_day_autorun() -> None:
 
 def _maybe_ensure_paper_sim() -> None:
     """Background paper sim when report stale/unusable (works even if weekly daemon exists)."""
+    if _paper_order_host():
+        return
     if os.getenv("AUTO_PAPER_SIM", "true").lower() not in ("1", "true", "yes"):
         return
     if _autopilot_paused():
@@ -271,6 +284,8 @@ def _maybe_verify_trades() -> None:
 
 
 def _maybe_self_maintenance() -> None:
+    if _paper_order_host():
+        return
     if os.getenv("SELF_MAINTENANCE", "true").lower() not in ("1", "true", "yes"):
         return
     if _autopilot_paused():
@@ -316,7 +331,34 @@ def _pgrep(pattern: str) -> bool:
         return False
 
 
+def _node_script_alive(script: str) -> bool:
+    """True only if a Node process (not bash daemon_loop) has `script` in argv."""
+    try:
+        r = subprocess.run(
+            ["ps", "-ax", "-o", "comm=,args="],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception:
+        return False
+    needle = script.lower()
+    for line in r.stdout.splitlines():
+        s = line.strip()
+        if not s:
+            continue
+        comm = s.split(None, 1)[0].lower()
+        if comm.startswith("node") and needle in s.lower():
+            return True
+    return False
+
+
 def _daemon_alive(name: str) -> bool:
+    if name == "subsecond-obi":
+        return _node_script_alive("obi-tape/index.js")
+    if name == "subsecond-earnings":
+        return _node_script_alive("earnings/index.js")
     pid = _read_pid(name)
     if pid and _pid_alive(pid):
         return True
@@ -344,6 +386,9 @@ def _daemon_alive(name: str) -> bool:
         "execution-monitor": r"monitor_execution\.py",
         "weekly": r"daemon_loop\.sh 3600.*paper_sim_today",
         "longterm": r"daemon_loop\.sh 7200.*paper_sim_today",
+        "valuation-news-watch": r"valuation_news_watch\.py",
+        "event-calendar-watch": r"event_calendar_watch\.py",
+        "exec-delay": r"exec_delay",
         # Narrow patterns — avoid OR-globs that false-match unrelated lstm/train jobs.
         "train-lstm": r"tools/train_lstm|batch_train_lstm|train_lstm_meta",
         "retrain-weak-loop": r"retrain_weak_models\.py|finish_weak_top100|retrain_top100_strong",
@@ -394,6 +439,8 @@ def _run(args: list[str], *, timeout: int = 120) -> int:
 
 def _ensure_industry_ai_watch() -> None:
     """Industry classification runs even when autopilot is paused (no trading impact)."""
+    if _paper_order_host():
+        return
     if os.getenv("USE_INDUSTRY_AI", "true").lower() not in ("1", "true", "yes"):
         return
     if os.getenv("AUTO_INDUSTRY_AI_WATCH", "true").lower() not in ("1", "true", "yes"):
@@ -487,6 +534,12 @@ def _maybe_kill_hung_fortress() -> None:
 
 def ensure_stack(*, bootstrap: bool = False) -> None:
     _reload_env()
+    try:
+        from analytics.buying_power import refresh_and_persist
+
+        refresh_and_persist()
+    except Exception:
+        pass
     _maybe_auto_unpause()
     # Trading engines FIRST — never block restarts behind Cramer/autorun (was 5–120min stalls
     # that looked like "random STOPPED" while watchdog was "RUNNING").
@@ -510,9 +563,14 @@ def ensure_stack(*, bootstrap: bool = False) -> None:
         ("subsecond-obi", ["./run_all.sh", "ensure-subsecond"]),
         ("subsecond-earnings", ["./run_all.sh", "ensure-earnings"]),
         ("hft-rotator", ["./run_all.sh", "hft-rotator"]),
-        ("weekly", ["./run_all.sh", "ensure-weekly"]),
+        ("valuation-news-watch", ["./run_all.sh", "valuation-news-watch"]),
+        ("event-calendar-watch", ["./run_all.sh", "event-calendar-watch"]),
+        ("exec-delay", ["./run_all.sh", "exec-delay-daemon"]),
     ]
-    if os.getenv("PAPER_USE_LONGTERM", "false").lower() in ("1", "true", "yes"):
+    paper_host = _paper_order_host()
+    if not paper_host:
+        checks.append(("weekly", ["./run_all.sh", "ensure-weekly"]))
+    if os.getenv("PAPER_USE_LONGTERM", "false").lower() in ("1", "true", "yes") and not paper_host:
         checks.append(("longterm", ["./run_all.sh", "ensure-longterm"]))
     if os.getenv("DAY_TRADE_MODE", "false").lower() in ("1", "true", "yes"):
         checks.append(("day-trade", ["./run_all.sh", "ensure-day-trade"]))
@@ -530,30 +588,36 @@ def ensure_stack(*, bootstrap: bool = False) -> None:
         ("paper-hygiene", ["./run_all.sh", "ensure-paper-hygiene"]),
         ("hft-news-watch", ["./run_all.sh", "ensure-hft-news"]),
         ("bottom-fisher-watch", ["./run_all.sh", "bottom-fisher-watch"]),
-        ("sheldon-hunt", ["./run_all.sh", "sheldon-hunt"]),
-        ("universe-lifecycle-watch", ["./run_all.sh", "universe-lifecycle-watch"]),
-        ("pattern-anomaly-watch", ["./run_all.sh", "pattern-anomaly-watch"]),
-        ("stack-autotune", ["./run_all.sh", "ensure-autotune"]),
-        ("self-improve", ["./run_all.sh", "ensure-self-improve"]),
-        ("cortex-singularity", ["./run_all.sh", "ensure-cortex"]),
-        ("free-agent", ["./run_all.sh", "ensure-free-agent"]),
-        ("ule-watch", ["./run_all.sh", "ule-watch"]),
-        ("continuous-learn", ["./run_all.sh", "ensure-continuous-learn"]),
         ("disk-cleanup", ["./run_all.sh", "ensure-disk-cleanup"]),
     ])
-    if os.getenv("USE_ALGO_PIPELINE", "true").lower() in ("1", "true", "yes"):
+    if not paper_host:
+        checks.extend([
+            ("sheldon-hunt", ["./run_all.sh", "sheldon-hunt"]),
+            ("universe-lifecycle-watch", ["./run_all.sh", "universe-lifecycle-watch"]),
+            ("pattern-anomaly-watch", ["./run_all.sh", "pattern-anomaly-watch"]),
+            ("stack-autotune", ["./run_all.sh", "ensure-autotune"]),
+            ("self-improve", ["./run_all.sh", "ensure-self-improve"]),
+            ("cortex-singularity", ["./run_all.sh", "ensure-cortex"]),
+            ("free-agent", ["./run_all.sh", "ensure-free-agent"]),
+        ])
+    if os.getenv("USE_ALGO_PIPELINE", "true").lower() in ("1", "true", "yes") and not paper_host:
         checks.append(("algo-pipeline", ["./run_all.sh", "algo-pipeline"]))
     if os.getenv("CRAMER_CNBC_TOP10_ENABLED", "true").lower() in ("1", "true", "yes"):
         checks.append(("cramer-cnbc-poll", ["./run_all.sh", "ensure-cramer-cnbc"]))
-    # Self-improving historical learners — always on, not gated by AUTOPILOT_AUTO_TRAIN.
-    checks.append(("hist-cook", ["./run_all.sh", "hist-cook"]))
-    checks.append(("event-learn-train", ["./run_all.sh", "event-learn-train"]))
-    checks.append(("gen-learn-train", ["./run_all.sh", "gen-learn-train"]))
-    if os.getenv("AUTOPILOT_AUTO_TRAIN", "true").lower() in ("1", "true", "yes") or os.getenv(
-        "FOREVER_TRAIN", "true"
-    ).lower() in ("1", "true", "yes"):
-        checks.append(("retrain-weak-loop", ["./run_all.sh", "retrain-weak-until"]))
-        checks.append(("train-lstm", ["./run_all.sh", "train-lstm"]))
+    # Heavy cooks stay on fate-algobot-trainer. Paper 16GB must keep fortress/HFT alive.
+    if not _paper_order_host():
+        checks.append(("ule-watch", ["./run_all.sh", "ule-watch"]))
+        checks.append(("continuous-learn", ["./run_all.sh", "ensure-continuous-learn"]))
+        checks.append(("hist-cook", ["./run_all.sh", "hist-cook"]))
+        checks.append(("event-learn-train", ["./run_all.sh", "event-learn-train"]))
+        checks.append(("gen-learn-train", ["./run_all.sh", "gen-learn-train"]))
+        if os.getenv("AUTOPILOT_AUTO_TRAIN", "true").lower() in ("1", "true", "yes") or os.getenv(
+            "FOREVER_TRAIN", "true"
+        ).lower() in ("1", "true", "yes"):
+            checks.append(("retrain-weak-loop", ["./run_all.sh", "retrain-weak-until"]))
+            checks.append(("train-lstm", ["./run_all.sh", "train-lstm"]))
+    else:
+        _log("paper_order_host", "skip heavy trainers — they run on fate-algobot-trainer")
 
     if _thermal_cool():
         keep = {
@@ -561,7 +625,12 @@ def ensure_stack(*, bootstrap: bool = False) -> None:
             "intraday",
             "subsecond-obi",
             "subsecond-earnings",
+            "hft-rotator",
+            "weekly",
+            "longterm",
             "paper-hygiene",
+            "valuation-news-watch",
+            "event-calendar-watch",
         }
         checks = [c for c in checks if c[0] in keep]
         _log("thermal_cool", f"skip trainers; keep {sorted(keep)}")

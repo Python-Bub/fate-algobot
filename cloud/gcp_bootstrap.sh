@@ -3,7 +3,8 @@
 #
 #   ./cloud/gcp_bootstrap.sh setup     # project + billing + Compute API check
 #   ./cloud/gcp_bootstrap.sh paper     # create 24/7 paper VM (needs .env)
-#   ./cloud/gcp_bootstrap.sh up        # create trainer VM, start train-everything
+#   ./cloud/gcp_bootstrap.sh up        # create trainer VM, start cloud-train (hist + LSTM-all)
+#   ./cloud/gcp_bootstrap.sh push-train  # rsync code to existing trainer and resume cloud-train
 #   ./cloud/gcp_bootstrap.sh ssh       # SSH
 #   ./cloud/gcp_bootstrap.sh status    # VM + ./run_all.sh progress
 #   ./cloud/gcp_bootstrap.sh sync      # pull models + checkpoints to this Mac
@@ -136,6 +137,7 @@ _sync_code() {
     --exclude='.pids/' \
     --exclude='.env' \
     --exclude='models/' \
+    --exclude='data/autopilot_state.json' \
     --exclude='data/policy/' \
     --exclude='data/cortex/' \
     --exclude='data/intel/' \
@@ -167,9 +169,22 @@ _sync_env() {
 
 _sync_models() {
   echo "[GCP] rsync models → VM (no --delete)…"
-  rsync -az --partial "$(_rsync_prog)" \
+  # Trainers rewrite .pkl while we copy. rc 23/24 is a partial success, not a
+  # 54-hour retry loop. Network/auth failures still return so the caller can retry.
+  set +e
+  rsync -az --partial --update "$(_rsync_prog)" \
     -e "$(_rsync_e)" \
     "$ROOT/models/" "${INSTANCE}:~/FATE_AlgoBot/models/"
+  local rc=$?
+  set -e
+  if [ "$rc" -eq 23 ] || [ "$rc" -eq 24 ]; then
+    echo "[GCP] models rsync vanished-file warning (rc=$rc) — copy is enough, continuing"
+    return 0
+  fi
+  if [ "$rc" -ne 0 ]; then
+    echo "[GCP] models rsync failed rc=$rc" >&2
+    return "$rc"
+  fi
 }
 
 cmd_setup() {
@@ -185,17 +200,25 @@ cmd_setup() {
 }
 
 cmd_up() {
+  INSTANCE="${GCP_INSTANCE:-fate-algobot-trainer}"
+  DISK_GB="${GCP_DISK_GB:-400}"
+  if [ "${GCP_TRAIN_ALWAYS_ON:-false}" = "true" ] || [ "${GCP_TRAIN_ALWAYS_ON:-false}" = "1" ]; then
+    PROVISIONING="STANDARD"
+    echo "[GCP] GCP_TRAIN_ALWAYS_ON — STANDARD (not Spot) so hist/LSTM keep running"
+  fi
   _create_vm
   _sync_code
-  echo "[GCP] remote install + start tmux training…"
+  _sync_env || echo "[GCP] no local .env — Yahoo train still works; later: $0 sync-env" >&2
+  echo "[GCP] remote install + start autonomous cloud-train…"
   gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command="chmod +x ~/FATE_AlgoBot/${REMOTE_SETUP} && bash ~/FATE_AlgoBot/${REMOTE_SETUP}"
   echo
   echo "============================================================"
-  echo "  VM is up. Training runs in tmux session: train"
+  echo "  Trainer VM is up. cloud-train (hist + LSTM-all) in tmux: train"
   echo "  SSH:        ./cloud/gcp_bootstrap.sh ssh"
   echo "  Then:       tmux attach -t train"
   echo "  Status:     ./cloud/gcp_bootstrap.sh status"
   echo "  Pull models: ./cloud/gcp_bootstrap.sh sync"
+  echo "  Resume:     ./cloud/gcp_bootstrap.sh push-train"
   echo "  Destroy VM: ./cloud/gcp_bootstrap.sh down $INSTANCE"
   echo "============================================================"
 }
@@ -253,16 +276,19 @@ cmd_sync() {
   rsync -avz \
     -e "$(_rsync_e)" \
     "${INSTANCE}:~/FATE_AlgoBot/data/intraday_train_checkpoint.json" "$ROOT/data/" 2>/dev/null || true
+  rsync -avz \
+    -e "$(_rsync_e)" \
+    "${INSTANCE}:~/FATE_AlgoBot/data/lstm_train_checkpoint.json" "$ROOT/data/" 2>/dev/null || true
   echo "[GCP] local daily models: $(ls "$ROOT/models/"*_model.pkl 2>/dev/null | wc -l | tr -d ' ')"
 }
 
 cmd_sync_env() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_env
 }
 
 cmd_sync_models() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_models
 }
 
@@ -280,11 +306,49 @@ cmd_down() {
   echo "[GCP] deleted $INSTANCE"
 }
 
+_ensure_instance_running() {
+  local status
+  status="$(gcloud compute instances describe "$INSTANCE" --zone="$ZONE" --format='value(status)' 2>/dev/null || true)"
+  if [ -z "$status" ]; then
+    echo "[GCP] $INSTANCE not found in $ZONE." >&2
+    return 1
+  fi
+  if [ "$status" = "RUNNING" ]; then
+    return 0
+  fi
+  echo "[GCP] $INSTANCE is $status — starting…"
+  gcloud compute instances start "$INSTANCE" --zone="$ZONE"
+  local i
+  for i in $(seq 1 18); do
+    if gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='true' >/dev/null 2>&1; then
+      echo "[GCP] $INSTANCE SSH ready"
+      return 0
+    fi
+    sleep 10
+  done
+  echo "[GCP] $INSTANCE started but SSH not ready yet" >&2
+  return 1
+}
+
 cmd_push_paper() {
-  INSTANCE="${GCP_INSTANCE:-fate-algobot-paper}"
+  INSTANCE="${GCP_PAPER_INSTANCE:-fate-algobot-paper}"
   _sync_code
-  echo "[GCP] refresh-paper on $INSTANCE (trainers untouched)…"
-  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='cd ~/FATE_AlgoBot && PAPER_USE_FORTRESS=true PAPER_USE_LONGTERM=true ./run_all.sh refresh-paper'
+  echo "[GCP] rebuild HFT + restart fortress/HFT on $INSTANCE (no sync-env, no hygiene hang)…"
+  # Do not put 'obi-tape' or paper_portfolio_hygiene.py in this --command string.
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export FATE_ORDER_ROLE=gcp-paper KEEP_STACK_ALWAYS_ONLINE=true PAPER_USE_FORTRESS=true NETWORK_FIRST=true && (cd hft && npm run build) && ./run_all.sh reload-intraday; ./run_all.sh reload-paper-hygiene; ./run_all.sh reload-stack-watchdog; ./run_all.sh paper-spare-ram; ./run_all.sh stop-hft-obi || true; ./run_all.sh ensure-subsecond; ./run_all.sh ensure-earnings || true; ./run_all.sh watchdog || true; bash cloud/install_paper_systemd.sh || true"'
+}
+
+cmd_push_train() {
+  INSTANCE="${GCP_TRAIN_INSTANCE:-fate-algobot-trainer}"
+  if ! gcloud compute instances describe "$INSTANCE" --zone="$ZONE" &>/dev/null; then
+    echo "[GCP] $INSTANCE not found. Create it with: $0 up" >&2
+    exit 1
+  fi
+  _ensure_instance_running || exit 1
+  _sync_code
+  # Keep the trainer's own .env. Mac sync-env has overwritten paper/order flags before.
+  echo "[GCP] resume cloud-train on $INSTANCE (no paper/HFT, no sync-env)…"
+  gcloud compute ssh "$INSTANCE" --zone="$ZONE" --command='bash -lc "cd ~/FATE_AlgoBot && export SKIP_PAPER_AUTO_TRAIN=true FATE_ORDER_ROLE=observe NETWORK_FIRST=true && ./run_all.sh cloud-train"'
 }
 
 case "${1:-}" in
@@ -297,9 +361,10 @@ case "${1:-}" in
   sync-env) cmd_sync_env ;;
   sync-models) cmd_sync_models ;;
   push-paper) cmd_push_paper ;;
+  push-train|ensure-train) cmd_push_train ;;
   down)     cmd_down "${2:-${GCP_INSTANCE:-}}" ;;
   *)
-    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|push-paper|down NAME}" >&2
+    echo "Usage: $0 {setup|up|paper|ssh|status|sync|sync-env|sync-models|push-paper|push-train|down NAME}" >&2
     exit 1
     ;;
 esac

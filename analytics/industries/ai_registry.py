@@ -32,9 +32,19 @@ def _load_json(path: Path, default: Any) -> Any:
 
 def _save_json(path: Path, doc: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".json.tmp")
+    tmp = path.parent / f".{path.name}.{os.getpid()}.tmp"
     tmp.write_text(json.dumps(doc, indent=2), encoding="utf-8")
-    os.replace(tmp, path)
+    try:
+        os.replace(tmp, path)
+    except FileNotFoundError:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(tmp, path)
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
 
 
 def load_ai_registry(*, reload: bool = False) -> dict[str, dict[str, Any]]:

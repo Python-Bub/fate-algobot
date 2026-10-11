@@ -1,0 +1,22 @@
+[Unit]
+Description=FATE AlgoBot stack watchdog (keeps HFT + all timeframes alive)
+After=network-online.target fate-algobot-paper.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=8
+User=demirgenc
+Group=demirgenc
+WorkingDirectory=/home/demirgenc/FATE_AlgoBot
+Environment=PAPER_USE_FORTRESS=true
+Environment=PAPER_USE_LONGTERM=true
+Environment=SKIP_PAPER_AUTO_TRAIN=true
+Environment=NETWORK_FIRST=true
+Environment=FATE_ORDER_ROLE=gcp-paper
+Environment=KEEP_STACK_ALWAYS_ONLINE=true
+ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./venv/bin/python -u tools/stack_watchdog.py >> logs/gcp_watchdog.log 2>&1'
+
+[Install]
+WantedBy=multi-user.target

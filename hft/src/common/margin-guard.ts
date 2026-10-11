@@ -1,6 +1,9 @@
 /**
  * Block new HFT entries when margin / buying power is too tight.
+ * Overnight cash is fortress's job (1.0×). HFT sizes from same-day DTBP.
  */
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { type AlpacaExecutor, type AccountSnapshot } from "./alpaca-exec.js";
 import { stdoutTag } from "./logger.js";
 
@@ -13,6 +16,36 @@ let refreshTimer: ReturnType<typeof setInterval> | null = null;
 function numEnv(name: string, fallback: number): number {
   const v = Number(process.env[name]);
   return Number.isFinite(v) ? v : fallback;
+}
+
+type BpPlan = {
+  hft_day_budget?: number;
+  hft_clip?: number;
+  leftover_cash?: number;
+  overnight_full?: boolean;
+};
+
+function loadPythonPlan(): BpPlan | null {
+  for (const p of [
+    resolve(process.cwd(), "data/ops/buying_power.json"),
+    resolve(process.cwd(), "../data/ops/buying_power.json"),
+  ]) {
+    if (!existsSync(p)) continue;
+    try {
+      return JSON.parse(readFileSync(p, "utf8")) as BpPlan;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function hftPool(snap: AccountSnapshot): number {
+  const plan = loadPythonPlan();
+  if (plan && Number(plan.hft_day_budget) > 0) return Number(plan.hft_day_budget);
+  const useDtbp = process.env.HFT_USE_DTBP !== "false";
+  const day = useDtbp ? snap.daytradingBuyingPower || snap.buyingPower : snap.buyingPower;
+  return Math.max(0, day * numEnv("HFT_BP_USE_FRAC", 0.85) - numEnv("HFT_BP_RESERVE_USD", 200));
 }
 
 export function startMarginGuard(broker: AlpacaExecutor): void {
@@ -44,20 +77,17 @@ export function canEnterBuy(notionalUsd: number): { ok: boolean; reason?: string
     return { ok: true };
   }
 
-  const minBp = numEnv("HFT_MIN_BUYING_POWER_USD", 5000);
-  const bpFrac = numEnv("HFT_BP_USE_FRAC", 0.35);
-  const reserve = numEnv("HFT_BP_RESERVE_USD", 10_000);
+  const minBp = numEnv("HFT_MIN_BUYING_POWER_USD", 2000);
   const minEquityMm = numEnv("HFT_MIN_EQUITY_TO_MM_RATIO", 1.15);
-
-  const bpRoom = Math.max(0, cache.buyingPower * bpFrac - reserve);
-  if (notionalUsd > bpRoom) {
+  const pool = hftPool(cache);
+  if (notionalUsd > pool) {
     return {
       ok: false,
-      reason: `bp-room ${bpRoom.toFixed(0)} < notional ${notionalUsd.toFixed(0)}`,
+      reason: `bp-room ${pool.toFixed(0)} < notional ${notionalUsd.toFixed(0)}`,
     };
   }
-  if (cache.buyingPower < minBp) {
-    return { ok: false, reason: `buying_power ${cache.buyingPower.toFixed(0)} < min ${minBp}` };
+  if (pool < minBp && cache.buyingPower < minBp && cache.daytradingBuyingPower < minBp) {
+    return { ok: false, reason: `hft-pool ${pool.toFixed(0)} < min ${minBp}` };
   }
   if (cache.maintenanceMargin > 0) {
     const ratio = cache.equity / cache.maintenanceMargin;
@@ -84,24 +114,28 @@ export function resolveHftNotionalUsd(baseNotional: number): number {
     return Math.max(100, baseNotional);
   }
   const floor = numEnv("HFT_MIN_ORDER_NOTIONAL", 200);
-  const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 2_500));
-  const slots = Math.max(1, numEnv("HFT_MAX_CONCURRENT_SLOTS", 12));
-  const bpFrac = numEnv("HFT_BP_USE_FRAC", 0.8);
-  const reserve = numEnv("HFT_BP_RESERVE_USD", 2000);
-
-  if (cache && cache.buyingPower > 0) {
-    const deployable = Math.max(0, cache.buyingPower * bpFrac - reserve);
-    const slot = deployable / slots;
-    return Math.max(floor, Math.min(cap, slot));
+  const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", 0) || numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 0);
+  const plan = loadPythonPlan();
+  if (plan && Number(plan.hft_clip) > 0) {
+    const clip = Number(plan.hft_clip);
+    const hi = cap > 0 ? Math.min(cap, clip) : clip;
+    return Math.max(floor, hi);
   }
-  // Before first account snapshot, use configured base (not hardcoded $1k default).
-  return Math.max(floor, Math.min(cap, baseNotional));
+  const slots = Math.max(1, numEnv("HFT_MAX_CONCURRENT_SLOTS", 16));
+  if (cache && (cache.daytradingBuyingPower > 0 || cache.buyingPower > 0)) {
+    const deployable = hftPool(cache);
+    const slot = deployable / slots;
+    const hi = cap > 0 ? Math.min(cap, slot) : slot;
+    return Math.max(floor, hi);
+  }
+  return Math.max(floor, Math.min(cap > 0 ? cap : 2_500, baseNotional));
 }
 
 /** Apply floor/cap AFTER confidence/news multipliers (resolveHftNotionalUsd clamps too early). */
 export function clampHftNotionalUsd(notional: number): number {
   const floor = numEnv("HFT_MIN_ORDER_NOTIONAL", 200);
-  const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 2_500));
+  const cap = numEnv("HFT_MAX_ORDER_NOTIONAL", 0) || numEnv("FORTRESS_GO_LIVE_MAX_NOTIONAL", 0);
   if (!(notional > 0) || !Number.isFinite(notional)) return floor;
-  return Math.max(floor, Math.min(cap, notional));
+  if (cap > 0) return Math.max(floor, Math.min(cap, notional));
+  return Math.max(floor, notional);
 }

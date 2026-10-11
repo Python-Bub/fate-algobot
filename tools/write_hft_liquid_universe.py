@@ -16,16 +16,18 @@ sys.path.insert(0, str(ROOT))
 OUT = Path(os.getenv("HFT_REST_TICKERS_FILE", str(ROOT / "data" / "ops" / "hft_rest_tickers.txt")))
 
 # Liquid single-names HFT can actually fill — not the fortress mega-cap book.
+# Cheap names first: 15¢ TP ticks clear IEX spread (edge-cost). Expensive
+# names (INTU/NOW) skip-all because 15 ticks is only a few bps.
 _LIQUID = (
-    "INTU,NOW,PANW,CRWD,PLTR,COIN,UBER,ABNB,SHOP,BA,CAT,GE,RTX,HON,DE,UNH,LLY,"
-    "PEP,DIS,NKE,PYPL,IBM,ORCL,CSCO,INTC,AMAT,LRCX,KLAC,ADI,TXN,AVGO,CRM,ADBE,"
-    "SNOW,NET,DDOG,ZS,OKTA,TEAM,WDAY,SQ,XYZ,MELI,SE,ARM,APP,SMCI,HOOD,SOFI,"
-    "RIVN,LCID,NIO,MARA,RIOT,MSTR,COIN,ROKU,SNAP,PINS,U,PATH,CFLT,ESTC,MDB,"
-    "TTD,ZG,BKNG,ABNB,DAL,UAL,AAL,LUV,F,GM,RCL,MAR,HLT,NCLH,CCL,WYNN,MGM,"
-    "CVX,COP,SLB,HAL,OXY,MPC,VLO,PSX,PFE,MRK,ABBV,BMY,GILD,AMGN,REGN,VRTX,"
-    "ISRG,SYK,BSX,MDT,TMO,DHR,UNH,ELV,CI,HUM,CVS,WBA,COST,TGT,HD,LOW,NKE,"
-    "SBUX,MCD,CMG,YUM,BKNG,AXP,V,MA,BLK,GS,MS,C,WFC,USB,PNC,SCHW,ICE,CME,"
-    "SPGI,MCO,ICE,NDAQ,DE,CAT,GE,HON,UNP,UPS,FDX,CSX,NSC,BA,LMT,NOC,GD,RTX"
+    "SOFI,MARA,RIOT,NIO,LCID,RIVN,HOOD,SNAP,ROKU,AAL,F,T,PFE,KEY,RF,HBAN,"
+    "DAL,UAL,LUV,CCL,NCLH,MGM,WYNN,HAL,SLB,OXY,INTC,CSCO,BA,GE,C,WFC,USB,"
+    "PINS,U,PATH,NU,GOLD,GM,RCL,MAR,HLT,PNC,SCHW,PYPL,DIS,NKE,IBM,ORCL,"
+    "INTU,NOW,PANW,CRWD,PLTR,COIN,UBER,ABNB,SHOP,CAT,RTX,HON,DE,UNH,LLY,"
+    "PEP,AMAT,LRCX,KLAC,ADI,TXN,AVGO,CRM,ADBE,SNOW,NET,DDOG,ZS,OKTA,TEAM,"
+    "WDAY,XYZ,MELI,SE,ARM,APP,SMCI,MSTR,MDB,TTD,ZG,BKNG,"
+    "CVX,COP,MPC,VLO,PSX,MRK,ABBV,BMY,GILD,AMGN,REGN,VRTX,ISRG,SYK,BSX,"
+    "MDT,TMO,DHR,ELV,CI,HUM,CVS,COST,TGT,HD,LOW,SBUX,MCD,CMG,YUM,"
+    "AXP,V,MA,BLK,GS,MS,ICE,CME,SPGI,MCO,NDAQ,UNP,UPS,FDX,CSX,NSC,LMT,NOC,GD"
 )
 
 
@@ -51,7 +53,7 @@ def _banned() -> set[str]:
     return {s.strip().upper() for s in raw.split(",") if s.strip()}
 
 
-def write_file(*, cap: int = 80) -> Path:
+def write_file(*, cap: int = 120) -> Path:
     held = _held()
     banned = _banned()
     seen: set[str] = set()
@@ -80,7 +82,7 @@ def write_file(*, cap: int = 80) -> Path:
 
 
 def main() -> int:
-    path = write_file(cap=int(os.getenv("HFT_REST_TICKER_CAP", "80")))
+    path = write_file(cap=int(os.getenv("HFT_REST_TICKER_CAP", "120")))
     n = len(path.read_text(encoding="utf-8").split(","))
     print(f"[hft-universe] {n} rest tickers → {path}")
     return 0

@@ -126,8 +126,11 @@ _EXPLORER_RECIPES: list[dict[str, Any]] = [
         ],
         "hft_rules": ["if float(metrics.get('alpha', 0) or 0) < 0:", "    delta -= 0.02"],
         "policy_lines": [
-            'hints["BUY_THRESHOLD"] = max(0.50, float(metrics.get("cur_buy", 0.55)) - 0.015)',
-            'hints["ORDER_NOTIONAL"] = min(float(metrics.get("cur_notional", 8000)) * 1.08, 45000.0)',
+            'if float(metrics.get("equity_delta") or metrics.get("alpha") or 0) < 0:',
+            '    hints["BUY_THRESHOLD"] = min(0.72, float(metrics.get("cur_buy", 0.55)) + 0.01)',
+            '    hints["ORDER_NOTIONAL"] = max(500.0, float(metrics.get("cur_notional", 8000)) * 0.90)',
+            'else:',
+            '    hints["BUY_THRESHOLD"] = max(0.55, float(metrics.get("cur_buy", 0.55)))',
         ],
     },
     {
@@ -141,7 +144,12 @@ _EXPLORER_RECIPES: list[dict[str, Any]] = [
         ],
         "paper_rules": ["boost += 0.03 * float(metrics.get('hit_rate', 0.5) - 0.5)"],
         "hft_rules": ["delta -= 0.01"],
-        "policy_lines": ['hints["BUY_THRESHOLD"] = max(0.50, float(metrics.get("cur_buy", 0.55)) - 0.01)'],
+        "policy_lines": [
+            'if float(metrics.get("equity_delta") or 0.0) <= 0:',
+            '    hints["BUY_THRESHOLD"] = min(0.72, float(metrics.get("cur_buy", 0.55)) + 0.01)',
+            'else:',
+            '    hints["BUY_THRESHOLD"] = max(0.55, float(metrics.get("cur_buy", 0.55)))',
+        ],
     },
     {
         "rationale": "beat_market — quality + deploy hard",
@@ -153,7 +161,10 @@ _EXPLORER_RECIPES: list[dict[str, Any]] = [
         ],
         "hft_rules": ["if float(metrics.get('deployed_frac', 0) or 0) < 0.4:", "    delta -= 0.03"],
         "policy_lines": [
-            'hints["ORDER_NOTIONAL"] = min(float(metrics.get("cur_notional", 8000)) * 1.10, 45000.0)',
+            'if float(metrics.get("equity_delta") or 0.0) <= 0:',
+            '    hints["ORDER_NOTIONAL"] = max(500.0, float(metrics.get("cur_notional", 8000)) * 0.90)',
+            'else:',
+            '    hints["ORDER_NOTIONAL"] = min(float(metrics.get("cur_notional", 8000)) * 1.04, 12000.0)',
         ],
     },
 ]

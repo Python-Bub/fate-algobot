@@ -30,12 +30,15 @@ class TestAgiObjective(unittest.TestCase):
     def test_custom_hooks_callable(self):
         from self_modify.custom_hooks import equity_rank_boost, fortress_size_mult, policy_priority_hints
 
-        b = equity_rank_boost("AAPL", 0.6, {"equity_delta": -10, "p_up": 0.62, "deployed_frac": 0.4})
-        self.assertGreaterEqual(b, -0.08)
-        self.assertLessEqual(b, 0.08)
-        m = fortress_size_mult({"deployed_frac": 0.3})
+        red = {"equity_delta": -10, "p_up": 0.62, "deployed_frac": 0.4}
+        b = equity_rank_boost("AAPL", 0.6, red)
+        self.assertEqual(b, 0.0)
+        m = fortress_size_mult({"equity_delta": -10, "deployed_frac": 0.3})
+        self.assertLess(m, 1.0)
         self.assertGreaterEqual(m, 0.85)
-        self.assertLessEqual(m, 1.25)
+        hints = policy_priority_hints({"equity_delta": -10, "cur_buy": 0.58, "cur_notional": 8000})
+        self.assertGreaterEqual(hints["BUY_THRESHOLD"], 0.58)
+        self.assertLessEqual(hints["ORDER_NOTIONAL"], 8000)
         hints = policy_priority_hints({"deployed_frac": 0.4, "cur_buy": 0.58, "cur_notional": 8000})
         self.assertIsInstance(hints, dict)
 

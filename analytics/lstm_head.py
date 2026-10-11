@@ -7,9 +7,11 @@ checkpoint to `models/lstm/{TICKER}_lstm.pt`. Inference happens via
 `lstm_proba_up(ticker, df)` and the result is blended into the meta-stack input
 when `BLEND_LSTM_INTO_META=true`.
 
-Architecture: 2-layer LSTM(`hidden=64`) → Dropout → Linear → sigmoid. Trained
-chronologically (last 20% bars held out). Falls back to no-op when PyTorch is
-unavailable or the bundle is missing.
+Architecture: LSTM(`LSTM_HIDDEN`×`LSTM_LAYERS`, default 256×4) → Dropout → Linear
+→ sigmoid. Trained chronologically (last 20% bars held out) with early stopping
+on holdout accuracy; the **best** weights are saved (not the last epoch).
+Checkpoints store `hidden`/`num_layers` so older 64×2 and 128×3 heads still load.
+Falls back to no-op when PyTorch is unavailable or the bundle is missing.
 """
 
 from __future__ import annotations
@@ -106,21 +108,44 @@ def _b(name: str, default: bool) -> bool:
     return v.strip().lower() in ("1", "true", "yes")
 
 
+def _lstm_arch() -> tuple[int, int, float]:
+    hidden = int(os.getenv("LSTM_HIDDEN", "256") or 256)
+    layers = int(os.getenv("LSTM_LAYERS", "4") or 4)
+    dropout = float(os.getenv("LSTM_DROPOUT", "0.2") or 0.2)
+    hidden = max(16, hidden)
+    layers = max(1, min(8, layers))
+    if layers <= 1:
+        dropout = 0.0
+    return hidden, layers, dropout
+
+
+def _torch_device():
+    if not _TORCH_OK:
+        return None
+    want = (os.getenv("LSTM_CUDA", "true") or "true").strip().lower() in ("1", "true", "yes")
+    if want and torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
+
+
 class _LSTMNet(nn.Module if _TORCH_OK else object):  # type: ignore[misc]
-    def __init__(self, n_features: int, hidden: int = 64, num_layers: int = 2, dropout: float = 0.2):
+    def __init__(self, n_features: int, hidden: int = 256, num_layers: int = 4, dropout: float = 0.2):
         super().__init__()
+        self.hidden = int(hidden)
+        self.num_layers = int(num_layers)
+        self.dropout_p = float(dropout if num_layers > 1 else 0.0)
         self.lstm = nn.LSTM(
             input_size=n_features,
-            hidden_size=hidden,
-            num_layers=num_layers,
+            hidden_size=self.hidden,
+            num_layers=self.num_layers,
             batch_first=True,
-            dropout=dropout,
+            dropout=self.dropout_p,
         )
         self.head = nn.Sequential(
-            nn.Linear(hidden, hidden // 2),
+            nn.Linear(self.hidden, max(16, self.hidden // 2)),
             nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden // 2, 1),
+            nn.Dropout(float(dropout)),
+            nn.Linear(max(16, self.hidden // 2), 1),
         )
 
     def forward(self, x: "torch.Tensor") -> "torch.Tensor":
@@ -163,9 +188,10 @@ def train_lstm_head(
     if df.empty or target_col not in df.columns:
         return {"skipped": "no_target"}
 
-    seq_len = int(seq_len or os.getenv("LSTM_SEQ_LEN", "30"))
-    epochs = int(epochs or os.getenv("LSTM_EPOCHS", "12"))
+    seq_len = int(seq_len or os.getenv("LSTM_SEQ_LEN", "80"))
+    epochs = int(epochs or os.getenv("LSTM_EPOCHS", "24"))
     lr = float(lr or os.getenv("LSTM_LR", "1e-3"))
+    hidden, num_layers, dropout = _lstm_arch()
 
     use_cols = [c for c in feat_cols if c in df.columns]
     if len(use_cols) < 4:
@@ -217,10 +243,13 @@ def train_lstm_head(
     X_tr = (X_tr - mu) / sd
     X_te = (X_te - mu) / sd
 
-    device = torch.device("cpu")
-    net = _LSTMNet(n_features=len(use_cols)).to(device)
+    device = _torch_device()
+    net = _LSTMNet(
+        n_features=len(use_cols), hidden=hidden, num_layers=num_layers, dropout=dropout
+    ).to(device)
     opt = torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=1e-4)
     loss_fn = nn.BCEWithLogitsLoss()
+    sched = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, mode="max", factor=0.5, patience=2)
 
     Xt = torch.from_numpy(X_tr).to(device)
     yt = torch.from_numpy(y_tr).to(device)
@@ -228,7 +257,10 @@ def train_lstm_head(
     ye = torch.from_numpy(y_te).to(device)
 
     batch = int(os.getenv("LSTM_BATCH", "256"))
-    best_test_acc = 0.0
+    patience = int(os.getenv("LSTM_EARLY_STOP_PATIENCE", "5") or 5)
+    best_test_acc = -1.0
+    best_state = None
+    stale = 0
     for ep in range(epochs):
         net.train()
         idx = torch.randperm(len(Xt))
@@ -238,29 +270,58 @@ def train_lstm_head(
             logit = net(Xt[sel])
             loss = loss_fn(logit, yt[sel])
             loss.backward()
+            nn.utils.clip_grad_norm_(net.parameters(), 1.0)
             opt.step()
         net.eval()
         with torch.no_grad():
-            p_te = torch.sigmoid(net(Xe))
-            acc = float(((p_te > 0.5).float() == ye).float().mean().item())
-        best_test_acc = max(best_test_acc, acc)
-        log.info("[LSTM] %s ep=%d test_acc=%.4f", ticker, ep + 1, acc)
+            if len(Xe) > 0:
+                p_te = torch.sigmoid(net(Xe))
+                acc = float(((p_te > 0.5).float() == ye).float().mean().item())
+            else:
+                p_tr = torch.sigmoid(net(Xt))
+                acc = float(((p_tr > 0.5).float() == yt).float().mean().item())
+        sched.step(acc)
+        if acc > best_test_acc:
+            best_test_acc = acc
+            best_state = {k: v.detach().cpu().clone() for k, v in net.state_dict().items()}
+            stale = 0
+        else:
+            stale += 1
+        log.info("[LSTM] %s ep=%d test_acc=%.4f best=%.4f", ticker, ep + 1, acc, best_test_acc)
+        if patience > 0 and stale >= patience:
+            log.info("[LSTM] %s early-stop at ep=%d", ticker, ep + 1)
+            break
+
+    if best_state is not None:
+        net.load_state_dict(best_state)
+    if best_test_acc < 0:
+        best_test_acc = 0.0
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     out_path = lstm_model_path(ticker)
     torch.save(
         {
-            "state_dict": net.state_dict(),
+            "state_dict": {k: v.cpu() for k, v in net.state_dict().items()},
             "feat_cols": use_cols,
             "seq_len": seq_len,
             "mu": mu.tolist(),
             "sd": sd.tolist(),
             "target_col": target_col,
             "test_acc": best_test_acc,
+            "hidden": hidden,
+            "num_layers": num_layers,
+            "dropout": dropout,
         },
         out_path,
     )
-    return {"saved": str(out_path), "test_acc": best_test_acc, "rows": int(n)}
+    return {
+        "saved": str(out_path),
+        "test_acc": best_test_acc,
+        "rows": int(n),
+        "hidden": hidden,
+        "num_layers": num_layers,
+        "seq_len": seq_len,
+    }
 
 
 def _load_bundle(ticker: str):
@@ -286,7 +347,7 @@ def lstm_proba_up(ticker: str, df: pd.DataFrame) -> float | None:
     if bundle is None:
         return None
     feat_cols = list(bundle.get("feat_cols") or [])
-    seq_len = int(bundle.get("seq_len") or 30)
+    seq_len = int(bundle.get("seq_len") or 60)
     if df.empty or not feat_cols:
         return None
     missing = [c for c in feat_cols if c not in df.columns]
@@ -301,10 +362,28 @@ def lstm_proba_up(ticker: str, df: pd.DataFrame) -> float | None:
     sd = np.asarray(bundle["sd"], dtype=np.float32)
     seq = ((X[-seq_len:] - mu) / sd)[None, :, :]
 
-    net = _LSTMNet(n_features=len(feat_cols))
+    hidden = int(bundle.get("hidden") or 64)
+    num_layers = int(bundle.get("num_layers") or 2)
+    dropout = float(bundle.get("dropout") or 0.2)
+    net = _LSTMNet(
+        n_features=len(feat_cols), hidden=hidden, num_layers=num_layers, dropout=dropout
+    )
     net.load_state_dict(bundle["state_dict"])
     net.eval()
     with torch.no_grad():
         logit = net(torch.from_numpy(seq))
         p = float(torch.sigmoid(logit).item())
     return p
+
+
+def lstm_head_needs_upgrade(ticker: str) -> bool:
+    """True when on-disk arch is smaller than the live LSTM_HIDDEN×LSTM_LAYERS cook."""
+    if os.getenv("LSTM_UPGRADE_SMALLER", "true").lower() not in ("1", "true", "yes"):
+        return False
+    bundle = _load_bundle(ticker)
+    if not isinstance(bundle, dict):
+        return False
+    want_h, want_l, _ = _lstm_arch()
+    have_h = int(bundle.get("hidden") or 0)
+    have_l = int(bundle.get("num_layers") or 0)
+    return have_h < want_h or have_l < want_l

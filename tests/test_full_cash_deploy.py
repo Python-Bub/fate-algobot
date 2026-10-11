@@ -103,10 +103,10 @@ def test_idle_split_reserves_crypto_gap_before_stocks(monkeypatch):
         positions=[
             {"symbol": "BTCUSD", "qty": "0.1", "market_value": "12755", "unrealized_plpc": "0.01"},
             {"symbol": "ETHUSD", "qty": "5", "market_value": "12673", "unrealized_plpc": "-0.001"},
-            {"symbol": "AAPL", "qty": "10", "market_value": "5564", "unrealized_plpc": "1.4"},
-            {"symbol": "MSFT", "qty": "10", "market_value": "6820", "unrealized_plpc": "1.7"},
-            {"symbol": "GOOGL", "qty": "10", "market_value": "2530", "unrealized_plpc": "1.2"},
-            {"symbol": "AMZN", "qty": "10", "market_value": "2518", "unrealized_plpc": "1.1"},
+            {"symbol": "AAPL", "qty": "10", "market_value": "5564", "unrealized_plpc": "0.02"},
+            {"symbol": "MSFT", "qty": "10", "market_value": "6820", "avg_entry_price": "-600", "unrealized_plpc": "1.7"},
+            {"symbol": "GOOGL", "qty": "10", "market_value": "2530", "unrealized_plpc": "0.02"},
+            {"symbol": "AMZN", "qty": "10", "market_value": "2518", "unrealized_plpc": "0.02"},
         ],
         equity=71_394.0,
         max_single_usd=7_139.0,
@@ -116,6 +116,7 @@ def test_idle_split_reserves_crypto_gap_before_stocks(monkeypatch):
     )
     assert extra.get("SOL-USD", 0) > 9_000
     assert extra.get("AAPL", 0) + extra.get("GOOGL", 0) + extra.get("AMZN", 0) > 5_000
+    assert "MSFT" not in extra  # negative entry + 170% plpc is not a winner
     assert "BTCUSD" not in extra  # already at 18% cap
 
 
@@ -153,3 +154,44 @@ def test_idle_addon_allows_winners_not_losers(monkeypatch):
     rm.can_open = lambda *_a, **_k: True  # noqa: E731
     assert can_add_position(rm, "BTCUSD", 2_500.0, 80_000.0, 70_000.0, existing_mv=2_650.0) is True
     assert can_add_position(rm, "LCID", 200.0, 5.0, 4.0, existing_mv=98.0) is False
+
+
+def test_addon_on_still_refuses_red_when_winners_only(monkeypatch):
+    from types import SimpleNamespace
+
+    from fortress_portfolio import can_add_position
+
+    monkeypatch.setenv("FORTRESS_ALLOW_ADD_ON", "true")
+    monkeypatch.setenv("FORTRESS_WINNERS_ONLY", "true")
+    monkeypatch.setenv("FORTRESS_MIN_ADD_GAIN", "0")
+    monkeypatch.setenv("FORTRESS_SINGLE_CAP_USE_EQUITY", "true")
+    monkeypatch.setenv("USE_BUYING_POWER", "false")
+    monkeypatch.setattr(
+        "intel.downward_pressure.blocks_new_buy",
+        lambda *_a, **_k: (False, ""),
+    )
+
+    def _pos(sym: str):
+        s = str(sym).upper()
+        if "LCID" in s:
+            return {"unrealized_plpc": -0.08, "qty": 19, "avg_entry_price": 5.7}
+        return {"unrealized_plpc": 0.09, "qty": 0.03, "avg_entry_price": 74000}
+
+    monkeypatch.setattr("alpaca_broker.get_position", _pos)
+    rm = SimpleNamespace(equity=72_000.0, total_gross_exposure=lambda: 29_000.0)
+    rm.can_open = lambda *_a, **_k: True  # noqa: E731
+    assert can_add_position(rm, "LCID", 200.0, 5.0, 4.0, existing_mv=98.0) is False
+
+
+def test_fortress_keeps_held_idle_when_scan_scores_nothing():
+    from pathlib import Path
+
+    text = Path(__file__).resolve().parents[1].joinpath("fortress_live.py").read_text()
+    assert "skip idle-cash fill — scan scored 0 ticks this pass" not in text
+    assert "keep held idle fills" in text
+    assert "FORTRESS_CRYPTO_TICK_TIMEOUT_SEC" in text
+    assert 'os.environ["FORTRESS_LITE_INTEL"] = "true"' in text
+    assert "weekend idle-cash" in text
+    assert "weekend fill — keep cooldown holds" in text
+    assert "lite tick" in text
+    assert "overnight_cash_deploy can make buy_ok true" in text

@@ -24,7 +24,11 @@ fi
 PAPER_USE_FORTRESS="${PAPER_USE_FORTRESS:-true}"
 PAPER_USE_LONGTERM="${PAPER_USE_LONGTERM:-true}"
 SKIP_PAPER_AUTO_TRAIN="${SKIP_PAPER_AUTO_TRAIN:-true}"
+FATE_ORDER_ROLE="${FATE_ORDER_ROLE:-gcp-paper}"
 
 tmux kill-session -t paper 2>/dev/null || true
-tmux new-session -d -s paper "cd ~/FATE_AlgoBot && export PAPER_USE_FORTRESS=${PAPER_USE_FORTRESS} PAPER_USE_LONGTERM=${PAPER_USE_LONGTERM} SKIP_PAPER_AUTO_TRAIN=${SKIP_PAPER_AUTO_TRAIN} && ./run_all.sh paper 2>&1 | tee -a logs/gcp_paper.log; exec bash"
+tmux new-session -d -s paper "cd ~/FATE_AlgoBot && export PAPER_USE_FORTRESS=${PAPER_USE_FORTRESS} PAPER_USE_LONGTERM=${PAPER_USE_LONGTERM} SKIP_PAPER_AUTO_TRAIN=${SKIP_PAPER_AUTO_TRAIN} FATE_ORDER_ROLE=${FATE_ORDER_ROLE} KEEP_STACK_ALWAYS_ONLINE=true && ./run_all.sh paper 2>&1 | tee -a logs/gcp_paper.log; exec bash"
 echo "[REMOTE] tmux session 'paper' started. Attach: tmux attach -t paper"
+if command -v sudo >/dev/null 2>&1; then
+  bash ~/FATE_AlgoBot/cloud/install_paper_systemd.sh || echo "[REMOTE] systemd paper unit skipped"
+fi

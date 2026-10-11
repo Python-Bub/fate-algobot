@@ -108,14 +108,23 @@ export function flattenDebounceMs(): number {
 }
 
 /**
+ * IOC must take the offer. Buy-low + IOC was fire:0 (bid-anchored IOC cancels).
+ * DAY TIF can still sit on the bid when HFT_AGGRESSIVE_ENTRY is not true.
+ */
+export function wantAggressiveEntry(): boolean {
+  if (process.env.HFT_AGGRESSIVE_ENTRY === "false") return false;
+  if (process.env.HFT_AGGRESSIVE_ENTRY === "true") return true;
+  return (process.env.HFT_LIMIT_TIF || "").toLowerCase() === "ioc";
+}
+
+/**
  * Entry limits — MR default is buy LOW / sell HIGH (bid-anchored entries).
- * Set HFT_AGGRESSIVE_ENTRY=true to chase ask/bid for guaranteed IOC fills.
+ * IOC (or HFT_AGGRESSIVE_ENTRY=true) chases ask/bid so clips actually fill.
  */
 export function entryLimitPx(side: "buy" | "sell", book: L2Book): number | null {
   const slipBps = Number(process.env.HFT_LIMIT_SLIP_BPS ?? 8) / 10_000;
   const tick = CFG.tickSize;
-  const buyLow = (process.env.HFT_BUY_LOW ?? "true").toLowerCase() === "true";
-  const aggressive = process.env.HFT_AGGRESSIVE_ENTRY === "true" && !buyLow;
+  const aggressive = wantAggressiveEntry();
   const wide = spreadBps(book) > Number(process.env.HFT_TIGHT_SPREAD_BPS ?? 25);
   if (side === "buy") {
     if (!(book.bestAsk > 0 && book.bestBid > 0)) return null;
@@ -127,11 +136,9 @@ export function entryLimitPx(side: "buy" | "sell", book: L2Book): number | null 
       const capped = Math.min(Math.max(tick, px), book.bestAsk - tick);
       return roundLimit(Math.max(tick, capped));
     }
+    // IOC / aggressive: must be at or through the ask or the clip cancels.
     const askPx = book.bestAsk * (1 + slipBps) + tick;
-    const midPx = book.mid > 0 ? book.mid * (1 + slipBps) : askPx;
-    const bidAnchored = book.bestBid + tick * 2;
-    const px = wide ? Math.min(midPx, bidAnchored, askPx) : Math.min(askPx, midPx);
-    return roundLimit(px);
+    return roundLimit(askPx);
   }
   if (!(book.bestBid > 0 && book.bestAsk > 0)) return null;
   if (!aggressive) {
@@ -143,10 +150,7 @@ export function entryLimitPx(side: "buy" | "sell", book: L2Book): number | null 
     return roundLimit(capped);
   }
   const bidPx = Math.max(tick, book.bestBid * (1 - slipBps) - tick);
-  const midPx = book.mid > 0 ? book.mid * (1 - slipBps) : bidPx;
-  const askAnchored = book.bestAsk - tick * 2;
-  const px = wide ? Math.max(midPx, askAnchored, bidPx) : Math.max(bidPx, midPx);
-  return roundLimit(px);
+  return roundLimit(bidPx);
 }
 
 /**

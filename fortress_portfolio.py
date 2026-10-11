@@ -24,17 +24,9 @@ def _f(name: str, default: float) -> float:
 
 
 def _position_gain_frac(pos: dict) -> float | None:
-    uplpc = pos.get("unrealized_plpc")
-    if uplpc is not None:
-        return float(uplpc)
-    try:
-        entry = float(pos.get("avg_entry_price") or 0)
-        cur = float(pos.get("current_price") or 0)
-        if entry > 0 and cur > 0:
-            return (cur - entry) / entry
-    except (TypeError, ValueError):
-        pass
-    return None
+    from analytics.position_gain import sane_unrealized_gain
+
+    return sane_unrealized_gain(pos)
 
 
 def maybe_trim_index_etfs_for_force(
@@ -130,7 +122,10 @@ def liquidate_losing_positions() -> int:
             if not _hygiene_min_hold_ok(p):
                 continue
             q = get_quote_bid_ask(sym)
-            if q and not quote_is_sane(q[0], q[1]):
+            hard = _f("FORTRESS_HARD_STOP_PCT", 0.04)
+            # Wide paper NBBOs must not block a real structural loss (BCH −8% sat
+            # for days because every crypto quote looked "too wide" to stop).
+            if q and not quote_is_sane(q[0], q[1]) and gain > -hard:
                 if os.getenv("PAPER_HYGIENE_AGGRESSIVE", "false").lower() not in (
                     "1",
                     "true",
@@ -162,6 +157,82 @@ def liquidate_losing_positions() -> int:
                     pass
     except Exception as e:
         log.debug("[PORTFOLIO] liquidate losers: %s", e)
+    return closed
+
+
+def enforce_hard_stops() -> int:
+    """Cut longs past FORTRESS_HARD_STOP_PCT even when soft hygiene is off.
+
+    Crypto bought by the idle-cash sleeve was skipped by the HFT daemon
+    (fortress already held it) and never reached the aggressive liquidator,
+    so BCH −8% and LTC −5% just sat in the book.
+    """
+    closed = 0
+    hard = _f("FORTRESS_HARD_STOP_PCT", 0.04)
+    if hard <= 0:
+        return 0
+    try:
+        from alpaca_broker import close_position_alpaca, list_positions
+
+        for p in list_positions() or []:
+            qty = float(p.get("qty") or 0)
+            if qty <= 0 or str(p.get("side") or "").lower() == "short":
+                continue
+            gain = _position_gain_frac(p)
+            if gain is None or gain > -hard:
+                continue
+            sym = str(p.get("symbol", "")).replace("/", "-").upper()
+            if not sym or _hygiene_protected(sym) or _hygiene_close_skip(sym):
+                continue
+            if close_position_alpaca(sym, force=True):
+                closed += 1
+                log.warning(
+                    "[PORTFOLIO] hard stop %s gain=%.2f%% (cut %.2f%%)",
+                    sym,
+                    100 * gain,
+                    100 * hard,
+                )
+                try:
+                    from online_learning.trade_feedback import learn_from_realized_trade
+
+                    learn_from_realized_trade(sym, "LONG", float(gain), source="hard_stop")
+                except Exception:
+                    pass
+    except Exception as e:
+        log.debug("[PORTFOLIO] hard stop: %s", e)
+    return closed
+
+
+def flatten_phantom_dust() -> int:
+    """One full close for sub-$25 lots whose cost basis is not real.
+
+    Partial trims of those lots were a geometric 25% sell every few minutes.
+    """
+    closed = 0
+    dust = _f("ALPACA_DUST_FULL_CLOSE_USD", 25.0)
+    if dust <= 0:
+        return 0
+    try:
+        from alpaca_broker import close_position_alpaca, list_positions
+        from analytics.position_gain import is_phantom_cost_basis
+
+        for p in list_positions() or []:
+            qty = float(p.get("qty") or 0)
+            if qty <= 0:
+                continue
+            mv = abs(float(p.get("market_value") or 0))
+            if mv <= 0 or mv > dust:
+                continue
+            if not is_phantom_cost_basis(p):
+                continue
+            sym = str(p.get("symbol", "")).replace("/", "-").upper()
+            if not sym or _hygiene_protected(sym) or _hygiene_close_skip(sym):
+                continue
+            if close_position_alpaca(sym, force=True):
+                closed += 1
+                log.warning("[PORTFOLIO] phantom dust close %s mv=$%.2f", sym, mv)
+    except Exception as e:
+        log.debug("[PORTFOLIO] phantom dust: %s", e)
     return closed
 
 
@@ -349,7 +420,7 @@ def liquidate_outside_obi_scope() -> int:
 
 def paper_portfolio_hygiene() -> dict[str, int]:
     """Shorts + losers + off-scope / news-blocked names."""
-    aggressive = os.getenv("PAPER_HYGIENE_AGGRESSIVE", "true").lower() in ("1", "true", "yes")
+    aggressive = os.getenv("PAPER_HYGIENE_AGGRESSIVE", "false").lower() in ("1", "true", "yes")
     return {
         "shorts": close_all_short_positions(),
         "losers": liquidate_losing_positions() if aggressive else 0,
@@ -484,6 +555,12 @@ def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
                 ctx["multiplier"] = float(acct.get("multiplier") or 0.0)
             except (TypeError, ValueError):
                 ctx["multiplier"] = 0.0
+            try:
+                ctx["daytrading_buying_power"] = float(
+                    acct.get("daytrading_buying_power") or acct.get("buying_power") or 0.0
+                )
+            except (TypeError, ValueError):
+                ctx["daytrading_buying_power"] = ctx["buying_power"]
             rm.equity = ctx["equity"]
 
         rm.legs.clear()
@@ -510,13 +587,32 @@ def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
         ctx["gross_mv"] = gross
         ctx["position_count"] = n
         ctx["deployed_frac"] = gross / max(ctx["equity"], 1e-9)
-        log.info(
-            "[FORTRESS] portfolio equity=$%.0f deployed=%.1f%% positions=%d bp=$%.0f",
-            ctx["equity"],
-            100 * ctx["deployed_frac"],
-            n,
-            ctx["buying_power"],
-        )
+        try:
+            from analytics.buying_power import plan_from_account
+
+            plan = plan_from_account(acct or {}, pos, persist=True)
+            ctx["overnight_budget"] = plan.overnight_budget
+            ctx["overnight_clip"] = plan.overnight_clip
+            log.info(
+                "[FORTRESS] portfolio equity=$%.0f cash=$%.0f deployed=%.1f%% gap=$%.0f "
+                "clip=$%.0f positions=%d bp=$%.0f dtbp=$%.0f",
+                ctx["equity"],
+                ctx["cash"],
+                100 * ctx["deployed_frac"],
+                plan.overnight_gap,
+                plan.overnight_clip,
+                n,
+                ctx["buying_power"],
+                ctx.get("daytrading_buying_power") or 0,
+            )
+        except Exception:
+            log.info(
+                "[FORTRESS] portfolio equity=$%.0f deployed=%.1f%% positions=%d bp=$%.0f",
+                ctx["equity"],
+                100 * ctx["deployed_frac"],
+                n,
+                ctx["buying_power"],
+            )
     except Exception as e:
         log.debug("[FORTRESS] portfolio sync: %s", e)
     return ctx
@@ -531,16 +627,10 @@ def position_snapshot(ticker: str) -> tuple[float, float | None]:
         if not pos or float(pos.get("qty") or 0) <= 0:
             return 0.0, None
         mv = abs(float(pos.get("market_value") or 0))
-        px = float(pos.get("current_price") or pos.get("avg_entry_price") or 0)
-        uplpc = pos.get("unrealized_plpc")
-        if uplpc is not None:
-            gain = float(uplpc)
-        elif px > 0:
-            entry = float(pos.get("avg_entry_price") or 0)
-            gain = (px - entry) / entry if entry > 0 else None
-        else:
-            gain = None
-        return mv, gain
+        from analytics.position_gain import sane_unrealized_gain
+
+        px = float(pos.get("current_price") or 0)
+        return mv, sane_unrealized_gain(pos, px if px > 0 else None)
     except Exception:
         return 0.0, None
 
@@ -714,10 +804,15 @@ def allocate_idle_cash_to_holds(
             qty = 0.0
         if qty <= 0:
             continue
-        # Idle cash goes into winners / flat — never average into a loser.
+        # Idle cash goes into winners / flat — never average into a loser
+        # or a phantom +100% cost basis (negative avg entry).
         try:
-            gain = p.get("unrealized_plpc")
-            if gain is not None and float(gain) < -1e-9:
+            from analytics.position_gain import is_phantom_cost_basis
+
+            if is_phantom_cost_basis(p):
+                continue
+            gain = _position_gain_frac(p)
+            if gain is not None and gain < -1e-9:
                 continue
         except (TypeError, ValueError):
             pass
@@ -903,31 +998,40 @@ def deploy_budget_usd(portfolio: dict) -> dict:
     """
     Capital still available for new/add buys under risk caps.
 
-    Risk model (default):
-    - Per-name ~FORTRESS_MAX_SINGLE_FRAC of *equity* (concentration risk).
-    - Total gross book → ~MAX_GROSS_LEVERAGE × equity (buying_power / margin).
-    - Each order still gated by *remaining* buying_power × FORTRESS_BP_USE_FRAC.
+    Overnight: cash/equity gap at 1.0× (see analytics.buying_power). Never the
+    leftover 4× PDT number. Per-name cap is a fraction of equity.
     """
+    from analytics.buying_power import (
+        clip_ceiling_usd,
+        equity_single_cap,
+        overnight_target_frac,
+        plan_from_account,
+        sizing_slots,
+    )
+
     equity = float(portfolio.get("equity") or 100_000.0)
     buying_power = float(portfolio.get("buying_power") or equity)
     multiplier = float(portfolio.get("multiplier") or 0.0)
     gross_mv = gross_mv_of(portfolio)
+    cash = float(portfolio.get("cash") or 0.0)
     use_bp = use_buying_power_sizing()
     total_capacity = gross_capacity_usd(portfolio)
-    max_gross_frac = min(
-        1.0,
-        _f("FORTRESS_MAX_GROSS_FRAC", _f("HF_MAX_GROSS_FRAC", 1.0)),
-    )
-    # Equity target 100% = all cash in stocks. BP only funds that gap — not 4×.
     use_eq_target = _truthy("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
+    target_frac = overnight_target_frac()
     target_base = equity if use_eq_target else (total_capacity if use_bp else equity)
-    target_frac = min(_f("FORTRESS_TARGET_DEPLOY_FRAC", 1.0), max_gross_frac)
-    bp_frac = _f("FORTRESS_BP_USE_FRAC", 1.0)
-    if idle_cash_fill_active({"equity": equity, "gross_mv": gross_mv}):
-        bp_frac = max(bp_frac, 1.0)
-    gap = max(0.0, target_base * target_frac - gross_mv)
-    budget = min(gap, max(0.0, buying_power * bp_frac))
-    max_single = equity_single_cap_usd(equity)
+    plan = plan_from_account(
+        {
+            "equity": equity,
+            "cash": cash if cash > 0 else max(0.0, equity - gross_mv),
+            "buying_power": buying_power,
+            "daytrading_buying_power": float(portfolio.get("daytrading_buying_power") or buying_power),
+            "long_market_value": gross_mv,
+        },
+        portfolio.get("positions") or [],
+        persist=False,
+    )
+    budget = float(plan.overnight_budget)
+    max_single = equity_single_cap(equity)
     return {
         "equity": equity,
         "buying_power": buying_power,
@@ -939,6 +1043,9 @@ def deploy_budget_usd(portfolio: dict) -> dict:
         "target_usd": target_base * target_frac,
         "budget": budget,
         "max_single_usd": max_single,
+        "overnight_clip": float(plan.overnight_clip),
+        "sizing_slots": sizing_slots(),
+        "clip_ceiling": clip_ceiling_usd(equity),
         "deployed_frac_equity": gross_mv / max(equity, 1e-9),
         "deployed_frac_capacity": gross_mv / max(total_capacity, 1e-9),
         "use_eq_target": use_eq_target,
@@ -977,13 +1084,25 @@ def fortress_order_notional(
     cap_base = total_capacity if use_bp else equity
     deployed = gross_mv / max(target_base, 1e-9)
 
+    from analytics.buying_power import (
+        clip_ceiling_usd,
+        fortress_ticket_usd,
+        order_hard_max_usd,
+        sizing_slots,
+    )
+
     target_deploy = min(_f("FORTRESS_TARGET_DEPLOY_FRAC", 1.0), max_gross_frac)
-    max_names = int(_f("FORTRESS_MAX_POSITIONS", 500))
-    if max_names <= 0:
-        max_names = 500
-    max_names = max(1, max_names)
+    max_names = sizing_slots()
     floor = _f("MIN_ORDER_NOTIONAL", 100.0)
-    base = _f("ORDER_NOTIONAL", 2500.0)
+    ceil = clip_ceiling_usd(equity)
+    # HARD_MAX=0 / ORDER_NOTIONAL=0 → equity single-cap, never a $2,500 crumb.
+    # Skip policy_agent ORDER_NOTIONAL here so AGI cannot re-spray leftover cash.
+    try:
+        base = float(os.getenv("ORDER_NOTIONAL") or 0)
+    except (TypeError, ValueError):
+        base = 0.0
+    if order_hard_max_usd() <= 0 or base <= 0:
+        base = ceil if ceil > 0 else max(floor, equity * 0.08)
 
     slot = target_base * target_deploy / max_names
     # Conviction curve: high confidence → near single-name cap; weak/risky → small probe.
@@ -1031,7 +1150,7 @@ def fortress_order_notional(
             n = min(n, max(base, slot))
     else:
         n = max(base, slot) * conf_mult * max(scale, 0.0)
-    go_live_cap = float(os.getenv("FORTRESS_GO_LIVE_MAX_NOTIONAL", "0") or 0)
+    go_live_cap = ceil
     if go_live_cap > 0:
         n = min(n, go_live_cap)
 
@@ -1054,7 +1173,7 @@ def fortress_order_notional(
         else cap_base * _f("FORTRESS_MAX_SINGLE_FRAC", 0.09)
     )
 
-    allow_dca = _truthy("FORTRESS_ALLOW_DCA", "true")
+    allow_dca = _truthy("FORTRESS_ALLOW_DCA", "false")
     min_dip = _f("FORTRESS_DCA_MIN_DIP", 0.002)
     if allow_dca and existing_mv > 0 and existing_gain is not None and existing_gain < -min_dip:
         dip = abs(existing_gain)
@@ -1073,7 +1192,11 @@ def fortress_order_notional(
         n = min(n, room)
 
     n = min(n, max_single if existing_mv <= 0 else max(0.0, max_single - existing_mv))
-    n = min(n, buying_power * _f("FORTRESS_BP_USE_FRAC", 1.0))
+    cash_room = float(portfolio.get("cash") or 0.0)
+    if cash_room <= 1.0:
+        cash_room = max(0.0, equity - gross_mv)
+    # Overnight tickets spend cash / the 1.0× gap — leftover 4× buying_power is HFT's pool.
+    n = min(n, cash_room * _f("FORTRESS_BP_USE_FRAC", 1.0))
     # Strong JP candle + under-deploy → use more of the book
     jp_mult = float(os.getenv("FORTRESS_JP_NOTIONAL_MULT", "1.0"))
     if jp_mult > 1.0 and deployed < target_deploy - 0.05:
@@ -1083,12 +1206,18 @@ def fortress_order_notional(
     room_total = max(0.0, target_base * target_deploy - gross_mv)
     if use_bp and not use_eq_target:
         room_total = max(0.0, cap_base * max_gross_frac - gross_mv)
-    pos_n = max(0, int(portfolio.get("position_count") or 0))
-    slots_left = max(1, max_names - pos_n)
     if existing_mv <= 0:
-        # Remaining BP already nets current exposure — do not subtract gross again.
-        bp_room = max(0.0, buying_power * _f("FORTRESS_BP_USE_FRAC", 1.0))
-        n = min(n, room_total, bp_room / slots_left)
+        # Fill idle overnight cash — calculator ticket is a FLOOR, not min() with a
+        # $144 slot crumb. `or n` used to keep the tiny n when ticket was 0.
+        ticket = fortress_ticket_usd(
+            equity=equity,
+            existing_mv=0.0,
+            leftover_budget=room_total,
+        )
+        if ticket > 0:
+            n = min(max(n, ticket), room_total, ceil if ceil > 0 else ticket)
+        else:
+            n = min(n, room_total)
     else:
         n = min(n, room_total, max(0.0, max_single - existing_mv))
 
@@ -1108,6 +1237,27 @@ def can_add_position(
         return False
     if existing_mv <= 0:
         return rm.can_open(symbol, notional, entry, stop)
+    gain = None
+    try:
+        from alpaca_broker import get_position
+
+        pos = get_position(symbol)
+        if pos:
+            from analytics.position_gain import is_phantom_cost_basis
+
+            if is_phantom_cost_basis(pos):
+                return False
+            gain = _position_gain_frac(pos)
+    except Exception:
+        gain = None
+    try:
+        from analytics.buying_power import hold_is_green
+
+        if not hold_is_green(gain):
+            return False
+    except Exception:
+        if gain is not None and gain < -1e-9:
+            return False
     if not _truthy("FORTRESS_ALLOW_ADD_ON", "true"):
         # Idle cash may add to winners / crypto. Never average into a red name.
         port = {
@@ -1119,17 +1269,6 @@ def can_add_position(
         except Exception:
             port["gross_mv"] = float(existing_mv)
         if not idle_cash_fill_active(port):
-            return False
-        gain = None
-        try:
-            from alpaca_broker import get_position
-
-            pos = get_position(symbol)
-            if pos:
-                gain = _position_gain_frac(pos)
-        except Exception:
-            gain = None
-        if gain is not None and gain < -1e-9:
             return False
     try:
         from intel.downward_pressure import blocks_new_buy

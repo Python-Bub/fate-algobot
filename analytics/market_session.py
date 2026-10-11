@@ -359,6 +359,13 @@ def orders_allowed(side: str = "buy", *, for_hft: bool = False, symbol: str | No
         return ok, f"session={sess.value} exit_mode={exit_mode}"
 
     if overnight_cash:
+        # Leftover cash may buy when NYSE is closed. Midday chop still stays HFT-only.
+        if side_l in ("buy", "any") and not for_hft:
+            slow_ok, slow_reason = slow_intraday_buy_allowed(for_hft=False)
+            if not slow_ok:
+                return False, slow_reason
+            if "fade" in slow_reason:
+                return True, slow_reason
         return True, "overnight_cash_deploy"
 
     if side_l in ("buy", "any") and not for_hft:

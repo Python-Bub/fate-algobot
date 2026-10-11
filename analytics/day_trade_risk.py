@@ -25,6 +25,23 @@ def _f(name: str, default: float) -> float:
         return default
 
 
+def _b(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None or raw == "":
+        return default
+    return raw.lower() in ("1", "true", "yes")
+
+
+def session_et_date() -> str:
+    """Alpaca session date (America/New_York), not the paper VM's UTC clock."""
+    try:
+        from zoneinfo import ZoneInfo
+
+        return datetime.now(ZoneInfo("America/New_York")).date().isoformat()
+    except Exception:
+        return date.today().isoformat()
+
+
 def session_start_equity() -> float:
     try:
         from alpaca_broker import get_account
@@ -38,6 +55,11 @@ def session_start_equity() -> float:
 def _state_path():
     from pathlib import Path
 
+    override = os.getenv("DAY_TRADE_SESSION_PATH", "").strip()
+    if override:
+        p = Path(override)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
     p = Path(__file__).resolve().parents[1] / "data" / "intel" / "day_trade_session.json"
     p.parent.mkdir(parents=True, exist_ok=True)
     return p
@@ -61,12 +83,43 @@ def _save_session(data: dict) -> None:
     _state_path().write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def ensure_session_anchor(equity: float) -> float:
-    """Return today's session-start equity (anchor for daily P&L)."""
-    today = date.today().isoformat()
+def _is_weekend_et(day: str | None = None) -> bool:
+    raw = str(day or session_et_date() or "")
+    try:
+        return date.fromisoformat(raw[:10]).weekday() >= 5
+    except Exception:
+        return False
+
+
+def ensure_session_anchor(equity: float, last_equity: float | None = None) -> float:
+    """Anchor today's P&L at prior close (`last_equity`) so overnight marks count.
+
+    Saturday/Sunday must not inherit Friday's close — crypto weekend marks would
+    look like a red US session and freeze leftover-cash fills.
+    """
+    today = session_et_date()
     st = _load_session()
     if st.get("date") != today or not st.get("start_equity"):
-        st = {"date": today, "start_equity": equity, "halted": False, "halt_reason": ""}
+        start = float(last_equity or 0)
+        if _is_weekend_et(today):
+            start = float(equity or 0) or start
+        if start <= 0:
+            try:
+                from alpaca_broker import get_account
+
+                acct = get_account() or {}
+                start = float(acct.get("last_equity") or 0)
+            except Exception:
+                start = 0.0
+        if start <= 0:
+            start = float(equity or 0)
+        st = {
+            "date": today,
+            "start_equity": start,
+            "halted": False,
+            "halt_reason": "",
+            "weekend_rebased": _is_weekend_et(today),
+        }
         _save_session(st)
     return float(st.get("start_equity") or equity)
 
@@ -92,9 +145,8 @@ def halt_trading(reason: str) -> None:
 
 def trading_halted() -> tuple[bool, str]:
     st = _load_session()
-    today = date.today().isoformat()
-    # Stale halt from a prior calendar day must not block forever.
-    # Also drop prior-day start_equity — keeping it skews today's loss % vs a stale anchor.
+    today = session_et_date()
+    # Stale halt from a prior ET session must not block forever.
     if st.get("date") and str(st.get("date")) != today:
         st = {"date": today, "start_equity": 0, "halted": False, "halt_reason": ""}
         _save_session(st)
@@ -103,7 +155,7 @@ def trading_halted() -> tuple[bool, str]:
     if st.get("halted"):
         reason = str(st.get("halt_reason") or "halted")
         target = _f("SESSION_EQUITY_TARGET_USD", 0)
-        if target <= 0 and "profit target" in reason.lower():
+        if target <= 0 and "profit target" in reason.lower() and "daily profit" not in reason.lower():
             st["halted"] = False
             st["halt_reason"] = ""
             _save_session(st)
@@ -112,23 +164,77 @@ def trading_halted() -> tuple[bool, str]:
     return False, ""
 
 
-def check_daily_limits(equity: float) -> tuple[bool, str]:
-    start = ensure_session_anchor(equity)
+def is_trading_halted() -> bool:
+    halted, _why = trading_halted()
+    return halted
+
+
+def check_daily_limits(equity: float, last_equity: float | None = None) -> tuple[bool, str]:
+    """Stop new buys when red, at -0.2% max loss, or at the +1.5% lock. Exits stay on."""
+    try:
+        eq = float(equity or 0)
+    except (TypeError, ValueError):
+        eq = 0.0
+    if eq < 100.0:
+        log.warning("[DAY_TRADE] skip daily limits — equity snapshot missing (%.2f)", eq)
+        return True, ""
+    start = ensure_session_anchor(eq, last_equity=last_equity)
     if start <= 0:
         return True, ""
-    pnl_pct = (equity - start) / start
-    max_loss = _f("DAY_TRADE_MAX_DAILY_LOSS_PCT", 0.02)
+    st_pre = _load_session()
+    if (
+        _is_weekend_et()
+        and not st_pre.get("weekend_rebased")
+        and eq >= 100.0
+        and start > 0
+        and (eq - start) / start <= -_f("DAILY_RED_EPS_PCT", 0.0003)
+    ):
+        log.info(
+            "[DAY_TRADE] weekend rebase start %.2f → %.2f (skip inherited Friday close)",
+            start,
+            eq,
+        )
+        st_w = dict(st_pre)
+        st_w["start_equity"] = eq
+        st_w["halted"] = False
+        st_w["halt_reason"] = ""
+        st_w["weekend_rebased"] = True
+        st_w.pop("halted_at", None)
+        _save_session(st_w)
+        start = eq
+    pnl_pct = (eq - start) / start
+    max_loss = _f("DAY_TRADE_MAX_DAILY_LOSS_PCT", 0.002)
+    profit_lock = _f("DAY_TRADE_DAILY_PROFIT_PCT", 0.015)
+    red_eps = _f("DAILY_RED_EPS_PCT", 0.0003)
+    st = _load_session()
+    reason = str(st.get("halt_reason") or "")
+
+    if profit_lock > 0 and pnl_pct >= profit_lock:
+        halt_trading(f"daily profit lock {100 * pnl_pct:.2f}% (target {100 * profit_lock:.1f}%)")
+        return False, "daily-profit-pct"
+
+    # Drop a stale/false max-loss halt once live equity is no longer through the floor.
+    if reason.startswith("max daily loss") and pnl_pct > -max_loss:
+        clear_trading_halt()
+        reason = ""
+
     if pnl_pct <= -max_loss:
         halt_trading(f"max daily loss {100 * pnl_pct:.2f}%")
         return False, "max-daily-loss"
+
+    # Transient red: block new entries, but allow a resume if the mark recovers.
+    if reason.startswith("daily red") and pnl_pct > -red_eps:
+        clear_trading_halt()
+        reason = ""
+
     target = _f("SESSION_EQUITY_TARGET_USD", 0)
-    if target > 0 and equity >= target:
+    if target > 0 and eq >= target:
         halt_trading(f"profit target ${target:,.0f} hit")
         return False, "profit-target"
-    min_target_pct = _f("DAY_TRADE_DAILY_PROFIT_PCT", 0)
-    if min_target_pct > 0 and pnl_pct >= min_target_pct:
-        halt_trading(f"daily profit {100 * pnl_pct:.2f}%")
-        return False, "daily-profit-pct"
+
+    if _b("DAILY_RED_NO_NEW_ENTRIES", True) and pnl_pct <= -red_eps:
+        halt_trading(f"daily red {100 * pnl_pct:.2f}% — no new entries")
+        return False, "daily-red"
     return True, ""
 
 
@@ -152,15 +258,22 @@ def size_position(
     qty = max(1, min(qty, cap))
     # Dollar cap: 1% stop on $72k equity used to size 389 WMT (~$45k). Risk-$ ≠ notional.
     hard_max = _f("HARD_MAX_ORDER_NOTIONAL", 0.0)
-    if hard_max <= 0:
-        hard_max = _f("DAY_TRADE_MAX_NOTIONAL", 2500.0)
-    else:
-        hard_max = min(hard_max, _f("DAY_TRADE_MAX_NOTIONAL", hard_max))
-    max_frac = min(
-        _f("MAX_SINGLE_ASSET_FRAC", 0.10),
-        _f("FORTRESS_MAX_SINGLE_FRAC", 0.10),
-    )
-    notional_cap = min(hard_max, max(0.0, equity * max_frac)) if hard_max > 0 else equity * max_frac
+    dt_max = _f("DAY_TRADE_MAX_NOTIONAL", 0.0)
+    try:
+        from analytics.buying_power import clip_ceiling_usd, load_plan
+
+        snap = load_plan() or {}
+        calc_clip = float(snap.get("day_trade_clip") or 0) or clip_ceiling_usd(equity)
+    except Exception:
+        calc_clip = equity * min(
+            _f("MAX_SINGLE_ASSET_FRAC", 0.10),
+            _f("FORTRESS_MAX_SINGLE_FRAC", 0.10),
+        )
+    if hard_max > 0 and dt_max > 0:
+        hard_max = min(hard_max, dt_max)
+    elif hard_max <= 0:
+        hard_max = dt_max
+    notional_cap = min(hard_max, calc_clip) if hard_max > 0 else calc_clip
     if notional_cap > 0 and entry_px > notional_cap * 1.02:
         return RiskDecision(False, "name-too-expensive-for-cap")
     if notional_cap > 0:

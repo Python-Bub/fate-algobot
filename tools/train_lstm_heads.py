@@ -51,7 +51,7 @@ PERMANENT_LSTM_SKIP = frozenset(
 
 
 def _pending_symbols() -> list[str]:
-    from analytics.lstm_head import has_quality_lstm_head
+    from analytics.lstm_head import has_quality_lstm_head, lstm_head_needs_upgrade
     from fortress_universe import prioritize_training_universe, symbols_paper_active_universe
     from model_trainer import training_saved_model
 
@@ -87,12 +87,12 @@ def _pending_symbols() -> list[str]:
     pending: list[str] = []
     for s in syms:
         if requeue_weak:
-            if has_quality_lstm_head(s):
+            if has_quality_lstm_head(s) and not lstm_head_needs_upgrade(s):
                 continue
         else:
             from analytics.lstm_head import has_lstm_head
 
-            if has_lstm_head(s):
+            if has_lstm_head(s) and not lstm_head_needs_upgrade(s):
                 continue
         if skip_perm:
             reason = str(failed.get(s, "")).strip()
@@ -119,13 +119,13 @@ def _train_one(sym: str) -> tuple[str, bool, str]:
         os.environ["PRICE_DATA_SOURCE"] = "yfinance"
         os.environ["FORCE_YAHOO_PRICES"] = "true"
     try:
-        from analytics.lstm_head import has_quality_lstm_head, train_lstm_head
+        from analytics.lstm_head import has_quality_lstm_head, lstm_head_needs_upgrade, train_lstm_head
         from model_trainer import build_training_frame_for_lstm, training_saved_model
 
         sym = sym.upper()
         if not training_saved_model(sym):
             return sym, False, "no_daily_model"
-        if has_quality_lstm_head(sym):
+        if has_quality_lstm_head(sym) and not lstm_head_needs_upgrade(sym):
             return sym, True, "exists"
         built = build_training_frame_for_lstm(sym)
         if built is None:

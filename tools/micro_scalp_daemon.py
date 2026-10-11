@@ -201,6 +201,23 @@ class MicroScalpEngine:
 
     def _gate(self) -> tuple[bool, str]:
         eq, dt, _bp = _account_snapshot()
+        try:
+            from analytics.day_trade_risk import check_daily_limits, trading_halted
+
+            last_eq = eq
+            try:
+                from alpaca_broker import get_account
+
+                acct = get_account() or {}
+                last_eq = float(acct.get("last_equity") or eq)
+            except Exception:
+                last_eq = eq
+            check_daily_limits(eq, last_equity=last_eq)
+            halted, why = trading_halted()
+            if halted:
+                return False, why or "daily-halt"
+        except Exception:
+            pass
         return can_attempt(
             open_scalps=len(self.open) + len(self.pending_entry),
             open_notional=self._open_notional(),
@@ -517,7 +534,17 @@ class MicroScalpEngine:
                 continue
 
             _, _, bp = _account_snapshot()
-            notional = min(self.caps.per_trade_notional, max(0.0, bp * float(os.getenv("MICRO_SCALP_BP_USE_FRAC", "0.15"))))
+            try:
+                from analytics.buying_power import load_plan
+
+                snap = load_plan() or {}
+                calc = float(snap.get("micro_scalp_clip") or 0)
+            except Exception:
+                calc = 0.0
+            notional = min(
+                self.caps.per_trade_notional,
+                calc if calc > 0 else max(0.0, bp * float(os.getenv("MICRO_SCALP_BP_USE_FRAC", "0.15"))),
+            )
             if notional < float(os.getenv("MICRO_SCALP_MIN_NOTIONAL", "200")):
                 return
             qty = max(1.0, notional / entry)

@@ -48,6 +48,7 @@ import {
   spreadOkForSession,
   sellLimitUnfillable,
   completeNbbo,
+  wantAggressiveEntry,
 } from "../obi-tape/order-pricing.js";
 import { assessQuoteHealth } from "../obi-tape/quote-health.js";
 import { AlpacaExecutor } from "../common/alpaca-exec.js";
@@ -135,6 +136,16 @@ ok("KillSwitch rolling 60s does not reset at calendar minute", () => {
   // :00 clock wall — first submit is still inside the rolling 60s window.
   assert.equal(k.reserveOrderSlot(61_000), false);
   assert.equal(k.reserveOrderSlot(119_001), true);
+});
+
+ok("KillSwitch spaces burst submits to max-per-sec", () => {
+  process.env.HFT_GLOBAL_MAX_ORDERS_PER_MIN = "0";
+  process.env.HFT_MAX_ORDERS_PER_SEC = "4";
+  const k = new KillSwitch(["AAPL"], 0, 200);
+  assert.equal(k.reserveOrderSlot(1000), true);
+  assert.equal(k.reserveOrderSlot(1000), false); // same ms burst
+  assert.equal(k.reserveOrderSlot(1249), false); // < 250ms gap
+  assert.equal(k.reserveOrderSlot(1250), true);
 });
 
 ok("KillSwitch allows 200 submits inside a rolling minute", () => {
@@ -746,6 +757,11 @@ ok("lag haircut sits out and never rounds a thin clip up to the floor", () => {
   assert.equal(clipNotional(180, 0.5), 90);
   assert.equal(clipNotional(180, 0.1), 0);
   assert.equal(clipNotional(6_400, 1), 350);
+  const prevCapZero = process.env.HFT_MAX_ORDER_NOTIONAL;
+  process.env.HFT_MAX_ORDER_NOTIONAL = "0";
+  assert.equal(clipNotional(6_400, 1), 6_400);
+  if (prevCapZero === undefined) delete process.env.HFT_MAX_ORDER_NOTIONAL;
+  else process.env.HFT_MAX_ORDER_NOTIONAL = prevCapZero;
   const sit = sizeHftClip({
     baseUsd: 6_400,
     quoteAgeMs: 2_000,
@@ -812,6 +828,27 @@ ok("aggressive IOC take crosses the ask when buy-low is off", () => {
   else process.env.HFT_BUY_LOW = prevBuy;
   if (prevAgg === undefined) delete process.env.HFT_AGGRESSIVE_ENTRY;
   else process.env.HFT_AGGRESSIVE_ENTRY = prevAgg;
+});
+
+ok("IOC TIF takes the ask even when HFT_BUY_LOW is true", () => {
+  const prevBuy = process.env.HFT_BUY_LOW;
+  const prevAgg = process.env.HFT_AGGRESSIVE_ENTRY;
+  const prevTif = process.env.HFT_LIMIT_TIF;
+  process.env.HFT_BUY_LOW = "true";
+  delete process.env.HFT_AGGRESSIVE_ENTRY;
+  process.env.HFT_LIMIT_TIF = "ioc";
+  assert.equal(wantAggressiveEntry(), true);
+  const b = new L2Book("KO");
+  b.applySnapshot([[70.00, 400]], [[70.02, 200]], Date.now());
+  const px = entryLimitPx("buy", b);
+  assert.ok(px != null);
+  assert.ok(px! >= 70.02);
+  if (prevBuy === undefined) delete process.env.HFT_BUY_LOW;
+  else process.env.HFT_BUY_LOW = prevBuy;
+  if (prevAgg === undefined) delete process.env.HFT_AGGRESSIVE_ENTRY;
+  else process.env.HFT_AGGRESSIVE_ENTRY = prevAgg;
+  if (prevTif === undefined) delete process.env.HFT_LIMIT_TIF;
+  else process.env.HFT_LIMIT_TIF = prevTif;
 });
 
 ok("fuseObiMicro does not need a tape burst", () => {

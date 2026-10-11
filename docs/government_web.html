@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AI government — Demir Ege Genc</title>
+  <style>
+    body { margin: 0; background: #140e08; color: #f4e6d4; font: 14px/1.4 ui-sans-serif, system-ui, sans-serif; }
+    header { display: flex; justify-content: space-between; align-items: flex-end; padding: 16px 20px 0; }
+    h1 { margin: 0; font-size: 22px; font-weight: 600; }
+    p { margin: 4px 0 0; color: #c9a27a; }
+    button { background: #2a1c12; color: #f4e6d4; border: 1px solid #6a3d18; padding: 6px 10px; margin-right: 8px; }
+    button.on { background: #e07020; color: #1a0e06; border-color: #e07020; }
+    svg { width: 100%; height: 560px; display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 id="title">Chair order</h1>
+      <p>Demir Ege Genc · 2,616 desks · 16 sections · size, stop, and hold, then one order</p>
+    </div>
+    <div>
+      <button id="pay" class="on" type="button">Ticket that pays</button>
+      <button id="lose" type="button">Ticket that does not pay</button>
+    </div>
+  </header>
+  <svg id="web" viewBox="0 0 1000 560" role="img" aria-label="Desks linked through section hubs to the chair"></svg>
+  <script>
+    const sections = [
+      ["treasury", 960], ["sizing", 72], ["horizon", 240], ["liquidity", 40],
+      ["commerce", 40], ["regime", 48], ["book", 28], ["defense", 80],
+      ["tape", 40], ["intelligence", 240], ["census", 440], ["justice", 40],
+      ["interior", 36], ["earnings", 36], ["execution", 36], ["opposition", 240]
+    ];
+    const orders = {
+      pay: { action: "LONG", score: 0.889 },
+      lose: { action: "FLAT", score: -0.245, veto: "treasury" }
+    };
+    let book = "pay";
+    let frame = 0;
+    const hubs = [];
+    const desks = [];
+    sections.forEach((s, i) => {
+      const ang = -Math.PI / 2 + (i / sections.length) * Math.PI * 2;
+      const hx = 500 + Math.cos(ang) * 168;
+      const hy = 250 + Math.sin(ang) * 168;
+      hubs.push({ id: s[0], x: hx, y: hy, n: s[1] });
+      const cols = Math.ceil(Math.sqrt(s[1]));
+      const spread = Math.max(1.6, Math.min(4.2, 70 / cols));
+      for (let d = 0; d < s[1]; d++) {
+        const col = d % cols;
+        const row = Math.floor(d / cols);
+        desks.push({
+          section: s[0],
+          x: hx + (col - (cols - 1) / 2) * spread,
+          y: hy + 18 + row * spread
+        });
+      }
+    });
+    const svg = document.getElementById("web");
+    function draw() {
+      const phase = frame < 24 ? 0 : frame < 56 ? 1 : frame < 88 ? 2 : frame < 116 ? 3 : 4;
+      const pulse = (frame % 28) / 28;
+      const order = orders[book];
+      document.getElementById("title").textContent =
+        "Chair order: " + (phase >= 4 ? order.action : "working") +
+        (order.veto && phase >= 4 ? " · veto " + order.veto : "");
+      const parts = ['<rect width="1000" height="560" fill="#140e08"/>'];
+      hubs.forEach((hub, i) => {
+        const next = hubs[(i + 1) % hubs.length];
+        parts.push(`<line x1="${hub.x}" y1="${hub.y}" x2="${next.x}" y2="${next.y}" stroke="${phase >= 3 ? "#e07020" : "#4a301c"}" stroke-width="${phase >= 3 ? 1.4 : 0.6}"/>`);
+        parts.push(`<line x1="${hub.x}" y1="${hub.y}" x2="500" y2="250" stroke="${phase >= 4 ? "#e07020" : "#4a301c"}" stroke-width="${phase >= 4 ? 1.6 : 0.5}"/>`);
+      });
+      desks.forEach((d) => {
+        const hub = hubs.find((h) => h.id === d.section);
+        parts.push(`<line x1="${d.x}" y1="${d.y}" x2="${hub.x}" y2="${hub.y}" stroke="${phase >= 1 ? "#e07020" : "#4a301c"}" stroke-width="0.45" opacity="${phase >= 2 ? 0.8 : 0.35}"/>`);
+        parts.push(`<circle cx="${d.x}" cy="${d.y}" r="2.3" fill="${phase >= 1 ? "#f0a050" : "#6a5038"}"/>`);
+      });
+      if (phase >= 2 && phase < 4) {
+        hubs.forEach((hub) => {
+          const x = hub.x + (500 - hub.x) * pulse;
+          const y = hub.y + (250 - hub.y) * pulse;
+          parts.push(`<circle cx="${x}" cy="${y}" r="3.5" fill="#ffb060"/>`);
+        });
+      }
+      hubs.forEach((hub) => {
+        parts.push(`<circle cx="${hub.x}" cy="${hub.y}" r="8" fill="#140e08" stroke="#e07020" stroke-width="1.5"/>`);
+        parts.push(`<text x="${hub.x}" y="${hub.y - 14}" text-anchor="middle" fill="#f4e6d4" font-size="11">${hub.id}</text>`);
+      });
+      parts.push(`<circle cx="500" cy="250" r="22" fill="${phase >= 4 ? "#e07020" : "#2a1c12"}" stroke="#e07020"/>`);
+      parts.push(`<text x="500" y="254" text-anchor="middle" fill="${phase >= 4 ? "#1a0e06" : "#f4e6d4"}" font-size="11">${phase >= 4 ? order.action : "chair"}</text>`);
+      svg.innerHTML = parts.join("");
+      frame = (frame + 1) % 140;
+      requestAnimationFrame(() => setTimeout(draw, 70));
+    }
+    document.getElementById("pay").onclick = () => { book = "pay"; frame = 0; document.getElementById("pay").className = "on"; document.getElementById("lose").className = ""; };
+    document.getElementById("lose").onclick = () => { book = "lose"; frame = 0; document.getElementById("lose").className = "on"; document.getElementById("pay").className = ""; };
+    draw();
+  </script>
+</body>
+</html>

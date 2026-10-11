@@ -13,6 +13,8 @@ Environment=PAPER_USE_FORTRESS=true
 Environment=PAPER_USE_LONGTERM=true
 Environment=SKIP_PAPER_AUTO_TRAIN=true
 Environment=NETWORK_FIRST=true
+Environment=FATE_ORDER_ROLE=gcp-paper
+Environment=KEEP_STACK_ALWAYS_ONLINE=true
 TimeoutStartSec=180
 ExecStart=/bin/bash -lc 'cd /home/demirgenc/FATE_AlgoBot && ./run_all.sh paper >> logs/gcp_paper.log 2>&1'
 

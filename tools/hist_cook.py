@@ -51,6 +51,47 @@ _COOK_UNIVERSE = (
 )
 
 
+def _cook_symbols(max_n: int) -> list[str]:
+    """Mega-caps first, then the rest of the listed universe — never a shrink of the cook set."""
+    seen: list[str] = []
+    for s in _COOK_UNIVERSE:
+        u = str(s).strip().upper()
+        if u and u not in seen:
+            seen.append(u)
+    if len(seen) >= max_n:
+        return seen[: max(1, max_n)]
+    try:
+        from universe_provider import load_universe_symbols
+
+        for s in load_universe_symbols():
+            u = str(s).strip().upper()
+            if u and u not in seen:
+                seen.append(u)
+            if len(seen) >= max_n:
+                break
+    except Exception as e:
+        print(f"[HIST_COOK] universe expand skipped: {e}", flush=True)
+    return seen[: max(1, max_n)]
+
+
+def _train_hist_lstm(symbol: str) -> dict:
+    if os.getenv("HIST_COOK_TRAIN_LSTM", "true").lower() not in ("1", "true", "yes"):
+        return {"skipped": "off"}
+    os.environ.setdefault("USE_LSTM_HEAD", "true")
+    os.environ.setdefault("TRAIN_DATA_START", "2010-01-01")
+    try:
+        from analytics.lstm_head import train_lstm_head
+        from model_trainer import build_training_frame_for_lstm
+
+        built = build_training_frame_for_lstm(symbol)
+        if not built:
+            return {"skipped": "no_frame"}
+        df, cols = built
+        return train_lstm_head(symbol, df, cols, force=True)
+    except Exception as e:
+        return {"skipped": f"{type(e).__name__}:{e}"[:180]}
+
+
 def _closes(symbol: str, start: str, end: str) -> pd.DataFrame | None:
     try:
         from data_platform.market_prices import fetch_daily
@@ -209,8 +250,8 @@ def cook_symbol(
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--once", action="store_true")
-    ap.add_argument("--max-symbols", type=int, default=int(os.getenv("HIST_COOK_MAX_SYMBOLS", "80")))
-    ap.add_argument("--years", type=int, default=int(os.getenv("HIST_COOK_YEARS", "8")))
+    ap.add_argument("--max-symbols", type=int, default=int(os.getenv("HIST_COOK_MAX_SYMBOLS", "400")))
+    ap.add_argument("--years", type=int, default=int(os.getenv("HIST_COOK_YEARS", "16")))
     ap.add_argument("--stride", type=int, default=int(os.getenv("HIST_COOK_STRIDE", "1")))
     args = ap.parse_args()
     from analytics.proven_online import default_state, save_state
@@ -218,7 +259,11 @@ def main() -> int:
     end = date.today()
     start = end - timedelta(days=max(365 * max(2, args.years), 800))
     start_s, end_s = start.isoformat(), end.isoformat()
-    syms = list(_COOK_UNIVERSE)[: max(1, int(args.max_symbols))]
+    os.environ.setdefault("TRAIN_DATA_START", start_s)
+    os.environ.setdefault("NETWORK_FIRST", "true")
+    os.environ.setdefault("TRAIN_FORCE_YAHOO", "true")
+    os.environ.setdefault("USE_LSTM_HEAD", "true")
+    syms = _cook_symbols(max(1, int(args.max_symbols)))
     print(f"[HIST_COOK] proven walk-forward names={len(syms)} window={start_s}..{end_s} stride={args.stride}", flush=True)
     spy_df = _closes("SPY", start_s, end_s)
     spy = None
@@ -237,6 +282,8 @@ def main() -> int:
             rec = cook_symbol(sym, df, spy, stride=max(1, int(args.stride)), st=st)
             if rec.get("st"):
                 st = rec.pop("st")
+            lstm_rep = _train_hist_lstm(sym)
+            rec["lstm"] = lstm_rep
             rows.append(rec)
             used += 1
             if i % 8 == 0 or rec.get("n_tight"):

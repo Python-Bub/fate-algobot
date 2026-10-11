@@ -9,7 +9,7 @@
  * Size = Avellaneda–Stoikov lag×inventory haircut; sit out when haircut is thin.
  */
 import { AlpacaExecutor } from "../common/alpaca-exec.js";
-import { CFG, confidenceNotionalMult } from "../common/config.js";
+import { CFG, confidenceNotionalMult, effectiveConfidenceFloor } from "../common/config.js";
 import { canEnterBuy, logMarginSkip, marginSnapshot, resolveHftNotionalUsd } from "../common/margin-guard.js";
 import { dayTradeBuysHalted, KillSwitch } from "../common/kill-switch.js";
 import { nowNs, nsToMs } from "../common/latency.js";
@@ -213,7 +213,12 @@ export class ObiTapeSignals {
   }
 
   /** Returns true if a fire was attempted (regardless of broker result). */
-  maybeFire(book: L2Book, tape: TapeVelocity, processStartNs: bigint): boolean {
+  maybeFire(
+    book: L2Book,
+    tape: TapeVelocity,
+    processStartNs: bigint,
+    onWs = false,
+  ): boolean {
     if (process.env.HFT_OBI_ENABLED === "false" || process.env.HFT_JP_CANDLE_ONLY === "true") {
       return false;
     }
@@ -225,7 +230,7 @@ export class ObiTapeSignals {
     const mode = resolveSignalMode();
     const microOk =
       process.env.HFT_MICRO_PRICE_GATE === "false" || microPriceSupportsLong(book);
-    const { long, short } = wantsDirection(
+    const { long: wantLong, short: wantShort } = wantsDirection(
       mode,
       longOnly,
       {
@@ -235,6 +240,14 @@ export class ObiTapeSignals {
       },
       { microOk, sellToxic: process.env.HFT_VPIN_GATE !== "false" && flowIsSellToxic(book, tape) },
     );
+    let long = wantLong;
+    let short = wantShort;
+    // IEX top-of-book is often 1×1 → OBI=0, so OFI/OR never trip. Pace-fill
+    // spends leftover same-day BP up to the 200/min Alpaca cap on unheld names.
+    const paceFill = process.env.HFT_PACE_FILL === "true";
+    if (!long && !short && paceFill && longOnly) {
+      long = book.bestBid > 0 && book.bestAsk > 0 && book.bestAsk >= book.bestBid;
+    }
     if (!long && !short) return false;
     // Day-loss halt (shared with fortress): no new longs; shorts already gated by longOnly.
     if (long && dayTradeBuysHalted()) return false;
@@ -284,7 +297,8 @@ export class ObiTapeSignals {
     const strictDual = mode === "dual" && process.env.HFT_STRICT_DUAL_SIGNAL !== "false";
     const minDual = Number(process.env.HFT_MIN_DUAL_STRENGTH ?? 0.55);
     if (strictDual && (obiStrength < minDual || burstStrength < minDual)) return false;
-    const conf = signalConfidence(mode, obiStrength, burstStrength, microStrength, strictDual);
+    let conf = signalConfidence(mode, obiStrength, burstStrength, microStrength, strictDual);
+    if (paceFill) conf = Math.max(conf, effectiveConfidenceFloor());
     const minObi = Number(process.env.HFT_MIN_OBI_STRENGTH ?? 0);
     if (minObi > 0 && obiStrength < minObi) return false;
     const sizeMult = confidenceNotionalMult(conf);
