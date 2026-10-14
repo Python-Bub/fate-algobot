@@ -1641,8 +1641,17 @@ def run_fortress_pass(args) -> None:
     scan_t0 = time.monotonic()
     pass_max_sec = float(os.getenv("FORTRESS_PASS_MAX_SEC", "900") or 0)
     weekend_hold_fill = False
+    # A closed session must not spend leftover cash at a fixed 0.58. That
+    # bypasses the fit-period 95th of the 5-day head. The next equity session
+    # buys only names that clear the bar. Opt in with FORTRESS_CLOSED_IDLE_PREFILL.
+    closed_prefill = os.getenv("FORTRESS_CLOSED_IDLE_PREFILL", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
     if (
-        use_real
+        closed_prefill
+        and use_real
         and broker == "alpaca"
         and os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in ("1", "true", "yes")
     ):
@@ -1725,6 +1734,14 @@ def run_fortress_pass(args) -> None:
                     )
         except Exception as e:
             log.warning("[FORTRESS] weekend idle-cash prefill: %s", e)
+    elif (
+        use_real
+        and broker == "alpaca"
+        and os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in ("1", "true", "yes")
+    ):
+        log.info(
+            "[FORTRESS] closed session — cash waits for names that clear the fit-period 95th"
+        )
     bench_closes = None
     if spy is not None and not spy.empty and "Close" in spy.columns:
         bench_closes = spy["Close"].astype(float)
@@ -3101,7 +3118,16 @@ def run_fortress_pass(args) -> None:
                     except Exception as e:
                         log.debug("[GOV] %s skipped: %s", t, e)
                         gov = None
-                if gov is None or gov.get("action") == "LONG":
+                if os.getenv("FORTRESS_CRYPTO_SESSION_ONLY", "false").lower() in (
+                    "1",
+                    "true",
+                    "yes",
+                ):
+                    log.info(
+                        "[FORTRESS] skip BUY %s — closed session waits for the fit-period 95th",
+                        t,
+                    )
+                elif gov is None or gov.get("action") == "LONG":
                     buy_candidates.append(
                     {
                         "ticker": t,
