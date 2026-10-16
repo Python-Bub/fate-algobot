@@ -85,6 +85,38 @@ def fetch_account_equity() -> dict[str, Any]:
     return out
 
 
+def split_skill_delta(
+    *,
+    prev_cash: float | None,
+    prev_mv: float | None,
+    cash: float,
+    mv: float,
+    equity_delta: float,
+    prev_equity: float,
+) -> tuple[float, float]:
+    """Return (skill_delta, external_cash).
+
+    A buy or sell moves cash and position value in opposite directions, so the
+    equity change is the mark. A cash credit with a flat book (the +$20,803
+    paper step on 2026-10-13) is not a trade. A stale snapshot that jumps more
+    than 5% with no stored cash/book split is treated the same way, so the
+    next read after Sep 25's $71,872 state does not learn a +25% win.
+    """
+    if prev_cash is None or prev_mv is None:
+        if prev_equity > 0 and abs(equity_delta) > 0.05 * prev_equity:
+            return 0.0, equity_delta
+        return equity_delta, 0.0
+    cash_delta = float(cash) - float(prev_cash)
+    mv_delta = float(mv) - float(prev_mv)
+    if cash_delta * mv_delta < 0:
+        return equity_delta, 0.0
+    if abs(cash_delta) < 1.0:
+        return equity_delta, 0.0
+    if abs(mv_delta) < 1.0:
+        return 0.0, cash_delta
+    return mv_delta, cash_delta
+
+
 def record_equity_snapshot(*, source: str = "objective_engine") -> dict[str, Any]:
     acct = fetch_account_equity()
     eq = float(acct.get("equity") or 0.0)
@@ -114,15 +146,31 @@ def record_equity_snapshot(*, source: str = "objective_engine") -> dict[str, Any
     if baseline <= 0 and eq > 0:
         baseline = eq
 
-    delta = eq - prev if prev > 0 else 0.0
+    raw_delta = eq - prev if prev > 0 else 0.0
+    cash_now = float(acct.get("cash") or 0.0)
+    mv_now = float(acct.get("deployed_mv") or 0.0)
+    prev_cash = st.get("last_cash")
+    prev_mv = st.get("last_mv")
+    skill, external = split_skill_delta(
+        prev_cash=None if prev_cash is None else float(prev_cash),
+        prev_mv=None if prev_mv is None else float(prev_mv),
+        cash=cash_now,
+        mv=mv_now,
+        equity_delta=raw_delta,
+        prev_equity=prev,
+    )
+    if prev > 0 and external:
+        baseline = baseline * ((prev + external) / prev)
     growth_vs_baseline = ((eq / baseline) - 1.0) if baseline > 0 and eq > 0 else 0.0
-    growth_pct = (delta / prev) if prev > 0 else 0.0
+    growth_pct = (skill / prev) if prev > 0 else 0.0
 
     row = {
         "ts_utc": _now_iso(),
         "source": source,
         "equity": eq,
-        "delta": delta,
+        "delta": skill,
+        "raw_delta": raw_delta,
+        "external_cash": external,
         "growth_pct": growth_pct,
         "growth_vs_baseline": growth_vs_baseline,
         "objective": primary_objective(),
@@ -131,16 +179,20 @@ def record_equity_snapshot(*, source: str = "objective_engine") -> dict[str, Any
     _append_history(row)
 
     streak = int(st.get("growth_streak", 0))
-    if delta > 0:
+    if skill > 0:
         streak += 1
-    elif delta < 0:
+    elif skill < 0:
         streak = 0
 
     st.update(
         {
             "last_equity": eq,
+            "last_cash": cash_now,
+            "last_mv": mv_now,
             "baseline_equity": baseline,
-            "last_delta": delta,
+            "last_delta": skill,
+            "last_raw_delta": raw_delta,
+            "last_external_cash": external,
             "last_growth_pct": growth_pct,
             "growth_vs_baseline": growth_vs_baseline,
             "growth_streak": streak,

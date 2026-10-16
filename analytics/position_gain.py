@@ -58,6 +58,66 @@ def sane_unrealized_gain(pos: dict, price: float | None = None) -> float | None:
     return None
 
 
+def trusted_entry_price(pos: dict) -> float:
+    """Positive average entry, or 0 when the broker print is not a price.
+
+    A negative avg entry is short-flip residue. It must not become a stop,
+    a sell floor, or a heat denominator.
+    """
+    entry = _f(pos.get("avg_entry_price"))
+    return entry if entry > 0 else 0.0
+
+
+def risk_mark_price(pos: dict) -> float:
+    """Price used for stop distance. Real entry, else the live mark."""
+    entry = trusted_entry_price(pos)
+    if entry > 0:
+        return entry
+    px = _f(pos.get("current_price"))
+    return px if px > 0 else 0.0
+
+
+def open_mark_pnl(positions: list | None) -> tuple[float, int]:
+    """Sum of broker day marks. Lifetime unrealized P&L is not included."""
+    total = 0.0
+    n = 0
+    for p in positions or []:
+        raw = p.get("unrealized_intraday_pl")
+        if raw is None:
+            continue
+        n += 1
+        total += _f(raw)
+    return total, n
+
+
+def unexplained_equity_gap(
+    equity: float,
+    last_equity: float,
+    positions: list | None,
+) -> float:
+    """Account P&L minus open day marks, when the gap is too large to be trades.
+
+    The 2026-10-13 paper book jumped +$20,803 in one minute with no fill and
+    flat marks. Ordinary realized P&L stays inside 5% of prior equity and is
+    left on the account figure so a real +1.5% day still locks.
+    """
+    try:
+        last = float(last_equity or 0)
+        eq = float(equity or 0)
+    except (TypeError, ValueError):
+        return 0.0
+    if last <= 0:
+        return 0.0
+    marks, n = open_mark_pnl(positions)
+    if n <= 0:
+        return 0.0
+    gap = (eq - last) - marks
+    ceiling = max(1500.0, 0.05 * abs(last))
+    if abs(gap) <= ceiling:
+        return 0.0
+    return gap
+
+
 def is_phantom_cost_basis(pos: dict) -> bool:
     """True when reported P&L cannot be a real winner or loser."""
     if _f(pos.get("avg_entry_price")) < 0:

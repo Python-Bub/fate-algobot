@@ -169,8 +169,17 @@ def is_trading_halted() -> bool:
     return halted
 
 
-def check_daily_limits(equity: float, last_equity: float | None = None) -> tuple[bool, str]:
-    """Stop new buys when red, at -0.2% max loss, or at the +1.5% lock. Exits stay on."""
+def check_daily_limits(
+    equity: float,
+    last_equity: float | None = None,
+    *,
+    pnl_adjust: float = 0.0,
+) -> tuple[bool, str]:
+    """Stop new buys when red, at -0.2% max loss, or at the +1.5% lock. Exits stay on.
+
+    ``pnl_adjust`` is an unexplained cash credit (see ``unexplained_equity_gap``).
+    It is removed from the P&L percent only. The session anchor stays on prior close.
+    """
     try:
         eq = float(equity or 0)
     except (TypeError, ValueError):
@@ -202,7 +211,11 @@ def check_daily_limits(equity: float, last_equity: float | None = None) -> tuple
         st_w.pop("halted_at", None)
         _save_session(st_w)
         start = eq
-    pnl_pct = (eq - start) / start
+    try:
+        adjust = float(pnl_adjust or 0.0)
+    except (TypeError, ValueError):
+        adjust = 0.0
+    pnl_pct = ((eq - adjust) - start) / start
     max_loss = _f("DAY_TRADE_MAX_DAILY_LOSS_PCT", 0.002)
     profit_lock = _f("DAY_TRADE_DAILY_PROFIT_PCT", 0.015)
     red_eps = _f("DAILY_RED_EPS_PCT", 0.0003)
