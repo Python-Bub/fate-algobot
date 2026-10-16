@@ -326,10 +326,16 @@ def plan_from_account(
     micro_scalp_clip = min(ms_cap, micro_scalp_budget)
 
     leftover_day = max(0.0, dtbp - overnight_budget)
-    if fig["daily_pnl"] > 0:
-        notes.append(f"account_green_today ${fig['daily_pnl']:.0f}")
+    from analytics.position_gain import unexplained_equity_gap
+
+    credit = unexplained_equity_gap(equity, fig["last_equity"], positions or [])
+    daily_pnl = fig["daily_pnl"] - credit
+    if credit:
+        notes.append(f"ignored_unexplained_equity ${credit:.0f}")
+    if daily_pnl > 0:
+        notes.append(f"account_green_today ${daily_pnl:.0f}")
     last_eq = fig["last_equity"] or equity
-    pnl_pct = (equity - last_eq) / max(last_eq, 1e-9)
+    pnl_pct = daily_pnl / max(last_eq, 1e-9)
     profit_lock = _f("DAY_TRADE_DAILY_PROFIT_PCT", 0.015)
     red_eps = _f("DAILY_RED_EPS_PCT", 0.0003)
     no_new = False
@@ -373,7 +379,7 @@ def plan_from_account(
         leftover_day_bp=leftover_day,
         notes=notes,
         last_equity=fig["last_equity"],
-        daily_pnl=fig["daily_pnl"],
+        daily_pnl=daily_pnl,
         regt_buying_power=fig["regt_buying_power"],
     )
     if persist:

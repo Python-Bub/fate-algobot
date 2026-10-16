@@ -1,7 +1,43 @@
 """Phantom Alpaca cost basis must not look like a winner."""
 
-from analytics.position_gain import dust_close_qty, is_phantom_cost_basis, sane_unrealized_gain
+from analytics.position_gain import (
+    dust_close_qty,
+    is_phantom_cost_basis,
+    risk_mark_price,
+    sane_unrealized_gain,
+    unexplained_equity_gap,
+)
 from self_modify.policy_agent import clamp_loss_chasing
+
+
+def test_negative_entry_is_not_a_price_or_a_gain():
+    pos = {"avg_entry_price": -1115.33, "current_price": 538.44, "unrealized_plpc": 1.7}
+    assert risk_mark_price(pos) == 538.44
+
+
+def test_cash_credit_is_not_day_pnl():
+    positions = [
+        {"symbol": "MSFT", "unrealized_intraday_pl": -51.0, "avg_entry_price": -1115},
+        {"symbol": "SOLUSD", "unrealized_intraday_pl": -179.0},
+        {"symbol": "NVO", "unrealized_intraday_pl": 22.0},
+    ]
+    gap = unexplained_equity_gap(90215.42, 69412.21, positions)
+    assert gap > 20_000
+    # A real +1.6% day whose open marks match the account is not a credit.
+    assert unexplained_equity_gap(71120.0, 70000.0, [{"unrealized_intraday_pl": 1120.0}]) == 0.0
+    # No day-mark field: leave the account figure alone.
+    assert unexplained_equity_gap(90215.0, 69412.0, [{"unrealized_pl": 16000}]) == 0.0
+
+
+def test_negative_entry_does_not_inflate_heat():
+    from risk_manager import OpenLeg, RiskManager
+
+    rm = RiskManager(equity=90_000)
+    rm.legs["MSFT"] = OpenLeg("MSFT", 5476, entry=-1115.0, stop=-1080.0)
+    assert rm.current_heat() == 0.0
+    rm.legs["MSFT"] = OpenLeg("MSFT", 5476, entry=538.0, stop=538.0 * 0.97)
+    heat = rm.current_heat()
+    assert 0 < heat < 0.01
 
 
 def test_negative_entry_is_not_a_gain():

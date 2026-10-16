@@ -38,6 +38,30 @@ def test_max_loss_is_stickier_than_red():
     assert is_trading_halted() is True
 
 
+def test_unexplained_cash_credit_does_not_lock_the_day():
+    positions = [
+        {"symbol": "MSFT", "unrealized_intraday_pl": -40.0},
+        {"symbol": "META", "unrealized_intraday_pl": 180.0},
+    ]
+    plan = plan_from_account(
+        {
+            "equity": 90215.42,
+            "last_equity": 69412.21,
+            "cash": 45000.0,
+            "buying_power": 200000.0,
+            "long_market_value": 45215.0,
+        },
+        positions,
+    )
+    assert any(n.startswith("ignored_unexplained_equity") for n in plan.notes)
+    assert abs(plan.daily_pnl - 140.0) < 1.0
+    assert plan.hft_day_budget > 0
+    credit = (90215.42 - 69412.21) - plan.daily_pnl
+    ok, why = check_daily_limits(90215.42, last_equity=69412.21, pnl_adjust=credit)
+    assert ok is True
+    assert why == ""
+
+
 def test_profit_lock_at_one_point_five_percent():
     start = 70_000.0
     ok, why = check_daily_limits(start * 1.016, last_equity=start)

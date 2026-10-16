@@ -1574,7 +1574,18 @@ def run_fortress_pass(args) -> None:
             _acct_halt = _ga_halt() or {}
             live_eq = float(_acct_halt.get("equity") or rm.equity or 0)
             last_eq = float(_acct_halt.get("last_equity") or 0)
-            check_daily_limits(live_eq if live_eq >= 100.0 else float(rm.equity), last_equity=last_eq)
+            from analytics.position_gain import unexplained_equity_gap
+
+            gap = unexplained_equity_gap(
+                live_eq,
+                last_eq,
+                (portfolio_ctx or {}).get("positions") or [],
+            )
+            check_daily_limits(
+                live_eq if live_eq >= 100.0 else float(rm.equity),
+                last_equity=last_eq,
+                pnl_adjust=gap,
+            )
             halted, halt_why = trading_halted()
             if halted:
                 log.warning("[FORTRESS] BUY HALT — %s (exits/hygiene still allowed)", halt_why)

@@ -576,13 +576,18 @@ def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
             if qty <= 0:
                 continue
             mv = abs(float(p.get("market_value") or 0))
-            entry = float(p.get("avg_entry_price") or 0)
+            from analytics.position_gain import risk_mark_price
+
+            entry = risk_mark_price(p)
             if mv <= 0 and entry > 0:
                 mv = abs(qty) * entry
             gross += mv
             n += 1
-            stop = entry * (1.0 - _f("FORTRESS_SYNTHETIC_STOP_PCT", 0.03)) if entry > 0 else entry
-            rm.legs[sym] = OpenLeg(symbol=sym, notional=mv, entry=entry or mv, stop=stop)
+            stop_pct = _f("FORTRESS_SYNTHETIC_STOP_PCT", 0.03)
+            stop = entry * (1.0 - stop_pct) if entry > 0 else 0.0
+            # Notional is a dollar value, not a price. Only use it when no mark exists.
+            leg_entry = entry if entry > 0 else mv
+            rm.legs[sym] = OpenLeg(symbol=sym, notional=mv, entry=leg_entry, stop=stop)
 
         ctx["gross_mv"] = gross
         ctx["position_count"] = n

@@ -219,7 +219,11 @@ class RiskManager:
     def current_heat(self) -> float:
         risk = 0.0
         for leg in self.legs.values():
-            risk += abs(leg.entry - leg.stop) / max(leg.entry, 1e-9) * leg.notional
+            # A negative broker entry is not a price. Dividing by it
+            # (via max(entry, 1e-9)) inflates heat and blocks every new buy.
+            if leg.entry <= 0 or leg.stop <= 0:
+                continue
+            risk += abs(leg.entry - leg.stop) / leg.entry * leg.notional
         return risk / max(self.equity, 1e-9)
 
     def total_gross_exposure(self) -> float:
