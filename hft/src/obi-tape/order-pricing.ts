@@ -214,11 +214,9 @@ export function requireExitProfit(): boolean {
   return minBps > 0;
 }
 
-/** Hold losers until bid/ask crosses into profit (sub-second default). */
+/** True only when green-exit is explicitly armed. Unset used to mean "sell any green". */
 export function waitForGreenExit(): boolean {
-  if (process.env.HFT_EXIT_ON_GREEN === "false") return false;
-  if (process.env.HFT_EXIT_ON_GREEN === "true") return true;
-  return process.env.HFT_INSTANT_GREEN_EXIT !== "false";
+  return process.env.HFT_EXIT_ON_GREEN === "true";
 }
 
 /** True when the position is in the green (bid/ask past entry + optional buffer). */

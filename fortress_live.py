@@ -616,7 +616,7 @@ def _maybe_exit_alpaca(
                     return True
         # Conviction exit engine: thesis death vs noise, TP, scale-out/rotate
         try:
-            from analytics.conviction_exit import decide_exit, update_trade_quality
+            from analytics.conviction_exit import decide_exit, scale_out_qty, update_trade_quality
 
             age_m = _position_age_minutes(ticker)
             bars_proxy = None if age_m is None else max(1.0, float(age_m) / 5.0)
@@ -662,14 +662,14 @@ def _maybe_exit_alpaca(
                 return False
             if decision.action == "scale_out":
                 pos_qty = abs(float(pos.get("qty") or 0))
-                trim_qty = max(1, int(pos_qty * float(decision.trim_frac)))
-                if trim_qty >= pos_qty:
-                    trim_qty = max(1, int(pos_qty) - 1) if pos_qty >= 2 else int(pos_qty)
+                trim_qty = scale_out_qty(pos_qty, decision.trim_frac)
+                if trim_qty <= 0:
+                    return False
                 log.info(
                     "[FORTRESS] SCALE_OUT %s trim=%s/%s — %s",
                     ticker,
                     trim_qty,
-                    int(pos_qty),
+                    pos_qty,
                     decision.reason,
                 )
                 if close_position_alpaca(ticker, force=True, qty=float(trim_qty), head="fortress"):
@@ -684,7 +684,7 @@ def _maybe_exit_alpaca(
             )
         except Exception as e:
             log.debug("[FORTRESS] conviction exit %s: %s", ticker, e)
-            if gain >= tp:
+            if tp > 0 and gain >= tp:
                 log.info(
                     "[FORTRESS] TAKE-PROFIT %s gain=%.3f%% (target %.3f%%) — closing",
                     ticker,
@@ -2773,7 +2773,7 @@ def run_fortress_pass(args) -> None:
                 better_candidate_waiting=bool(
                     existing_mv > 0
                     and float(existing_gain or 0) > 0
-                    and os.getenv("FORTRESS_ROTATE_ON_PROFIT", "true").lower()
+                    and os.getenv("FORTRESS_ROTATE_ON_PROFIT", "false").lower()
                     in ("1", "true", "yes")
                 ),
             )

@@ -50,28 +50,28 @@ def test_phantom_cost_basis_is_not_earned(gate_path):
     assert "NVDA" in out["earned"]
 
 
-def test_fortress_take_profit_uses_earned_target(gate_path, monkeypatch):
+def test_fortress_take_profit_ignores_earned_cushion(gate_path, monkeypatch):
     monkeypatch.setenv("HFT_PROFIT_CUSHION_MIN_PCT", "0.003")
     monkeypatch.setenv("FORTRESS_EARNED_SELL_PCT", "0.010")
     gate_path.write_text(json.dumps({"earned": {"COST": 0.004}}))
     gate._LAST = None
-    assert gate.fortress_take_profit_pct("COST", 0.015) == pytest.approx(0.010)
+    # A green earned name must not tighten a wider target or turn 0 back on.
+    assert gate.fortress_take_profit_pct("COST", 0.015) == pytest.approx(0.015)
     assert gate.fortress_take_profit_pct("XYZ", 0.015) == pytest.approx(0.015)
-    assert gate.fortress_take_profit_pct("COST", 0.0) == pytest.approx(0.010)
+    assert gate.fortress_take_profit_pct("COST", 0.0) == pytest.approx(0.0)
     assert gate.fortress_take_profit_pct("XYZ", 0.0) == pytest.approx(0.0)
 
 
-def test_a_non_positive_take_profit_does_not_sell(monkeypatch):
+def test_a_non_positive_take_profit_does_not_sell():
     from analytics.conviction_exit import decide_exit
 
-    monkeypatch.setenv("FORTRESS_SCALE_OUT_ENABLED", "false")
-    monkeypatch.setenv("FORTRESS_ROTATE_ON_PROFIT", "false")
     off = decide_exit(
         "KO",
         p_adj=0.8,
         gain=0.04,
         take_profit_pct=0.0,
         stop_loss_pct=0.08,
+        better_candidate_waiting=True,
     )
     on = decide_exit(
         "KO",
@@ -80,5 +80,62 @@ def test_a_non_positive_take_profit_does_not_sell(monkeypatch):
         take_profit_pct=0.035,
         stop_loss_pct=0.08,
     )
+    stopped = decide_exit(
+        "KO",
+        p_adj=0.8,
+        gain=-0.09,
+        take_profit_pct=0.0,
+        stop_loss_pct=0.08,
+    )
     assert off.action == "hold"
     assert on.action == "take_profit"
+    assert stopped.action == "stop_loss"
+
+
+def test_small_green_holds_without_scale_out(monkeypatch):
+    from analytics.conviction_exit import decide_exit, scale_out_qty
+
+    monkeypatch.delenv("FORTRESS_SCALE_OUT_ENABLED", raising=False)
+    monkeypatch.delenv("FORTRESS_ROTATE_ON_PROFIT", raising=False)
+    held = decide_exit(
+        "META",
+        p_adj=0.7,
+        gain=0.02,
+        take_profit_pct=0.0,
+        stop_loss_pct=0.08,
+        better_candidate_waiting=True,
+    )
+    assert held.action == "hold"
+    assert scale_out_qty(1, 0.5) == pytest.approx(0.5)
+    assert scale_out_qty(1.7, 0.5) == pytest.approx(0.85)
+    assert scale_out_qty(0.4, 0.5) == pytest.approx(0.2)
+    assert scale_out_qty(10, 0.5) == pytest.approx(5)
+    assert scale_out_qty(3, 1.5) == pytest.approx(3)
+
+
+def test_scale_out_still_runs_when_explicitly_armed(monkeypatch):
+    from analytics.conviction_exit import decide_exit
+
+    monkeypatch.setenv("FORTRESS_SCALE_OUT_ENABLED", "true")
+    monkeypatch.setenv("FORTRESS_ROTATE_ON_PROFIT", "true")
+    monkeypatch.setenv("FORTRESS_SCALE_OUT_PCT", "0.008")
+    monkeypatch.setenv("FORTRESS_ROTATE_MIN_GAIN", "0.006")
+    scaled = decide_exit(
+        "META",
+        p_adj=0.7,
+        gain=0.02,
+        take_profit_pct=0.0,
+        stop_loss_pct=0.08,
+    )
+    rotated = decide_exit(
+        "META",
+        p_adj=0.7,
+        gain=0.007,
+        take_profit_pct=0.0,
+        stop_loss_pct=0.08,
+        better_candidate_waiting=True,
+    )
+    assert scaled.action == "scale_out"
+    assert scaled.trim_frac == pytest.approx(0.5)
+    assert rotated.action == "scale_out"
+    assert rotated.trim_frac == pytest.approx(0.4)

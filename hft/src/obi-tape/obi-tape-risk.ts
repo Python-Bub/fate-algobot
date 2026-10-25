@@ -267,21 +267,23 @@ export class ObiTapeRiskManager {
     }
     const minHoldMs = Number(process.env.HFT_OBI_MIN_HOLD_MS ?? 2000);
     const minHoldOk = heldMs >= minHoldMs;
-    if (minHoldOk && isInGreen(pos.side, pos.entryPx, book)) {
+    // Green-only flatten is opt-in. Any bid above entry was closing the lot
+    // before the tick target, then the soft-green default closed it again.
+    if (minHoldOk && waitForGreenExit() && isInGreen(pos.side, pos.entryPx, book)) {
       void this.flatten(book, pos, "tp");
       return;
     }
     if (minHoldOk && !waitForGreenExit()) {
       const favorable =
         pos.side === "buy" ? book.bestBid - pos.entryPx : pos.entryPx - book.bestAsk;
-      if (favorable >= tpTicks * tick) {
+      if (tpTicks > 0 && favorable >= tpTicks * tick) {
         void this.flatten(book, pos, "tp");
         return;
       }
     }
-    // Soft TP only when truly green (entry + min bps/ticks) — 1-tick soft exits
-    // were selling into noise and stacking losses with high RTT.
-    if (minHoldOk && process.env.HFT_SOFT_GREEN_EXIT !== "false" && isInGreen(pos.side, pos.entryPx, book)) {
+    // Soft green is opt-in too. The old default (`!== "false"`) sold the
+    // same one-tick green the block above used to sell.
+    if (minHoldOk && process.env.HFT_SOFT_GREEN_EXIT === "true" && isInGreen(pos.side, pos.entryPx, book)) {
       void this.flatten(book, pos, "tp");
       return;
     }
