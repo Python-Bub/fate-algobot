@@ -196,10 +196,11 @@ def decide_exit(
             trim_frac=1.0,
         )
 
-    # 4) Scale-out / rotate after enough profit so capital can move
+    # 4) Scale-out / rotate only when explicitly armed. The old default sold
+    # half the lot at +0.8% and 40% at +0.6% whenever another name was waiting.
     scale_pct = _f("FORTRESS_SCALE_OUT_PCT", 0.008)  # +0.8%
     rotate_pct = _f("FORTRESS_ROTATE_MIN_GAIN", 0.006)
-    if float(gain) >= scale_pct and _b("FORTRESS_SCALE_OUT_ENABLED", True):
+    if float(gain) >= scale_pct and _b("FORTRESS_SCALE_OUT_ENABLED", False):
         frac = _f("FORTRESS_SCALE_OUT_FRAC", 0.50)
         return ExitDecision(
             "scale_out",
@@ -209,7 +210,7 @@ def decide_exit(
     if (
         better_candidate_waiting
         and float(gain) >= rotate_pct
-        and _b("FORTRESS_ROTATE_ON_PROFIT", True)
+        and _b("FORTRESS_ROTATE_ON_PROFIT", False)
     ):
         frac = _f("FORTRESS_ROTATE_TRIM_FRAC", 0.40)
         return ExitDecision(
@@ -243,6 +244,25 @@ def decide_exit(
         return ExitDecision("signal_sell", f"confirmed_signal_sell p={p_adj:.3f}", trim_frac=1.0)
 
     return ExitDecision("hold", "no_exit", trim_frac=0.0)
+
+
+def scale_out_qty(pos_qty: float, trim_frac: float) -> float:
+    """Shares to sell on a scale-out. Never round a fraction up into a full lot.
+
+    ``max(1, int(qty * frac))`` dumped every 1-share and fractional name: half
+    of 1 share became 1 share. The sold quantity is exactly ``qty * frac`` and
+    never more than the position.
+    """
+    try:
+        qty = abs(float(pos_qty))
+        frac = float(trim_frac)
+    except (TypeError, ValueError):
+        return 0.0
+    if qty <= 0 or frac <= 0:
+        return 0.0
+    if frac > 1.0:
+        frac = 1.0
+    return qty * frac
 
 
 def update_trade_quality(

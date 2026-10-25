@@ -37,6 +37,7 @@ import {
   flattenDebounceMs,
   flattenQuoteOk,
   isInGreen,
+  waitForGreenExit,
   chargedSpreadBps,
   sellLimitUnfillable,
   spreadBps,
@@ -242,7 +243,13 @@ export class MicroMeanReversion {
     //    trip (the dominant churn source). Stops + max-hold above still fire
     //    immediately. Reversible via HFT_MR_MIN_HOLD_MS=0.
     const minHoldMs = Number(process.env.HFT_MR_MIN_HOLD_MS ?? 4000);
-    if (heldMs >= minHoldMs && isInGreen(pos.side, pos.entryPx, book)) {
+    // Same rule as the OBI book: a green quote is not a sell unless
+    // HFT_EXIT_ON_GREEN=true. Stops and max-hold above still run.
+    if (
+      heldMs >= minHoldMs &&
+      waitForGreenExit() &&
+      isInGreen(pos.side, pos.entryPx, book)
+    ) {
       void this.flatten(pos, debounceMs, exitMs, false);
     }
   }

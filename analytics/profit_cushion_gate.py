@@ -112,12 +112,12 @@ def is_earned(symbol: str) -> bool:
 
 
 def fortress_take_profit_pct(symbol: str, default: float) -> float:
-    """Once a leg is green enough to scalp, sell the swing at the earned target."""
-    min_pct = _env_f("HFT_PROFIT_CUSHION_MIN_PCT", 0.003)
-    earned_sell = _env_f("FORTRESS_EARNED_SELL_PCT", 0.012)
-    gain = earned_gain(symbol)
-    if gain is not None and gain >= min_pct:
-        if float(default) <= 0:
-            return earned_sell
-        return min(float(default), earned_sell)
+    """Return the configured take-profit. A non-positive target stays off.
+
+    An earned cushion used to turn a 0 target back into a ~1.2% full close,
+    and pull a wider target down to that same 1.2%. That sold winners on the
+    first green tick. The cushion still records which names are green; it
+    does not pick the exit. `symbol` is kept so callers stay unchanged.
+    """
+    _ = symbol
     return float(default)
