@@ -11,6 +11,13 @@ import os
 from pathlib import Path
 
 
+def clears_fit_bar(p_model: float | None, fit_bar: float | None) -> bool:
+    """A new buy needs both numbers, and the live probability has to clear the bar."""
+    if p_model is None or fit_bar is None:
+        return False
+    return float(p_model) >= float(fit_bar)
+
+
 def fit_percentile() -> float:
     """Confidence bar. The confirm half kept 95 and dropped 70, 80, 90, and 0.62."""
     return float(os.getenv("FATE_FIT_BAR_PERCENTILE", "95"))
