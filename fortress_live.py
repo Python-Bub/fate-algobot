@@ -3077,6 +3077,8 @@ def run_fortress_pass(args) -> None:
                     avg_down = None
                     tf = None
                 gov = None
+                fit_p = None
+                fit_bar_live = None
                 if os.getenv("USE_AI_GOVERNMENT", "true").lower() in ("1", "true", "yes"):
                     try:
                         from analytics.ai_government import convene
@@ -3105,6 +3107,8 @@ def run_fortress_pass(args) -> None:
                                 if p_model is not None and fit_bar is not None:
                                     case["p_model"] = p_model
                                     case["fit_bar"] = fit_bar
+                                    fit_p = p_model
+                                    fit_bar_live = fit_bar
                         except Exception:
                             pass
                         if tf:
@@ -3138,8 +3142,34 @@ def run_fortress_pass(args) -> None:
                         "[FORTRESS] skip BUY %s — closed session waits for the fit-period 95th",
                         t,
                     )
-                elif gov is None or gov.get("action") == "LONG":
-                    buy_candidates.append(
+                else:
+                    from analytics.model_edge import clears_fit_bar
+
+                    new_name = float(existing_mv or 0) <= 0
+                    if new_name and (fit_p is None or fit_bar_live is None):
+                        try:
+                            from analytics.model_edge import short_head_bar
+
+                            fit_p, fit_bar_live = short_head_bar(
+                                path,
+                                df,
+                                at=getattr(row, "name", None) if row is not None else None,
+                            )
+                        except Exception:
+                            fit_p, fit_bar_live = None, None
+                    gov_ok = gov is None or gov.get("action") == "LONG"
+                    # A missing bar is not a pass. The loose path bought at 0.58
+                    # and the book was red on days the market was green.
+                    bar_ok = (not new_name) or clears_fit_bar(fit_p, fit_bar_live)
+                    if new_name and not bar_ok:
+                        log.info(
+                            "[FORTRESS] skip BUY %s — below the fit-period 95th (p=%s bar=%s)",
+                            t,
+                            None if fit_p is None else round(float(fit_p), 3),
+                            None if fit_bar_live is None else round(float(fit_bar_live), 3),
+                        )
+                    elif gov_ok and bar_ok:
+                        buy_candidates.append(
                     {
                         "ticker": t,
                         "p_up": float(p_up),

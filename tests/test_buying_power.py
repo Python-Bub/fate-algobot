@@ -190,6 +190,56 @@ def test_fortress_order_notional_fills_idle_cash(monkeypatch):
     assert n <= 7_300
 
 
+def test_empty_million_hits_the_single_name_limit(monkeypatch):
+    monkeypatch.setenv("FORTRESS_MAX_POSITIONS", "10")
+    monkeypatch.setenv("MAX_LIVE_SYMBOLS", "80")
+    monkeypatch.setenv("FORTRESS_TOP_BUYS_PER_PASS", "10")
+    monkeypatch.setenv("FORTRESS_ALLOW_DCA", "false")
+    monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_FRAC", "1.0")
+    monkeypatch.setenv("FORTRESS_MAX_GROSS_FRAC", "1.0")
+    monkeypatch.setenv("FORTRESS_TARGET_DEPLOY_USE_EQUITY", "true")
+    monkeypatch.setenv("FORTRESS_SINGLE_CAP_USE_EQUITY", "true")
+    monkeypatch.setenv("FORTRESS_MAX_SINGLE_FRAC", "0.10")
+    monkeypatch.setenv("MAX_SINGLE_ASSET_FRAC", "0.10")
+    monkeypatch.setenv("MAX_SINGLE_POSITION_FRAC", "0.10")
+    monkeypatch.setenv("FORTRESS_BP_USE_FRAC", "1.0")
+    monkeypatch.setenv("USE_BUYING_POWER", "true")
+    monkeypatch.setenv("FORTRESS_EXPOSURE_USE_BP", "false")
+    monkeypatch.setenv("ORDER_NOTIONAL", "0")
+    monkeypatch.setenv("HARD_MAX_ORDER_NOTIONAL", "0")
+    monkeypatch.setenv("MAX_ORDER_NOTIONAL", "0")
+    monkeypatch.setenv("FORTRESS_GO_LIVE_MAX_NOTIONAL", "0")
+    monkeypatch.setenv("TOP100_NOTIONAL_MULT", "1.0")
+    monkeypatch.setattr("intel.downward_pressure.exit_adjustments", lambda *_a, **_k: {"pressure_score": 0.0})
+    monkeypatch.setattr("analytics.conviction_exit.conviction_size_mult", lambda *_a, **_k: 1.0)
+    monkeypatch.setattr("analytics.catalyst_horizon.max_equity_size_mult", lambda *_a, **_k: 1.0)
+    monkeypatch.setattr("fortress_universe.is_top100_equity", lambda *_a, **_k: False)
+    n = fortress_order_notional(
+        ticker="ZZZZ",
+        p_adj=0.80,
+        scale=1.0,
+        portfolio={
+            "equity": 1_000_000.0,
+            "cash": 1_000_000.0,
+            "buying_power": 4_000_000.0,
+            "gross_mv": 0.0,
+            "multiplier": 4.0,
+        },
+        existing_mv=0.0,
+        existing_gain=None,
+    )
+    assert 90_000 <= n <= 100_000
+
+
+def test_a_missing_fit_bar_does_not_clear():
+    from analytics.model_edge import clears_fit_bar
+
+    assert clears_fit_bar(None, 0.70) is False
+    assert clears_fit_bar(0.80, None) is False
+    assert clears_fit_bar(0.69, 0.70) is False
+    assert clears_fit_bar(0.70, 0.70) is True
+
+
 def test_last_wins_buying_power_calculator():
     from pathlib import Path
 

@@ -11,3 +11,4 @@ def test_closed_session_waits_for_the_fit_bar():
     assert '"p_up": 0.58' in body
     assert "cash waits for names that clear the fit-period 95th" in text
     assert "closed session waits for the fit-period 95th" in text
+    assert "below the fit-period 95th" in text
