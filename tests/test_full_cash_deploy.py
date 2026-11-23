@@ -183,12 +183,16 @@ def test_addon_on_still_refuses_red_when_winners_only(monkeypatch):
     assert can_add_position(rm, "LCID", 200.0, 5.0, 4.0, existing_mv=98.0) is False
 
 
-def test_fortress_keeps_held_idle_when_scan_scores_nothing():
+def test_fortress_drops_unscored_holds_when_scan_scores_nothing():
     from pathlib import Path
 
     text = Path(__file__).resolve().parents[1].joinpath("fortress_live.py").read_text()
     assert "skip idle-cash fill — scan scored 0 ticks this pass" not in text
-    assert "keep held idle fills" in text
+    assert "keep held idle fills" not in text
+    assert "drop unscored hold fills" in text
+    assert "already held (no fixed-0.58 resubmit)" in text
+    assert "no fit-period 95th on this ticket" in text
+    assert "tu not in scored and tu not in held" not in text
     assert "FORTRESS_CRYPTO_TICK_TIMEOUT_SEC" in text
     assert 'os.environ["FORTRESS_LITE_INTEL"] = "true"' in text
     assert "weekend idle-cash" in text

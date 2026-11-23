@@ -523,6 +523,25 @@ def close_all_short_positions() -> int:
     return closed
 
 
+def heat_leg_from_position(pos: dict) -> tuple[float, float, float]:
+    """(heat entry, stop, live mark).
+
+    A negative or missing cost basis is not a price, not heat, and not a
+    profit. The stop level is the live quote, 8% under that quote when the
+    measured stop is on. Heat ignores the leg until the broker entry is a
+    real positive price.
+    """
+    from analytics.position_gain import risk_mark_price, trusted_entry_price
+
+    real = trusted_entry_price(pos)
+    mark = risk_mark_price(pos)
+    stop_pct = _f("FORTRESS_SYNTHETIC_STOP_PCT", _f("FORTRESS_STOP_LOSS_PCT", 0.08))
+    if stop_pct <= 0:
+        stop_pct = 0.08
+    stop = mark * (1.0 - stop_pct) if mark > 0 else 0.0
+    return (real if real > 0 else 0.0), stop, mark
+
+
 def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
     """
     Refresh equity, buying power, deployed %, and risk legs from live Alpaca book.
@@ -576,17 +595,11 @@ def sync_risk_manager_from_alpaca(rm: RiskManager) -> dict:
             if qty <= 0:
                 continue
             mv = abs(float(p.get("market_value") or 0))
-            from analytics.position_gain import risk_mark_price
-
-            entry = risk_mark_price(p)
-            if mv <= 0 and entry > 0:
-                mv = abs(qty) * entry
+            leg_entry, stop, mark = heat_leg_from_position(p)
+            if mv <= 0 and mark > 0:
+                mv = abs(qty) * mark
             gross += mv
             n += 1
-            stop_pct = _f("FORTRESS_SYNTHETIC_STOP_PCT", 0.03)
-            stop = entry * (1.0 - stop_pct) if entry > 0 else 0.0
-            # Notional is a dollar value, not a price. Only use it when no mark exists.
-            leg_entry = entry if entry > 0 else mv
             rm.legs[sym] = OpenLeg(symbol=sym, notional=mv, entry=leg_entry, stop=stop)
 
         ctx["gross_mv"] = gross

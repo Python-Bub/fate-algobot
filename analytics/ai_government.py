@@ -365,7 +365,7 @@ def convene(case: dict, weights: dict | None = None, *, record: bool = True) -> 
     below_bar = has_bar and float(p_model) < float(fit_bar)
     if veto:
         action = "FLAT"
-    elif not held and below_bar:
+    elif below_bar:
         action = "FLAT"
         veto = "confidence"
     elif not has_bar and case.get("tf_agree") is not None and int(case["tf_agree"]) < 3:
@@ -567,7 +567,7 @@ def act(case: dict):
     )
     if veto:
         action = "FLAT"
-    elif not held and below_bar:
+    elif below_bar:
         action = "FLAT"
         veto = "confidence"
     elif score > 0.12:

@@ -1699,6 +1699,15 @@ def run_fortress_pass(args) -> None:
                 }
                 for t, n_add in extra.items():
                     tu = str(t).replace("/", "-").upper()
+                    # The closed-session fill was resubmitting held names at a
+                    # fixed 0.58. That is not the fit-period bar. A name already
+                    # in the book waits for a scored pass, same as a new name.
+                    if tu in by_sym:
+                        log.info(
+                            "[FORTRESS] skip closed prefill %s — already held (no fixed-0.58 resubmit)",
+                            tu,
+                        )
+                        continue
                     p = by_sym.get(tu) or {}
                     px = float(p.get("current_price") or 0)
                     if px <= 0:
@@ -3146,7 +3155,7 @@ def run_fortress_pass(args) -> None:
                     from analytics.model_edge import clears_fit_bar
 
                     new_name = float(existing_mv or 0) <= 0
-                    if new_name and (fit_p is None or fit_bar_live is None):
+                    if fit_p is None or fit_bar_live is None:
                         try:
                             from analytics.model_edge import short_head_bar
 
@@ -3158,15 +3167,16 @@ def run_fortress_pass(args) -> None:
                         except Exception:
                             fit_p, fit_bar_live = None, None
                     gov_ok = gov is None or gov.get("action") == "LONG"
-                    # A missing bar is not a pass. The loose path bought at 0.58
-                    # and the book was red on days the market was green.
-                    bar_ok = (not new_name) or clears_fit_bar(fit_p, fit_bar_live)
-                    if new_name and not bar_ok:
+                    # A missing bar is not a pass, including a name already held.
+                    # The loose path bought holds at 0.58 and stacked open orders.
+                    bar_ok = clears_fit_bar(fit_p, fit_bar_live)
+                    if not bar_ok:
                         log.info(
-                            "[FORTRESS] skip BUY %s — below the fit-period 95th (p=%s bar=%s)",
+                            "[FORTRESS] skip BUY %s — below the fit-period 95th (p=%s bar=%s held=%s)",
                             t,
                             None if fit_p is None else round(float(fit_p), 3),
                             None if fit_bar_live is None else round(float(fit_bar_live), 3),
+                            not new_name,
                         )
                     elif gov_ok and bar_ok:
                         buy_candidates.append(
@@ -3191,6 +3201,7 @@ def run_fortress_pass(args) -> None:
                         "jp_candle": candle_meta,
                         "force_priority": bool(force_priority),
                         "earnings_meta": _ep_meta,
+                        "cleared_fit_bar": True,
                         "conviction": float(abs(float(p_adj) - 0.5) * 2.0),
                         "avg_up": avg_up,
                         "avg_down": avg_down,
@@ -3596,22 +3607,14 @@ def run_fortress_pass(args) -> None:
                     scored = {
                         str(c.get("ticker") or "").upper()
                         for c in ranked
-                        if float(c.get("score") or 0) > 0
+                        if float(c.get("score") or 0) > 0 and c.get("cleared_fit_bar")
                     }
-                    held = set()
-                    for p in pos_idle:
-                        try:
-                            if float(p.get("qty") or 0) <= 0:
-                                continue
-                        except (TypeError, ValueError):
-                            continue
-                        held.add(str(p.get("symbol") or "").replace("/", "-").upper())
                     kept_idle = 0.0
                     for t, n_add in extra.items():
                         tu = str(t).upper()
-                        # Winners already in the book may take idle cash even if this
-                        # pass did not re-score them. Skip only *new* zero-score dumps.
-                        if tu not in scored and tu not in held:
+                        # A held name is not a reason to buy. Idle cash goes only
+                        # to names this pass scored through the fit-period bar.
+                        if tu not in scored:
                             log.info(
                                 "[FORTRESS] idle skip %s $%.0f — no scored edge this pass",
                                 tu,
@@ -3665,21 +3668,13 @@ def run_fortress_pass(args) -> None:
             pass
         if ranked or vec_notionals:
             log.warning(
-                "[FORTRESS] keep held idle fills — scan scored 0 ticks (ranked=%d sized=%d held=%d)",
+                "[FORTRESS] drop unscored hold fills — scan scored 0 ticks (ranked=%d sized=%d held=%d)",
                 len(ranked),
                 len(vec_notionals),
                 len(held_syms),
             )
-        ranked = [
-            c
-            for c in ranked
-            if str(c.get("ticker") or "").replace("/", "-").upper() in held_syms
-        ]
-        vec_notionals = {
-            k: v
-            for k, v in vec_notionals.items()
-            if str(k).replace("/", "-").upper() in held_syms
-        }
+        ranked = []
+        vec_notionals = {}
 
     try:
         from alpaca_broker import cancel_extra_working_buys
@@ -3694,6 +3689,12 @@ def run_fortress_pass(args) -> None:
         t = str(cand["ticker"])
         px = float(cand["px"])
         existing_mv = float(cand["existing_mv"])
+        if not cand.get("cleared_fit_bar"):
+            log.info(
+                "[FORTRESS] skip BUY %s — no fit-period 95th on this ticket (no fixed-0.58 resubmit)",
+                t,
+            )
+            continue
         allow_addon = os.getenv("FORTRESS_ALLOW_ADD_ON", "false").lower() in ("1", "true", "yes")
         allow_dca = os.getenv("FORTRESS_ALLOW_DCA", "false").lower() in ("1", "true", "yes")
         fill_idle = False
@@ -3703,6 +3704,13 @@ def run_fortress_pass(args) -> None:
             fill_idle = _idle_buy(portfolio_ctx)
         except Exception:
             fill_idle = False
+        # A held name without this pass's fit bar is the fixed-0.58 resubmit.
+        if existing_mv > 0 and not cand.get("cleared_fit_bar"):
+            log.info(
+                "[FORTRESS] skip BUY %s — already held and this pass did not clear the fit-period 95th",
+                t,
+            )
+            continue
         # Held names can still absorb idle cash up to the equity single-name cap.
         if existing_mv > 0 and not (allow_addon or allow_dca or fill_idle):
             log.info(

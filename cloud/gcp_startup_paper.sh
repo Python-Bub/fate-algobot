@@ -33,8 +33,8 @@ export SKIP_PAPER_AUTO_TRAIN=true
 export NETWORK_FIRST=true
 export FATE_ORDER_ROLE=gcp-paper
 export KEEP_STACK_ALWAYS_ONLINE=true
-export DAY_TRADE_MODE=true
-export MICRO_SCALP_ENABLED=true
+export DAY_TRADE_MODE=false
+export MICRO_SCALP_ENABLED=false
 ./run_all.sh paper >> logs/gcp_paper.log 2>&1
 ./run_all.sh paper-spare-ram >> logs/gcp_paper.log 2>&1 || true
 ./run_all.sh ensure-subsecond >> logs/gcp_paper.log 2>&1 || true
