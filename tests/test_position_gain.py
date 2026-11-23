@@ -40,6 +40,29 @@ def test_negative_entry_does_not_inflate_heat():
     assert 0 < heat < 0.01
 
 
+def test_phantom_basis_is_not_heat_and_the_stop_uses_the_live_price(monkeypatch):
+    monkeypatch.delenv("FORTRESS_SYNTHETIC_STOP_PCT", raising=False)
+    monkeypatch.delenv("FORTRESS_STOP_LOSS_PCT", raising=False)
+    from fortress_portfolio import heat_leg_from_position
+    from risk_manager import OpenLeg, RiskManager
+
+    entry, stop, mark = heat_leg_from_position(
+        {"avg_entry_price": -1115.33, "current_price": 538.44, "unrealized_plpc": 1.7}
+    )
+    assert entry == 0.0
+    assert mark == 538.44
+    assert abs(stop - 538.44 * 0.92) < 1e-6
+    rm = RiskManager(equity=90_000)
+    rm.legs["MSFT"] = OpenLeg("MSFT", 5476, entry=entry, stop=stop)
+    assert rm.current_heat() == 0.0
+    real_entry, real_stop, real_mark = heat_leg_from_position(
+        {"avg_entry_price": 100.0, "current_price": 92.0}
+    )
+    assert real_entry == 100.0
+    assert real_mark == 100.0
+    assert abs(real_stop - 92.0) < 1e-6
+
+
 def test_negative_entry_is_not_a_gain():
     pos = {"avg_entry_price": -3280.82, "unrealized_plpc": 1.1028, "current_price": 337.33}
     assert sane_unrealized_gain(pos) is None

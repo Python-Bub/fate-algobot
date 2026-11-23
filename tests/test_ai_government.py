@@ -109,6 +109,23 @@ def test_desks_work_and_the_chair_speaks_last():
     assert any(isinstance(s["work"], float) and s["work"] != 0 for s in computes)
 
 
+def test_a_held_name_below_its_fit_bar_is_not_a_buy():
+    order = convene(
+        {
+            "p_up": 0.8,
+            "avg_up": 0.02,
+            "avg_down": 0.005,
+            "exec_conf": 0.8,
+            "held": True,
+            "gain": 0.04,
+            "p_model": 0.40,
+            "fit_bar": 0.70,
+        }
+    )
+    assert order["action"] == "FLAT"
+    assert order["veto"] == "confidence"
+
+
 def test_a_model_below_its_fit_bar_is_not_a_long():
     order = convene(
         {
